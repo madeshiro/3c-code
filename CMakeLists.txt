@@ -1,4 +1,4 @@
-# 3C-CODE -- Colored and Compressed Circle CODE
+# 3C-CODE -- Colored and Compressed Circular CODE
 # Copyright (C) 2023 - Rin "madeshiro" Baudelet
 #
 # This program is free software: you can redistribute it and/or
@@ -15,7 +15,7 @@
 cmake_minimum_required(VERSION 3.23)
 project(3c-code C CXX)
 set(CMAKE_C_STANDARD 11)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 
 # Setup CTest
 include(CTest)
@@ -64,7 +64,7 @@ add_definitions(
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 
-set(3CCODE_TARGET 3C_CODE)
+set(3CCODE_TARGET 3C-code)
 
 set(SOURCES
         src/main.cc
@@ -74,27 +74,58 @@ set(HEADERS
         )
 
 set(LIBSOURCES
-        src/3ccode/3ccode.cc
-        )
+        src/code3c/3ccode.cc
+        src/code3c/displaymanager.cc
+        src/code3c/huffman.cc
+        src/code3c/bitmat.cc)
 
 set(LIBHEADERS
-        include/3ccode/3ccode.hh)
+        include/code3c/3ccode.hh
+        include/code3c/displaymanager.hh
+        include/code3c/huffman.hh
+        include/code3c/3ccodelib.hh
+        include/code3c/bitmat.hh)
+
+if(UNIX)
+    add_definitions(-DCODE3C_UNIX)
+    set(LIBSOURCES ${LIBSOURCES}
+            src/code3c/x11/X11Display.cc)
+elseif(WIN32)
+    add_definitions(-DCODE3C_WIN32)
+    set(LIBSOURCES ${LIBSOURCES}
+            src/code3c/win32/Win32Display.cc)
+endif()
+
+# Add Dependencies
+find_package(PNG REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GTK REQUIRED gtk4)
+
+set(CODE3C_DEPENDENCIES
+        PNG::PNG
+        ${GTK_LIBRARIES}
+        )
+
+include_directories(${PNG_INCLUDE_DIRS})
+include_directories(${OPENGL_INCLUDE_DIR})
+include_directories(${GTK_INCLUDE_DIRS})
+link_directories(${GTK_LIBRARY_DIR})
 
 # Setup Targets
 message("> add target {'name': '${3CCODE_TARGET}', 'type': 'library'}")
 add_library(${3CCODE_TARGET} STATIC ${LIBSOURCES} ${LIBHEADERS})
-target_link_libraries(${3CCODE_TARGET} -lpng)
+target_link_libraries(${3CCODE_TARGET} ${CODE3C_DEPENDENCIES})
 
-message("> add target {'name': '${3CCODE_TARGET}_GEN', 'type': 'executable'}")
-add_executable(${3CCODE_TARGET}_GEN ${SOURCES} ${HEADERS})
-target_link_libraries(${3CCODE_TARGET}_GEN ${3CCODE_TARGET} -lpng)
+message("> add target {'name': '${3CCODE_TARGET}_gen', 'type': 'executable'}")
+add_executable(${3CCODE_TARGET}_gen ${SOURCES} ${HEADERS})
+target_link_libraries(${3CCODE_TARGET}_gen ${3CCODE_TARGET})
 
 
 # Instanciate Test Applications
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/test")
 create_test_sourcelist(ctest_testmodule ${3CCODE_TARGET}_testmodule.cxx
         test/3c_generation.cxx
-        test/x11-opengl.cxx
+        test/x11-display.cxx
 )
 
 add_library(${3CCODE_TARGET}_testmodule ${ctest_testmodule})

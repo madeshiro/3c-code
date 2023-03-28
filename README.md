@@ -1,5 +1,5 @@
 # uca-l3\_graphicalprot
-> **3C-CODE** - _Colored and Compressed Circle Code_
+> **3C-CODE** - _Colored and Compressed Circular Code_
 
 [//]: <> (TODO readme.md)
 [![uca](https://www.uca.fr/uas/ksup/LOGO_CLAIR/UCA__Logo_head.png)]()

@@ -1,5 +1,4 @@
-/*
- * 3C-CODE Library
+/* 3C-CODE Library
  * Copyright (C) 2023 - Rin "madeshiro" Baudelet
  *
  * This program is free software: you can redistribute it and/or
@@ -14,12 +13,8 @@
  * You should have received a copy of the GNU General Public License along with this
  * program. If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef HH_LIB_3CCODE
-#define HH_LIB_3CCODE
+#ifndef HH_LIB_3CCODELIB
+#define HH_LIB_3CCODELIB
 
-namespace code3c
-{
 
-}
-
-#endif // HH_LIB_3CCODE
+#endif //HH_LIB_3CCODELIB
