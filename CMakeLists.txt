@@ -77,14 +77,16 @@ set(LIBSOURCES
         src/code3c/3ccode.cc
         src/code3c/displaymanager.cc
         src/code3c/huffman.cc
-        src/code3c/bitmat.cc)
+        src/code3c/bitmat.cc
+        src/code3c/in3ccode.cc)
 
 set(LIBHEADERS
         include/code3c/3ccode.hh
         include/code3c/displaymanager.hh
         include/code3c/huffman.hh
         include/code3c/3ccodelib.hh
-        include/code3c/bitmat.hh)
+        include/code3c/bitmat.hh
+        include/code3c/in3ccode.hh)
 
 if(UNIX)
     add_definitions(-DCODE3C_UNIX)
@@ -125,10 +127,11 @@ target_link_libraries(${3CCODE_TARGET}_gen ${3CCODE_TARGET})
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/test")
 create_test_sourcelist(ctest_testmodule ${3CCODE_TARGET}_testmodule.cxx
         test/3c_generation.cxx
-        test/x11-display.cxx
+        test/x11_display.cxx
+        test/mat_operation.cxx
 )
 
-add_library(${3CCODE_TARGET}_testmodule ${ctest_testmodule})
+add_executable(${3CCODE_TARGET}_testmodule ${ctest_testmodule})
 target_link_libraries(${3CCODE_TARGET}_testmodule ${3CCODE_TARGET})
 
 set(ctest_runtest

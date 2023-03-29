@@ -14,6 +14,12 @@ namespace code3c
     template class mat<int, 3, 1>;
     template class mat<long, 3, 1>;
     
+    template class mat<float, 4, 1>;
+    template class mat<double, 4, 1>;
+    template class mat<char, 4, 1>;
+    template class mat<int, 4, 1>;
+    template class mat<long, 4, 1>;
+    
     template class mat<float, 2, 2>;
     template class mat<double, 2, 2>;
     template class mat<char, 2, 2>;
@@ -25,6 +31,12 @@ namespace code3c
     template class mat<char, 3, 3>;
     template class mat<int, 3, 3>;
     template class mat<long, 3, 3>;
+    
+    template class mat<float, 4, 4>;
+    template class mat<double, 4, 4>;
+    template class mat<char, 4, 4>;
+    template class mat<int, 4, 4>;
+    template class mat<long, 4, 4>;
     
     template < typename T, int n, int m >
     mat<T,n,m>::mat(T default_value):
@@ -39,15 +51,17 @@ namespace code3c
     }
     
     template < typename T, int n, int m >
-    mat<T,n,m>::mat(const T ** table):
-        m_(new T*[n])
+    mat<T,n,m>::mat(T** table)
     {
+        this->m_ = table;
+        /*
         for (int i(0); i < n; i++)
         {
             m_[i] = new T[m];
             for (int j(0); j < m; j++)
                 m_[i][j] = table[i][j];
         }
+        */
     }
     
     template < typename T, int n, int m >
@@ -114,6 +128,12 @@ namespace code3c
                 if (m_[i][j] != mat1[i, j])
                     return false;
         return true;
+    }
+    
+    template < typename T, int n, int m >
+    bool mat<T,n,m>::operator!=(const mat<T, n, m> & mat1) const
+    {
+        return !operator==(mat1);
     }
     
     template < typename T, int n, int m >

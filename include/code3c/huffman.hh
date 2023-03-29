@@ -1,4 +1,5 @@
-/* 3C-CODE Library
+/*
+ * 3C-CODE Library
  * Copyright (C) 2023 - Rin "madeshiro" Baudelet
  *
  * This program is free software: you can redistribute it and/or

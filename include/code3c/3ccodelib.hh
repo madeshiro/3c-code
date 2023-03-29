@@ -1,4 +1,5 @@
-/* 3C-CODE Library
+/*
+ * 3C-CODE Library
  * Copyright (C) 2023 - Rin "madeshiro" Baudelet
  *
  * This program is free software: you can redistribute it and/or
@@ -16,5 +17,36 @@
 #ifndef HH_LIB_3CCODELIB
 #define HH_LIB_3CCODELIB
 
+/**
+ * 3C-CODE Library -=- Colored and Compressed Circular CODE
+ *
+ * @file 3ccodelib.hh
+ * @version 2023/03 0.0.1 (alpha)
+ * @author Rin "madeshiro" Baudelet
+ *
+ * ----- << OS/SPECIFICATION >> -----
+ * > support OS(arch):
+ *   - GNU/Linux distribution (64bit)
+ *   - Unix-Like distribution (64bit)
+ *
+ * > Project made with CMake (@see CMakeLists.txt)
+ * > C Standard:    c11
+ * > CXX Standard:  c++23
+ */
+#if defined(BELI_LIB_UTILSLIB)
+#   define BLUTILSLIB_DIR __declspec(dllexport)
+#else
+#   define BLUTILSLIB_DIR __declspec(dllimport)
+#endif
+
+#define CODE3C_LIB  202303001L //>! 2023/03 0.0.1
+#define CODE3C_LIB_VERSION "2023/03 v0.0.1 (3c-code lib)"
+#define CODE3C_LIB_RELEASE 0
+#define CODE3C_LIB_MAJOR   0
+#define CODE3C_LIB_MINOR   1
+
+// DEFINE CONSTANTS //
+
+#define CODE3C_PIXEL_UNIT 5 // Amount of pixel for each data unit
 
 #endif //HH_LIB_3CCODELIB

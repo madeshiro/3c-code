@@ -1,2 +1,6 @@
 # Project exclude paths
 /cmake-build-*
+
+# Temporary -- test folder to build Huffman Table File (.htf)
+/resources
+*.pdf

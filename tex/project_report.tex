@@ -1,0 +1,135 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{tocloft}
+\usepackage{amsfonts}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{makecell}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{lettrine}
+\usepackage{lipsum} 
+\usepackage{circuitikz}
+\usepackage{amsmath,scalerel}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage[hidelinks,pdftex,
+            pdfauthor={Rin Baudelet},
+            pdftitle={Réseaux II - Rapport de project :: 3C-Code},
+            pdfsubject={},
+            pdfproducer={Latex with hyperref},
+            pdfcreator={pdflatex}]{hyperref}
+\usepackage[document]{ragged2e}
+\usepackage{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage[Glenn]{fncychap}
+\usepackage{lastpage}
+\usepackage{pgfplots}
+\usepackage{graphicx}
+\usepackage{glossaries}
+
+\pgfplotsset{compat=1.17}
+\graphicspath{ {./images/} }
+
+\setcellgapes{1pt}
+\makegapedcells
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash }b{#1}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash }b{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash }b{#1}}
+
+\fancypagestyle{basic}{
+	\fancyhf{}
+	\renewcommand{\headrulewidth}{0pt}
+	\cfoot{}
+}
+
+\fancypagestyle{theannex}{
+	\fancyhf{}
+	\lhead{TP Réseaux II}
+	\rhead{R. Baudelet}
+	\chead{\textbf{Annexe}}
+	\cfoot{Page \thepage \;sur \pageref{LastPage}}
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{R. Baudelet}
+\lhead{TP Réseaux II}
+\chead{3C-CODE}
+\cfoot{Page \thepage \;sur \pageref{LastPage}}
+
+\title{Réseaux II :: 3C-CODE\\\small{2022/2023}}
+\author{Rin Baudelet}
+\date{\today}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\newcommand{\tabs}[2]{\hspace*{#2} #1 \hspace*{#2}}
+\newcommand{\citeb}[1]{[\cite{#1}]}
+
+\newcommand{\jmpP}[0]{\vspace*{6mm}}
+\newcommand{\jmpp}[0]{\vspace*{4mm}}
+\newcommand{\jmpi}[0]{\vspace*{2mm}}
+\newcommand{\midpnt}{·}
+\newcommand{\card}[1]{\vert #1 \vert}
+\newcommand{\dbleunderline}[1]{\underline{\underline{#1}}}
+
+\makenoidxglossaries
+\renewcommand*\glspostdescription{\dotfill}
+
+\newglossaryentry{gls_template}
+{
+	name=something,
+	description={the description}
+}
+
+
+\begin{document}
+\maketitle 
+\rule{\linewidth}{0.2mm}
+\begin{flushleft}
+{\large \uppercase{PROJET DE RESEAUX II} — L3 INFO} \\
+\jmpP
+{
+	\centering
+	Cours de FILL ME \hfill \textit{Arrangé et rédigé par Rin Baudelet}\\
+	<FILL.ME@uca.fr> \hfill <rin.baudelet@etu.uca.fr>
+}
+\vspace*{-3mm}
+\end{flushleft}
+\rule{\linewidth}{0.2mm}
+\tableofcontents
+\vfill
+\begin{center}
+\begin{tcolorbox}[width=126mm]
+\centering
+Ce document est sous licence by-nc-sa 4.0. \\
+Le code de la bibliothèque 3C-Code est sous licence LGPL-v3.
+\end{tcolorbox}
+\vspace*{5mm}
+%\write18{wget https://www.gnu.org/graphics/lgplv3-with-text-154x68.png}
+%\write18{wget https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png}
+\href{https://www.gnu.org/licenses/lgpl-3.0.html}{\includegraphics[scale=0.63]{lgplv3-with-text-154x68.png}}
+\hspace*{15mm}
+\href{http://creativecommons.org/licenses/by-nc-sa/4.0/}{\includegraphics{88x31.png}}
+\end{center}
+\thispagestyle{basic}
+\pagebreak
+%
+%%% CONTENTS 
+%
+\section{Description}
+
+%
+%%% THE ANNEXE %%%
+%
+\pagebreak
+\addcontentsline{toc}{section}{Annexe}
+\addcontentsline{toc}{subsection}{Liste des définitions}
+\printnoidxglossary[title=Liste des définitions,toctitle=Liste des définitions]
+\addcontentsline{toc}{subsection}{Liste des figures}
+\listoffigures
+\addcontentsline{toc}{subsection}{Liste des tables}
+\listoftables
+\thispagestyle{theannex}
+\end{document}

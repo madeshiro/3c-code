@@ -14,32 +14,18 @@
  * You should have received a copy of the GNU General Public License along with this
  * program. If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef HH_LIB_GWINDOW_3CCODE
-#define HH_LIB_GWINDOW_3CCODE
-#include "3ccodelib.hh"
-#include <png.h>
+#ifndef HH_LIB_IN3CCODE
+#define HH_LIB_IN3CCODE
+#include "3ccode.hh"
 
 namespace code3c
 {
-    class DisplayManager /* abstract */
+    class Code3CReader
     {
     public:
-        virtual ~DisplayManager() noexcept = default;
-        
-        // ? savePNG(const char* name) const;
+    
     };
+    
+} // code3c
 
-#ifdef CODE3C_UNIX
-    class X11Display final : public DisplayManager
-    {
-    public:
-        X11Display();
-        virtual ~X11Display() noexcept override;
-    };
-#endif //CODE3C_UNIX
-#ifdef CODE3C_WIN32
-
-#endif //CODE3C_WIN32
-}
-
-#endif //HH_LIB_GWINDOW_3CCODE
+#endif //HH_LIB_IN3CCODE
