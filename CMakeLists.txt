@@ -106,6 +106,7 @@ pkg_check_modules(GTK REQUIRED gtk4)
 set(CODE3C_DEPENDENCIES
         PNG::PNG
         ${GTK_LIBRARIES}
+        -lm
         )
 
 include_directories(${PNG_INCLUDE_DIRS})

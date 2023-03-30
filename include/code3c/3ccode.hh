@@ -33,6 +33,7 @@
 namespace code3c
 {
     static struct CODE3C_MODEL_DESC {
+            int model_id;
             int error_margin;
             unsigned bitl, mask;
             struct CODE3C_MODEL_DIMENSION {
@@ -41,7 +42,7 @@ namespace code3c
             } dimensions[3];
     } code3c_models[3] = {
             {
-                    7,  CODE3C_COLORMODE_WB,
+                    0, 7,  CODE3C_COLORMODE_WB,
                     {
                         {90, 15, 10, 1},
                         {180, 40, 26, 2},
@@ -49,7 +50,7 @@ namespace code3c
                     }
             },
             {
-                    11, CODE3C_COLORMODE_WB2C,
+                    1, 11, CODE3C_COLORMODE_WB2C,
                     {
                         {90, 15, 10, 1},
                         {180, 40, 26, 2},
@@ -57,7 +58,7 @@ namespace code3c
                     }
             },
             {
-                    16, CODE3C_COLORMODE_WB6C,
+                    2, 16, CODE3C_COLORMODE_WB6C,
                     {
                         {90, 15, 10, 1},
                         {180, 40, 26, 2},
@@ -70,11 +71,6 @@ namespace code3c
 #define CODE3C_MODEL_DESC_2 code3c::code3c_models[CODE3C_MODEL_2];
 #define CODE3C_MODEL_DESC_3 code3c::code3c_models[CODE3C_MODEL_3];
     
-    template < CODE3C_MODEL_DESC &cModelDesc >
-    /**
-     *
-     * @tparam cModelDesc
-     */
     class Code3C
     {
         // TODO Code3CReader x Code3C (not prior)
@@ -82,16 +78,16 @@ namespace code3c
         // template < CODE3C_MODEL_DESC::CODE3C_MODEL_DIMENSION model_dimension >
         // Code3C(matb<model_dimension.axis_t, model_dimension.axis_r>);
     public:
-        template < int axis_t, int axis_r >
-        /**
-         *
-         * @tparam axis_t
-         * @tparam axis_r
-         */
-        class Code3CData : public matb<axis_t, axis_r>
+        class Code3CData : public matb
         {
+            const CODE3C_MODEL_DESC::CODE3C_MODEL_DIMENSION& m_dimension;
+            Code3C* m_parent;
         public:
-            Code3CData(char* data) noexcept(false);
+            static const CODE3C_MODEL_DESC::CODE3C_MODEL_DIMENSION&
+                getdim(const CODE3C_MODEL_DESC&, uint32_t);
+            
+            Code3CData(Code3C* parent, const CODE3C_MODEL_DESC::CODE3C_MODEL_DIMENSION&)
+                noexcept(false);
             Code3CData(const Code3CData& mat);
             ~Code3CData() = default;
             
@@ -129,40 +125,38 @@ namespace code3c
              * Get the mask to apply
              * @return
              */
-            inline unsigned mask() const { return cModelDesc.mask; }
+            inline unsigned mask() const { return m_parent->m_desc.mask; }
             /**
              * Get the number of bits coded by each "pixel"
              * @return
              */
-            inline unsigned bitl() const { return cModelDesc.bitl; }
+            inline unsigned bitl() const { return m_parent->m_desc.bitl; }
         };
     protected:
         char* m_data;
+        size_t m_datalen;
+        Code3CData m_dataMat;
+        CODE3C_MODEL_DESC& m_desc;
         
-        /**
-         * Code3CData&lt;axis_t, axis_r&gt;
-         */
-        void *m_dataMat;
-        
-        HuffmanTable m_huftable;
-        HuffmanTree m_huftree;
+        // HuffmanTable m_huftable;
+        // HuffmanTree m_huftree;
     public:
-        Code3C(const char* buffer, size_t bufsize, uint32_t model = 2);
-        Code3C(const char* utf8str);
-        Code3C(const char32_t* unistr);
+        Code3C(const char* buffer, size_t bufsize, uint32_t model);
+        Code3C(const char* utf8str, uint32_t model);
+        Code3C(const char32_t* unistr, uint32_t model);
         Code3C(const Code3C& c3c);
         virtual ~Code3C();
         
         /**
          *
          */
-        virtual void huffman(uint32_t);
+        // virtual void huffman(uint32_t);
         
         /**
          *
          * @return
          */
-        DisplayManager* draw();
+        DisplayManager* draw() const;
         
         /**
          * Get the raw data.

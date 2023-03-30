@@ -16,194 +16,191 @@
  */
 #ifndef HH_LIB_BITMAT
 #define HH_LIB_BITMAT
+#include <math.h>
 
 namespace code3c
 {
-    template < typename T, int n, int m >
+    template < typename T >
     /**
      * 
      *
      * @tparam T type of data contains in the matrix
-     * @tparam n row size of the matrix
-     * @tparam m column size of the matrix
      */
     class mat
     {
-        T **m_;
+        int m_row, m_column;
+    protected:
+        T **m_mat;
     public:
-        mat(T default_value = 0);
-        explicit mat(T**);
-        mat(const mat<T, n, m>& obj);
+        mat(int n);
+        mat(int n, int m);
+        explicit mat(int n, T**);
+        explicit mat(int n, int m, T**);
+        mat(const mat<T>& obj);
         virtual ~mat();
+
+        virtual T determinant() const noexcept(false);
+        virtual mat<T> invert() const noexcept(false);
+
+        virtual mat<T> transposed() const;
+        virtual mat<T> submatrix(int rows[], int nrows, int columns[], int ncolomns) const;
         
-        mat<T, m, n> transposed() const;
+        virtual int n() const noexcept(true) final;
+        virtual int m() const noexcept(true) final;
         
-        T determinant() const noexcept(false);
-        mat<T, n, m> invert() const noexcept(false);
+        virtual mat<T>& operator =(const mat<T>&);
+        virtual bool operator ==(const mat<T>&) const;
+        virtual bool operator !=(const mat<T>&) const;
         
-        mat<T,n,m>& operator =(const mat<T,n,m>&);
-        bool operator ==(const mat<T,n,m>&) const;
-        bool operator !=(const mat<T,n,m>&) const;
+        virtual mat<T>  operator +(const mat<T>&);
+        virtual mat<T>& operator +=(const mat<T>&);
+        virtual mat<T>  operator -(const mat<T>&);
+        virtual mat<T>& operator -=(const mat<T>&);
+        virtual mat<T>  operator -() const;
         
-        mat<T, n, m>  operator +(const mat<T, n, m>&);
-        mat<T, n, m>& operator +=(const mat<T, n, m>&);
-        mat<T, n, m>  operator -(const mat<T, n, m>&);
-        mat<T, n, m>& operator -=(const mat<T, n, m>&);
-        mat<T, n, m>  operator -() const;
+        mat<T> operator *(T) const;
+        mat<T>  operator *(const mat<T>&) const;
+        mat<T>& operator *=(T);
+        mat<T>& operator *=(const mat<T>&);
         
-        mat<T, n, m> operator *(T) const;
-        template < int np > mat<T, n, np>  operator *(const mat<T, m, np>&) const;
-        mat<T, n, m>& operator *=(T);
-        mat<T, n, m>& operator *=(const mat<T, m, m>&);
-        
-        mat<T, n, m> operator /(T) const;
-        mat<T, n, m>  operator /(const mat<T, m, m>&) const noexcept(false);
-        mat<T, n, m>& operator /=(T);
-        mat<T, n, m>& operator /=(const mat<T, m, m>&) noexcept(false);
-        
-        mat<T, n, m> operator ~() const noexcept(false);
+        mat<T> operator /(T) const;
+        mat<T>  operator /(const mat<T>&) const noexcept(false);
+        mat<T>& operator /=(T);
+        mat<T>& operator /=(const mat<T>&) noexcept(false);
         
         T& operator[](int i, int j);
         T operator[](int i, int j) const;
+
+        virtual mat<T> operator ~() const noexcept(false);
+
+        virtual operator T() const;
     };
     
-    template < typename T, int n, int m >
-    mat<T,n,m> operator *(T val, const mat<T,n,m>& mat1)
+    template < typename T >
+    mat<T> operator *(T val, const mat<T>& mat1)
     {
         return mat1 * val;
     }
     
-    template < typename T, int n, int m >
-    mat<T,n,m> operator /(T val, const mat<T,n,m>& mat1)
+    template < typename T >
+    mat<T> operator /(T val, const mat<T>& mat1)
     {
         return mat1 / val;
     }
     
-    template < typename T, int n >
-    using vec = mat<T, n ,1>;
-    
-    
-    template < typename T > using vec2 = vec<T, 2>;
-    
-    typedef vec<float, 2>   vec2f;  /*< */
-    typedef vec<double, 2>  vec2lf; /*< */
-    typedef vec<char, 2>    vec2b;  /*< */
-    typedef vec<int, 2>     vec2d;  /*< */
-    typedef vec<long, 2>    vec2ld; /*< */
-    
-    
-    template < typename T > using vec3 = vec<T, 3>;
-    
-    typedef vec<float, 3>   vec3f;  /*< */
-    typedef vec<double, 3>  vec3lf; /*< */
-    typedef vec<char, 3>    vec3b;  /*< */
-    typedef vec<int, 3>     vec3d;  /*< */
-    typedef vec<long, 3>    vec3ld; /*< */
-    
-    
-    template < typename T >using vec4 = vec<T, 4>;
-    
-    typedef vec<float, 4>   vec4f;  /*< */
-    typedef vec<double, 4>  vec4lf; /*< */
-    typedef vec<char, 4>    vec4b;  /*< */
-    typedef vec<int, 4>     vec4d;  /*< */
-    typedef vec<long, 4>    vec4ld; /*< */
-    
-    template < int n > using vecf  = vec<float, n>  ; /*< */
-    template < int n > using veclf = vec<double, n> ; /*< */
-    template < int n > using vecb  = vec<char, n>   ; /*< */
-    template < int n > using vecd  = vec<int, n>    ; /*< */
-    template < int n > using vecld = vec<long, n>   ; /*< */
-    
-    template < typename T > using mat2 = mat<T, 2, 2>;
-    typedef mat<float, 2, 2>   mat2f;  /*< */
-    typedef mat<double, 2, 2>  mat2lf; /*< */
-    typedef mat<char, 2, 2>    mat2b;  /*< */
-    typedef mat<int, 2, 2>     mat2d;  /*< */
-    typedef mat<long, 2, 2>    mat2ld; /*< */
-    
-    template < typename T > using mat3 = mat<T, 3, 3>;
-    typedef mat<float, 3, 3>   mat3f;  /*< */
-    typedef mat<double, 3, 3>  mat3lf; /*< */
-    typedef mat<char, 3, 3>    mat3b;  /*< */
-    typedef mat<int, 3, 3>     mat3d;  /*< */
-    typedef mat<long, 3, 3>    mat3ld; /*< */
-    
-    template < typename T > using mat4 = mat<T, 4, 4>;
-    typedef mat<float, 4, 4>   mat4f;  /*< */
-    typedef mat<double, 4, 4>  mat4lf; /*< */
-    typedef mat<char, 4, 4>    mat4b;  /*< */
-    typedef mat<int, 4, 4>     mat4d;  /*< */
-    typedef mat<long, 4, 4>    mat4ld; /*< */
-    
-    template < typename T, int n >
-    mat<T, n, n> matIn()
+    template < typename T >
+    mat<T> matIn(int n)
     {
-        mat<T, n, n> matrix(0);
+        mat<T> matrix(0);
         for (int i(0); i < n; i++)
             matrix[i, i] = (T) 1;
         return matrix;
     }
     
     template < typename T >
-    inline mat<T, 2, 2> matI2()
+    inline mat<T> matI2()
     {
-        return matIn<T, 2>();
+        return matIn<T>(2);
     }
     
     template < typename T >
-    inline mat<T, 3, 3> matI3()
+    inline mat<T> matI3()
     {
-        return matIn<T, 3>();
+        return matIn<T>(3);
     }
     
     template < typename T >
-    inline mat<T, 4, 4> matI4()
+    inline mat<T> matI4()
     {
-        return matIn<T, 4>();
+        return matIn<T>(4);
+    }
+
+    template < typename T >
+    class vec : public mat<T>
+    {
+    public:
+        vec(int n);
+        vec(int n, T* _vec);
+        vec(const mat<T>& mat1) noexcept(false);
+        vec(const vec<T>& vec1);
+        virtual ~vec() override = default;
+
+        virtual vec<T>  operator +(const vec<T>&);
+        virtual vec<T>& operator +=(const vec<T>&);
+        virtual vec<T>  operator -(const vec<T>&);
+        virtual vec<T>& operator -=(const vec<T>&);
+        // virtual vec<T>  operator -() const;
+    };
+    
+    typedef mat<float>   matf;  /*< */
+    typedef mat<double>  matlf; /*< */
+    typedef mat<char>    matb;  /*< */
+    typedef mat<int>     matd;  /*< */
+    typedef mat<long>    matld; /*< */
+
+    typedef vec<float>   vecf;  /*< */
+    typedef vec<double>  veclf; /*< */
+    typedef vec<char>    vecb;  /*< */
+    typedef vec<int>     vecd;  /*< */
+    typedef vec<long>    vecld; /*< */
+
+    extern template class mat<float>;
+    extern template class mat<double>;
+    extern template class mat<char>;
+    extern template class mat<int>;
+    extern template class mat<long>;
+
+    extern template class vec<float>;
+    extern template class vec<double>;
+    extern template class vec<char>;
+    extern template class vec<int>;
+    extern template class vec<long>;
+    
+    template < typename T >
+    mat<T> mat2translation(T dx, T dy)
+    {
+        return mat<T>(3, new T[3]{
+            new T[3]{1, 0, dx},
+            new T[3]{0, 1, dy},
+            new T[3]{0, 0,  1}
+        });
     }
     
-    template < int n, int m = n > using matf  = mat<float, n, m>  ; /*< */
-    template < int n, int m = n > using matlf = mat<double, n, m> ; /*< */
-    template < int n, int m = n > using matb  = mat<char, n, m>   ; /*< */
-    template < int n, int m = n > using matd  = mat<int, n, m>    ; /*< */
-    template < int n, int m = n > using matld = mat<long, n, m>   ; /*< */
+    template < typename T >
+    mat<T> mat2dilation(T scale)
+    {
+        return mat<T>(3, new T[3] {
+            new T[3] {scale, 0, 0},
+            new T[3] {0, scale, 0},
+            new T[3] {0,     0, 1}
+        });
+    }
     
-    extern template class mat<float, 2, 1>;
-    extern template class mat<double, 2, 1>;
-    extern template class mat<char, 2, 1>;
-    extern template class mat<int, 2, 1>;
-    extern template class mat<long, 2, 1>;
+    template < typename T >
+    mat<T> mat2dilation(T scaleX, T scaleY)
+    {
+        return mat<T>(3, new T[3] {
+            new T[3] {scaleX, 0, 0},
+            new T[3] {0, scaleY, 0},
+            new T[3] {0,      0, 1}
+        });
+    }
     
-    extern template class mat<float, 3, 1>;
-    extern template class mat<double, 3, 1>;
-    extern template class mat<char, 3, 1>;
-    extern template class mat<int, 3, 1>;
-    extern template class mat<long, 3, 1>;
-    
-    extern template class mat<float, 4, 1>;
-    extern template class mat<double, 4, 1>;
-    extern template class mat<char, 4, 1>;
-    extern template class mat<int, 4, 1>;
-    extern template class mat<long, 4, 1>;
-    
-    extern template class mat<float, 2, 2>;
-    extern template class mat<double, 2, 2>;
-    extern template class mat<char, 2, 2>;
-    extern template class mat<int, 2, 2>;
-    extern template class mat<long, 2, 2>;
-    
-    extern template class mat<float, 3, 3>;
-    extern template class mat<double, 3, 3>;
-    extern template class mat<char, 3, 3>;
-    extern template class mat<int, 3, 3>;
-    extern template class mat<long, 3, 3>;
-    
-    extern template class mat<float, 4, 4>;
-    extern template class mat<double, 4, 4>;
-    extern template class mat<char, 4, 4>;
-    extern template class mat<int, 4, 4>;
-    extern template class mat<long, 4, 4>;
+    template < typename T >
+    /**
+     *
+     * @tparam T
+     * @param angle (rad)
+     * @return
+     */
+    mat<T> mat2rotate(double angle)
+    {
+        return mat<T>(3, new T[3] {
+           new T[3] {(T) cos(angle), (T) -sin(angle), (T) 0},
+           new T[3] {(T) sin(angle), (T)  cos(angle), (T) 0},
+           new T[3] {(T)          0, (T)           0, (T) 1}
+        });
+    }
 }
 
 #endif //HH_LIB_BITMAT

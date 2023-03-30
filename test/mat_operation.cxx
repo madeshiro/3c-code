@@ -62,12 +62,12 @@ int test_mat_operation(int argc [[maybe_unused]], char** argv [[maybe_unused]])
     return (int) status;
 }
 
-template < typename T, int n, int m >
-void printMatrix(const mat<T,n,m>& mat1)
+template < typename T >
+void printMatrix(const mat<T>& mat1)
 {
-    for (int i(0); i < 3; i++)
+    for (int i(0); i < mat1.n(); i++)
     {
-        for (int j(0); j < 3; j++)
+        for (int j(0); j < mat1.m(); j++)
             std::cout << mat1[i, j] << '\t';
         std::cout << std::endl;
     }
@@ -95,7 +95,7 @@ int test_mat_addition()
                     new int[3]{22,12,12},
                     new int[3]{ 4, 4, 6}
                 };
-        mat3d m1(d1), m2(d2), r12(dr12);
+        matd m1(3, 3, d1), m2(3, 3, d2), r12(3, 3, dr12);
         nbErrors += m1+m2 != r12;
     }
     
@@ -124,7 +124,7 @@ int test_mat_substraction()
                     new int[3]{18,-2, 0},
                     new int[3]{-2, 2, 4}
                 };
-        mat3d m1(d1), m2(d2), r12(dr12);
+        matd m1(3, 3, d1), m2(3, 3, d2), r12(3, 3, dr12);
         nbErrors += m1-m2 != r12;
     }
     
@@ -159,7 +159,7 @@ int test_mat_multiply()
                     new int[3]{100, 25,  30},
                     new int[3]{  5, 15,  25}
                 };
-        mat3d m1(d1), m2(d2), r12(dr12), r1d(dr1d);
+        matd m1(3, 3, d1), m2(3, 3, d2), r12(3, 3, dr12), r1d(3, 3, dr1d);
         nbErrors += m1*m2 != r12;
         nbErrors += 5*m1 != r1d;
     }
