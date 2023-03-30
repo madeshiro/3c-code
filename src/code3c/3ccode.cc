@@ -48,7 +48,7 @@ namespace code3c
                 char _byte(0);
                 for (size_t b(0); b < bitl(); b++, _byte <<= 1)
                 {
-                    _byte |= (m_parent->m_data[indexbuf] | (0b1 << b));
+                    _byte |= (m_parent->m_data[indexbuf] & (0b1 << b));
                     
                     bit++;
                     indexbuf = bit/8;
