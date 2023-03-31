@@ -3,6 +3,7 @@ image: gcc:latest
 variables:
   cmake: "cmake-3.26.2-linux-x86_64/bin/cmake"
   ctest: "cmake-3.26.2-linux-x86_64/bin/ctest"
+  build-dir: "3ccodelib-build-release"
 
 before_script:
   - apt-get update
@@ -18,19 +19,22 @@ build-lib:       # This job runs in the build stage, which runs first.
   stage: build
   artifacts:
     paths:
-      -  "3ccodelib-build-release"
-    untracked: true
+      -  "${build-dir}/"
+    untracked: false
     when: on_success
   only: 
       - master
   script:
-    - echo "Compiling the code..."
     - $cmake -B "3ccodelib-build-release" -DCMAKE_BUILD_TYPE=Release
     - $cmake --build "3ccodelib-build-release" --target all -j 3
-    - echo "Compile complete."
 
 ctest-test-job:   
   stage: test    
+  only:
+    - master
+  needs:
+    -  job: build-lib
+       artifacts: true
   dependencies:
     - "build-lib"
   script:
@@ -38,13 +42,18 @@ ctest-test-job:
 
 deploy-job:      
   stage: deploy  
+  only:
+    - master
+  needs:
+    - job: ctest-test-job
+      artifacts: false
   environment: production
   script: 
     - $cmake -B "3ccodelib-build-release" -DCMAKE_BUILD_TYPE=Release
     - $cmake --build "3ccodelib-build-release" --target all -j 3
   artifacts:
     paths:
-      - "3ccodelib-build-release/*.a"
-      - "3ccodelib-build-release/*.so"
+      - "${build-dir}/*.a"
+      - "${build-dir}/*.so"
     when: on_success
     expire_in: 30 days
