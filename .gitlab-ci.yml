@@ -1,14 +1,13 @@
 image: gcc:latest
 
+variables:
+  cmake: "cmake-3.26.2-linux-x86_64/bin/cmake"
+  ctest: "cmake-3.26.2-linux-x86_64/bin/ctest"
+
 before_script:
   - apt-get update
   - wget -nv https://github.com/Kitware/CMake/releases/download/v3.26.2/cmake-3.26.2-linux-x86_64.tar.gz
   - tar xf cmake-3.26.2-linux-x86_64.tar.gz
-  - cd cmake-3.26.2-linux-x86_64
-  - ./configure
-  - make
-  - make install
-  - cd ../
 
 stages:          # List of stages for jobs, and their order of execution
   - build
@@ -21,14 +20,14 @@ build-lib:       # This job runs in the build stage, which runs first.
       - master
   script:
     - echo "Compiling the code..."
-    - cmake -B "3ccodelib-build-release" -DCMAKE_BUILD_TYPE=Release
-    - cmake --build "3ccodelib-build-release" --target code3c -j 3
+    - $cmake -B "3ccodelib-build-release" -DCMAKE_BUILD_TYPE=Release
+    - $cmake --build "3ccodelib-build-release" --target code3c -j 3
     - echo "Compile complete."
 
 unit-test-job:   # This job runs in the test stage.
   stage: test    # It only starts when the job in the build stage completes successfully.
   script:
-    - ctest -C Release --test-dir "3ccodelib-build-release"
+    - $ctest -C Release --test-dir "3ccodelib-build-release"
 
 deploy-job:      # This job runs in the deploy stage.
   stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
