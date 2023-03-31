@@ -2,12 +2,12 @@ image: gcc:latest
 
 before_script:
   - apt-get update
-  - curl https://github.com/Kitware/CMake/releases/download/v3.26.2/cmake-3.26.2-linux-x86_64.tar.gz --output cmake.tar.gz
+  - wget https://github.com/Kitware/CMake/releases/download/v3.26.2/cmake-3.26.2-linux-x86_64.tar.gz -O cmake.tar.gz
   - tar xf cmake.tar.gz
   - cd cmake
   - ./configure
   - make
-  - sudo make install
+  - make install
   - cd ../
 
 stages:          # List of stages for jobs, and their order of execution
