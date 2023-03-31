@@ -1,7 +1,8 @@
 image: gcc:latest
 
-#before_script:
-#  - apt-get install -y cmake
+before_script:
+  - apt-get update
+  - apt-get install -y cmake
 
 stages:          # List of stages for jobs, and their order of execution
   - build
