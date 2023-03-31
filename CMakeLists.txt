@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License along with this
 # program. If not, see <https://www.gnu.org/licenses/>.
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.23)
 project(3c-code C CXX)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 23)
