@@ -21,12 +21,14 @@ build-lib:       # This job runs in the build stage, which runs first.
   script:
     - echo "Compiling the code..."
     - $cmake -B "3ccodelib-build-release" -DCMAKE_BUILD_TYPE=Release
-    - $cmake --build "3ccodelib-build-release" --target 3C-code -j 3
+    - $cmake --build "3ccodelib-build-release" --target all -j 3
     - echo "Compile complete."
 
 unit-test-job:   # This job runs in the test stage.
   stage: test    # It only starts when the job in the build stage completes successfully.
   script:
+    - $cmake -B "3ccodelib-build-release" -DCMAKE_BUILD_TYPE=Release
+    - $cmake --build "3ccodelib-build-release" --target all -j 3
     - $ctest -C Release --test-dir "3ccodelib-build-release"
 
 deploy-job:      # This job runs in the deploy stage.
