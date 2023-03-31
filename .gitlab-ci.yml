@@ -24,15 +24,21 @@ build-lib:       # This job runs in the build stage, which runs first.
     - $cmake --build "3ccodelib-build-release" --target all -j 3
     - echo "Compile complete."
 
-unit-test-job:   # This job runs in the test stage.
-  stage: test    # It only starts when the job in the build stage completes successfully.
+ctest-test-job:   
+  stage: test    
+  dependencies:
+    - "build-lib"
   script:
-    - $cmake -B "3ccodelib-build-release" -DCMAKE_BUILD_TYPE=Release
-    - $cmake --build "3ccodelib-build-release" --target all -j 3
     - $ctest -C Release --test-dir "3ccodelib-build-release"
 
-deploy-job:      # This job runs in the deploy stage.
-  stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
+deploy-job:      
+  stage: deploy  
+  dependencies:
+    - "build-lib"
   environment: production
-  script:
-    - echo "Nothing to do here..."
+  artifacts:
+    paths:
+      - "3ccodelib-build-release/*.a"
+      - "3ccodelib-build-release/*.so"
+    when: on_success
+    expire_in: 30 days
