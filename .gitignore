@@ -4,3 +4,6 @@
 # Temporary -- test folder to build Huffman Table File (.htf)
 /resources
 *.pdf
+
+# CLion IDE settings
+/.idea

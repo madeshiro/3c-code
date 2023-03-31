@@ -64,7 +64,7 @@ add_definitions(
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 
-set(3CCODE_TARGET 3C-code)
+set(3CCODE_TARGET 3ccode)
 
 set(SOURCES
         src/main.cc
@@ -101,7 +101,7 @@ endif()
 # Add Dependencies
 find_package(PNG REQUIRED)
 # find_package(PkgConfig REQUIRED)
-# pkg_check_modules(GTK REQUIRED gtk3)
+# pkg_check_modules(GTK REQUIRED gtk4)
 
 set(CODE3C_DEPENDENCIES
         PNG::PNG
@@ -115,6 +115,10 @@ include_directories(${PNG_INCLUDE_DIRS})
 # Setup Targets
 message("> add target {'name': '${3CCODE_TARGET}', 'type': 'library'}")
 add_library(${3CCODE_TARGET} STATIC ${LIBSOURCES} ${LIBHEADERS})
+add_library(${3CCODE_TARGET}.so SHARED ${LIBSOURCES} ${LIBHEADERS})
+set_target_properties(${3CCODE_TARGET}.so PROPERTIES OUTPUT_NAME ${3CCODE_TARGET})
+
+target_link_libraries(${3CCODE_TARGET} ${CODE3C_DEPENDENCIES})
 target_link_libraries(${3CCODE_TARGET} ${CODE3C_DEPENDENCIES})
 
 message("> add target {'name': '${3CCODE_TARGET}_gen', 'type': 'executable'}")
