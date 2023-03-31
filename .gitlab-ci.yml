@@ -53,7 +53,7 @@ deploy-job:
     - $cmake --build "${build_dir}" --target all -j 3
   artifacts:
     paths:
-      - "${build-dir}/*.a"
-      - "${build-dir}/*.so"
+      - "${build_dir}/*.a"
+      - "${build_dir}/*.so"
     when: on_success
     expire_in: 30 days
