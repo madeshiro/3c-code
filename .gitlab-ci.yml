@@ -33,9 +33,10 @@ ctest-test-job:
 
 deploy-job:      
   stage: deploy  
-  dependencies:
-    - "build-lib"
   environment: production
+  script: 
+    - $cmake -B "3ccodelib-build-release" -DCMAKE_BUILD_TYPE=Release
+    - $cmake --build "3ccodelib-build-release" --target all -j 3
   artifacts:
     paths:
       - "3ccodelib-build-release/*.a"
