@@ -16,6 +16,11 @@ stages:          # List of stages for jobs, and their order of execution
 
 build-lib:       # This job runs in the build stage, which runs first.
   stage: build
+  artifacts:
+    paths:
+      -  "3ccodelib-build-release"
+    untracked: true
+    when: on_success
   only: 
       - master
   script:
