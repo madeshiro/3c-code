@@ -27,7 +27,7 @@ build-lib:
   only: 
       - master
   script:
-    - $cmake -B "${build_dir}" -DCMAKE_BUILD_TYPE=Release
+    - $cmake -B "${build_dir}" -DCMAKE_BUILD_TYPE=Release -DCMAKE_ENV_GUI=False
     - $cmake --build "${build_dir}" --target all -j 3
 
 ctest-test-job:   
@@ -51,7 +51,7 @@ deploy-job:
       artifacts: false
   environment: production
   script: 
-    - $cmake -B "${build_dir}" -DCMAKE_BUILD_TYPE=Release
+    - $cmake -B "${build_dir}" -DCMAKE_BUILD_TYPE=Release -DCMAKE_ENV_GUI=False
     - $cmake --build "${build_dir}" --target all -j 3
   artifacts:
     paths:

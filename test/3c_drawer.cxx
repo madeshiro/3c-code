@@ -44,7 +44,7 @@ typedef struct /* NOLINT */
 } testFunctionMapEntry;
 
 static testFunctionMapEntry registeredFunctionEntries[] = {
-#ifdef CMAKE_CTEST_ENV_GUI
+#ifndef CMAKE_CTEST_ENV_NOGUI
         {
             "create_window",
             test_create_window,

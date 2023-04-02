@@ -132,9 +132,9 @@ target_link_libraries(${3CCODE_TARGET}_gen ${3CCODE_TARGET})
 
 # Instanciate Test Applications
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/test")
-if(${CMAKE_ENV_GUI} MATCHES TRUE)
+if(${CMAKE_ENV_GUI} MATCHES False)
     add_definitions(
-        -DCMAKE_CTEST_ENV_GUI
+        -DCMAKE_CTEST_ENV_NOGUI
     )
 endif ()
 create_test_sourcelist(ctest_testmodule ${3CCODE_TARGET}_testmodule.cxx
