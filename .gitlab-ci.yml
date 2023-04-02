@@ -7,7 +7,7 @@ variables:
 
 before_script:
   - apt-get update
-  - apt-get install libx11-dev xserver-xorg-dev xorg-dev
+  - apt-get install -y libx11-dev xserver-xorg-dev xorg-dev
   - wget -nv https://github.com/Kitware/CMake/releases/download/v3.26.2/cmake-3.26.2-linux-x86_64.tar.gz
   - tar xf cmake-3.26.2-linux-x86_64.tar.gz
 
