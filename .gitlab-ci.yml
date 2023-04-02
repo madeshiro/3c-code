@@ -7,6 +7,7 @@ variables:
 
 before_script:
   - apt-get update
+  - apt-get install libx11-dev xserver-xorg-dev xorg-dev
   - wget -nv https://github.com/Kitware/CMake/releases/download/v3.26.2/cmake-3.26.2-linux-x86_64.tar.gz
   - tar xf cmake-3.26.2-linux-x86_64.tar.gz
 
@@ -18,6 +19,7 @@ stages:          # List of stages for jobs, and their order of execution
 build-lib:
   stage: build
   artifacts:
+    expire_in: 1 hour
     paths:
       -  "${build_dir}/"
     untracked: false
@@ -38,7 +40,7 @@ ctest-test-job:
   dependencies:
     - "build-lib"
   script:
-    - $ctest -C Release --test-dir "${build_dir}"
+    - $ctest --verbose -C Release --test-dir "${build_dir}"
 
 deploy-job:      
   stage: deploy  

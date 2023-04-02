@@ -18,7 +18,7 @@
 #define HH_LIB_3CCODE
 #include <cstddef>
 #include <cstdint>
-#include "displaymanager.hh"
+#include "drawer.hh"
 #include "huffman.hh"
 #include "bitmat.hh"
 
@@ -30,19 +30,28 @@
 #define CODE3C_COLORMODE_WB2C   2, 3   /*< WHITE, BLACK AND TWO COLORS: 2bits */
 #define CODE3C_COLORMODE_WB6C   3, 7   /*< WHITE, BLACK AND SIX COLORS: 3bits */
 
+#define CODE3C_ERRLVL_A    0
+#define CODE3C_ERRLVL_B    1
+#define CODE3C_ERRLVL_C    2
+
+
 namespace code3c
 {
     static struct CODE3C_MODEL_DESC {
             int model_id;
-            int error_margin;
             unsigned bitl, mask;
             struct CODE3C_MODEL_DIMENSION {
-                int rev, absRad, effRad, deltaRad;
-                int axis_t = rev*2, axis_r = effRad/deltaRad;
+                const int rev, absRad, effRad, deltaRad;
+                const int axis_t = rev*2, axis_r = effRad/deltaRad;
+                const uint32_t capacity =
+                        axis_t*axis_r - (3*axis_r) - rev + 2;
             } dimensions[3];
+            float error_margin[3] = {
+                    .08, .15, .25
+            };
     } code3c_models[3] = {
             {
-                    0, 7,  CODE3C_COLORMODE_WB,
+                    0,  CODE3C_COLORMODE_WB,
                     {
                         {90, 15, 10, 1},
                         {180, 40, 26, 2},
@@ -50,7 +59,7 @@ namespace code3c
                     }
             },
             {
-                    1, 11, CODE3C_COLORMODE_WB2C,
+                    1, CODE3C_COLORMODE_WB2C,
                     {
                         {90, 15, 10, 1},
                         {180, 40, 26, 2},
@@ -58,7 +67,7 @@ namespace code3c
                     }
             },
             {
-                    2, 16, CODE3C_COLORMODE_WB6C,
+                    2, CODE3C_COLORMODE_WB6C,
                     {
                         {90, 15, 10, 1},
                         {180, 40, 26, 2},
@@ -84,7 +93,7 @@ namespace code3c
             Code3C* m_parent;
         public:
             static const CODE3C_MODEL_DESC::CODE3C_MODEL_DIMENSION&
-                getdim(const CODE3C_MODEL_DESC&, uint32_t);
+                getdim(const CODE3C_MODEL_DESC&, uint32_t, int err);
             
             Code3CData(Code3C* parent, const CODE3C_MODEL_DESC::CODE3C_MODEL_DIMENSION&)
                 noexcept(false);
@@ -137,13 +146,15 @@ namespace code3c
         size_t m_datalen;
         Code3CData m_dataMat;
         CODE3C_MODEL_DESC& m_desc;
+        int m_errmodel;
         
         // HuffmanTable m_huftable;
         // HuffmanTree m_huftree;
     public:
-        Code3C(const char* buffer, size_t bufsize, uint32_t model);
-        Code3C(const char* utf8str, uint32_t model);
-        Code3C(const char32_t* unistr, uint32_t model);
+        Code3C(const char* buffer, size_t bufsize, uint32_t model,
+               int err = CODE3C_ERRLVL_A);
+        Code3C(const char* utf8str, uint32_t model, int err = CODE3C_ERRLVL_A);
+        Code3C(const char32_t* unistr, uint32_t model, int err = CODE3C_ERRLVL_A);
         Code3C(const Code3C& c3c);
         virtual ~Code3C();
         
@@ -156,7 +167,7 @@ namespace code3c
          *
          * @return
          */
-        DisplayManager* draw() const;
+        Drawer* draw() const;
         
         /**
          * Get the raw data.
