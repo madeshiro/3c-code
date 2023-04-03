@@ -65,7 +65,7 @@ namespace code3c
                         {30,  50, 20, 4}, //  30 slices, 20 units, 4 units per data
                         {30,  60, 30, 2}, //  60 slices, 30 units, 2 units per data
                         {60, 100, 60, 2}, // 120 slices, 60 units, 2 units per data
-                        {90, 140, 80, 2}  // 180 slices, 80 units, 2 units per data
+                        {90, 120, 80, 2}  // 180 slices, 80 units, 2 units per data
                     }
             },
             {
@@ -74,7 +74,7 @@ namespace code3c
                         {30,  50, 20, 4}, //  30 slices, 20 units, 4 units per data
                         {30,  60, 30, 2}, //  60 slices, 30 units, 2 units per data
                         {60, 100, 60, 2}, // 120 slices, 60 units, 2 units per data
-                        {90, 140, 80, 2}  // 180 slices, 80 units, 2 units per data
+                        {90, 120, 80, 2}  // 180 slices, 80 units, 2 units per data
                     }
             }
     };

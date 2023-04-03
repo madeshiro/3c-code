@@ -40,7 +40,7 @@ namespace code3c
         int qcal1 = 1*dim.axis_t/4,
             qcal2 = 1*dim.axis_t/2,
             qcal3 = 3*dim.axis_t/4;
-        int tcal1 = 2+1*dim.axis_t/3;
+        int tcal1 = 3*dim.axis_t/8;
         
         uint64_t header(((m_parent->m_desc.model_id-1) << 2) | m_parent->m_errmodel);
         header <<= ((2*m_dimension.axis_r) - 4);
