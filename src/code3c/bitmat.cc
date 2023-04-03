@@ -1,4 +1,5 @@
 #include "include/code3c/bitmat.hh"
+#include <stdexcept>
 
 namespace code3c
 {
@@ -122,7 +123,7 @@ namespace code3c
     mat<T>& mat<T>::operator=(const mat<T> & mat1)
     {
         if (mat1.n() != n() && mat1.m() != m())
-            throw "Invalid Dimension for assignment";
+            throw std::runtime_error("Invalid Dimension for assignment");
         
         for (int i(0); i < n(); i++)
         {
@@ -219,7 +220,7 @@ namespace code3c
     mat<T> mat<T>::operator*(const mat<T> &mat1) const
     {
         if (m() != mat1.n())
-            throw "Invalid dimension for matrix multiplication";
+            throw std::runtime_error("Invalid dimension for matrix multiplication");
 
         mat<T> mat2(m_row, mat1.m_column);
         for (int i(0); i < n(); i++)
@@ -288,7 +289,8 @@ namespace code3c
     T mat<T>::determinant() const noexcept(false)
     {
         if (this->n() != this->m())
-            throw "Invalid matrix dimension (require square dim, 2x2 or higher)";
+            throw std::runtime_error(
+                    "Invalid matrix dimension (require square dim, 2x2 or higher)");
         return (T) 0; // TODO mat::determinant
     }
 
@@ -327,7 +329,7 @@ namespace code3c
         mat<T>(mat1)
     {
         if (mat1.m() != 1)
-            throw "Invalid matrix dimension";
+            throw std::runtime_error("Invalid matrix dimension");
     }
     
     template < typename T >
@@ -354,7 +356,7 @@ namespace code3c
     vec<T> vec<T>::operator+(const vec<T> & vec1)
     {
         if (vec1.n() != this->n())
-            throw "Invalid vector dimension";
+            throw std::runtime_error("Invalid vector dimension");
         vec<T> vec2(*this);
         for (int i = 0; i < this->n(); i++)
             vec2[i] += vec1[i];
@@ -365,7 +367,7 @@ namespace code3c
     vec<T>& vec<T>::operator+=(const vec<T> & vec1)
     {
         if (vec1.n() != this->n())
-            throw "Invalid vector dimension";
+            throw std::runtime_error("Invalid vector dimension");
         for (int i = 0; i < this->n(); i++)
             this->m_mat[i][0] += vec1[i];
         return *this;
@@ -375,7 +377,7 @@ namespace code3c
     vec<T> vec<T>::operator-(const vec<T> & vec1)
     {
         if (vec1.n() != this->n())
-            throw "Invalid vector dimension";
+            throw std::runtime_error("Invalid vector dimension");
         vec<T> vec2(*this);
         for (int i = 0; i < this->n(); i++)
             vec2[i] -= vec1[i];
@@ -386,7 +388,7 @@ namespace code3c
     vec<T>& vec<T>::operator-=(const vec<T> & vec1)
     {
         if (vec1.n() != this->n())
-            throw "Invalid vector dimension";
+            throw std::runtime_error("Invalid vector dimension");
         for (int i = 0; i < this->n(); i++)
             this->m_mat[i][0] -= vec1[i];
         return *this;

@@ -3,6 +3,7 @@
 #include <ctime>
 #include <cstring>
 #include <X11/Xutil.h>
+#include <stdexcept>
 
 namespace code3c
 {
@@ -33,7 +34,7 @@ namespace code3c
         XSetWMProtocols(m_display, m_window, &wmDeleteWindow, 1);
         
         if ((m_font = XLoadQueryFont(m_display, "9x15")) == nullptr)
-            throw "Unable to find \"9x15\" font";
+            throw std::runtime_error("Unable to find \"9x15\" font");
     }
     
     X11Drawer::~X11Drawer() noexcept

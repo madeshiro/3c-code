@@ -1,5 +1,6 @@
 #include "code3c/3ccode.hh"
 #include <cstring>
+#include <stdexcept>
 
 namespace code3c
 {
@@ -21,7 +22,7 @@ namespace code3c
             }
         }
         
-        throw "Overflowing dimension required !";
+        throw std::runtime_error("Overflowing dimension required !");
     }
     
     Code3C::Code3CData::Code3CData(Code3C* parent,
@@ -198,7 +199,7 @@ namespace code3c
                         return ~rgb(red, green, blue);
                     }
                     default:
-                        throw "Unsupported model";
+                        throw std::runtime_error("Unsupported model");
                 }
             }
             
