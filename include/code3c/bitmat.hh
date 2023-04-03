@@ -120,7 +120,7 @@ namespace code3c
     {
     public:
         vec(int n);
-        vec(int n, T* _vec);
+        vec(int n, T** _vec);
         vec(const mat<T>& mat1) noexcept(false);
         vec(const vec<T>& vec1);
         virtual ~vec() override = default;
@@ -130,6 +130,9 @@ namespace code3c
         virtual vec<T>  operator -(const vec<T>&);
         virtual vec<T>& operator -=(const vec<T>&);
         // virtual vec<T>  operator -() const;
+        
+        virtual T& operator[](int i);
+        virtual T operator[](int i) const;
     };
     
     typedef mat<float>   matf;  /*< */
@@ -159,7 +162,7 @@ namespace code3c
     template < typename T >
     mat<T> mat2translation(T dx, T dy)
     {
-        return mat<T>(3, new T[3]{
+        return mat<T>(3, new T*[3]{
             new T[3]{1, 0, dx},
             new T[3]{0, 1, dy},
             new T[3]{0, 0,  1}
@@ -169,7 +172,7 @@ namespace code3c
     template < typename T >
     mat<T> mat2dilation(T scale)
     {
-        return mat<T>(3, new T[3] {
+        return mat<T>(3, new T*[3] {
             new T[3] {scale, 0, 0},
             new T[3] {0, scale, 0},
             new T[3] {0,     0, 1}
@@ -179,7 +182,7 @@ namespace code3c
     template < typename T >
     mat<T> mat2dilation(T scaleX, T scaleY)
     {
-        return mat<T>(3, new T[3] {
+        return mat<T>(3, new T*[3] {
             new T[3] {scaleX, 0, 0},
             new T[3] {0, scaleY, 0},
             new T[3] {0,      0, 1}
@@ -195,10 +198,9 @@ namespace code3c
      */
     mat<T> mat2rotate(double angle)
     {
-        return mat<T>(3, new T[3] {
-           new T[3] {(T) cos(angle), (T) -sin(angle), (T) 0},
-           new T[3] {(T) sin(angle), (T)  cos(angle), (T) 0},
-           new T[3] {(T)          0, (T)           0, (T) 1}
+        return mat<T>(2, new T*[2] {
+           new T[2] {(T) cos(angle), (T) -sin(angle)},
+           new T[2] {(T) sin(angle), (T)  cos(angle)},
         });
     }
 }

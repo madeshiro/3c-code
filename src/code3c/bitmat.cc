@@ -317,8 +317,8 @@ namespace code3c
     }
     
     template < typename T >
-    vec<T>::vec(int n, T *_vec):
-        mat<T>(n, 1, &_vec)
+    vec<T>::vec(int n, T **_vec):
+        mat<T>(n, 1, _vec)
     {
     }
     
@@ -326,7 +326,7 @@ namespace code3c
     vec<T>::vec(const mat<T> &mat1) noexcept(false):
         mat<T>(mat1)
     {
-        if (mat1.m())
+        if (mat1.m() != 1)
             throw "Invalid matrix dimension";
     }
     
@@ -343,7 +343,7 @@ namespace code3c
             throw "Invalid vector dimension";
         vec<T> vec2(*this);
         for (int i = 0; i < this->n(); i++)
-            vec2[i, 0] += vec1[i, 0];
+            vec2[i] += vec1[i];
         return vec2;
     }
     
@@ -353,7 +353,7 @@ namespace code3c
         if (vec1.n() != this->n())
             throw "Invalid vector dimension";
         for (int i = 0; i < this->n(); i++)
-            this->m_mat[i][0] += vec1[i, 0];
+            this->m_mat[i][0] += vec1[i];
         return *this;
     }
     
@@ -364,7 +364,7 @@ namespace code3c
             throw "Invalid vector dimension";
         vec<T> vec2(*this);
         for (int i = 0; i < this->n(); i++)
-            vec2[i, 0] -= vec1[i, 0];
+            vec2[i] -= vec1[i];
         return vec2;
     }
     
@@ -374,7 +374,19 @@ namespace code3c
         if (vec1.n() != this->n())
             throw "Invalid vector dimension";
         for (int i = 0; i < this->n(); i++)
-            this->m_mat[i][0] -= vec1[i, 0];
+            this->m_mat[i][0] -= vec1[i];
         return *this;
+    }
+    
+    template < typename T >
+    T& vec<T>::operator[](int i)
+    {
+        return this->m_mat[i][0];
+    }
+    
+    template < typename T >
+    T vec<T>::operator[](int i) const
+    {
+        return this->m_mat[i][0];
     }
 }

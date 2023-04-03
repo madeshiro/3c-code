@@ -20,8 +20,9 @@
 #include <png.h>
 
 #ifdef CODE3C_UNIX
-#include <X11/Xlib.h>
 #include <X11/X.h>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
 #endif
 
 namespace code3c
@@ -40,16 +41,29 @@ namespace code3c
     
     class Drawer /* abstract */
     {
+    protected:
         // Display variables
         const matb& m_data;
         int m_width, m_height;
         
         // FPS management
         unsigned long m_fps = 30;
-        
+    
         // Event variables
-        int key, keyCode;
+        char key;
+        int keyCode;
         MouseEvent mouseEvent;
+        
+        /**
+         *
+         * @param _byte
+         * @param t
+         * @param r
+         */
+        virtual void draw_angle(int t);
+    private:
+        int delta_r;
+        int delta_t;
     public:
         Drawer(int width, int height, const matb& data);
         virtual ~Drawer();
@@ -71,7 +85,7 @@ namespace code3c
         virtual unsigned long frameRate() const = 0;
         
         virtual void setup() = 0;
-        virtual void loop() = 0;
+        virtual void run() = 0;
         virtual void exit() = 0;
         virtual void draw() = 0;
         
@@ -92,7 +106,10 @@ namespace code3c
         virtual void savePNG(const char* name) const = 0;
         
         /* Draw functions */
-        virtual void draw_text(const char* str, int x, int y) = 0;
+        virtual void set_color(unsigned long color) = 0;
+        virtual void draw_text(const char* str, int x, int y)  = 0;
+        virtual void draw_slice(int origin_x, int origin_y, int radius, int degree,
+                                double rotation) = 0;
     };
 
 #ifdef CODE3C_UNIX
@@ -106,9 +123,9 @@ namespace code3c
         Display *m_display;
         Window m_window;
         int m_screen;
+        Pixmap m_db; // Double Buffer
         GC m_gc;
         
-        Colormap m_colormap;
         
         // Miscellanous
         Atom wmDeleteWindow;
@@ -122,9 +139,10 @@ namespace code3c
         virtual void setHeigh(int height) override;
         virtual void setWidth(int width) override;
         
-        virtual void loop() override;
+        virtual void run() override;
         virtual void exit() override;
         virtual void clear() override;
+        virtual void cleardb();
         
         virtual unsigned long frameRate() const override;
         
@@ -135,7 +153,12 @@ namespace code3c
         
         /* draw functions */
         
+        virtual void set_color(unsigned long color) override;
         virtual void draw_text(const char* str, int x, int y) override;
+        virtual void draw_slice(int origin_x, int origin_y, int radius, int degree,
+                                double rotation) override;
+        virtual void fill_circle(int x, int y, int radius);
+        virtual void draw_line(int x1, int y1, int x2, int y2);
     };
     typedef X11Drawer Code3CDrawer;
 #endif //CODE3C_UNIX

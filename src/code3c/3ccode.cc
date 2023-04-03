@@ -26,12 +26,31 @@ namespace code3c
     {
         int range[2] = {0, 0};
         size_t bit(0), indexbuf(0);
-        size_t bufsize(((size_t)dataSegSize() << 32) | ((size_t) errSegSize()));
+        // size_t bufsize(((size_t)dataSegSize() << ((dim.axis_t/4)-2))
+        //     | ((size_t) errSegSize()));
         
-        for (int i(0); i < dim.axis_t; i++) {
-            float degree((((float) i) / ((float) dim.axis_t))*360.0f);
-            
-            if (degree == 0.0f || degree == 270.0f) {
+        int qcal1 = dim.axis_t/4,
+            qcal2 = dim.axis_t/2,
+            qcal3 = 3*dim.axis_t/4;
+        int tcal1 = dim.axis_t/3;
+        
+        uint header(((m_parent->m_desc.model_id-1) << 2) | m_parent->m_errmodel);
+        switch (parent->m_desc.model_id)
+        {
+            case CODE3C_MODEL_1:
+                header <<= 16;
+                break;
+            case CODE3C_MODEL_2:
+                header <<= 22;
+                break;
+            case CODE3C_MODEL_3:
+                header <<= 26;
+                break;
+        }
+        
+        for (int i(0); i < dim.axis_t; i++)
+        {
+            if (i == 0 || i == qcal3) {
                 // Setup Calibration (radius)
                 range[0] = 0;
                 range[1] = 0;
@@ -40,25 +59,29 @@ namespace code3c
                 {
                     this->m_mat[i][j] = 0b111 * j % 2;
                 }
-            } else if (degree <= 90.0f || (degree >= 180.0 && degree <= 270.0f)) {
+            } else if (i <= qcal1 || (i >= qcal2 && i <= qcal3)) {
                 // Setup Calibration (angle)
                 range[0] = 1;
                 range[1] = dim.axis_r;
                 
                 this->m_mat[i][0] = 0b111 * i%2;
-            } else if (degree == 135.0f) {
+            } else if (i == tcal1 || i == tcal1+1) {
                 // Set-up header
-                // TODO header writing
+                for (int j(0); j < dim.axis_r; header >>= 1, j++)
+                {
+                    this->m_mat[i][j] = header|0b1;
+                }
             } else {
                 range[0] = 0;
                 
-                if (degree > 270.0f && degree < 360.0f) {
-                    // Set-up data size's header
-                    range[1] = dim.axis_r-1;
-                    
-                } else {
+                // if (degree > 270.0f && degree < 360.0f) {
+                //     // Set-up data size's header
+                //     range[1] = dim.axis_r-1;
+                //     this->m_mat[i][dim.axis_r-1] = bufsize & 0b1;
+                //     bufsize >>= 1;
+                // } else {
                     range[1] = dim.axis_r;
-                }
+                // }
             }
             
             // Write data
@@ -77,6 +100,34 @@ namespace code3c
             }
         }
     }
+    
+    Code3C::Code3CData::Code3CData(const code3c::Code3C::Code3CData &mat):
+        Code3CData(mat.m_parent, mat.m_dimension)
+    {
+        // Nothing to do here
+    }
+    
+    char Code3C::Code3CData::getByte(uint32_t cursor [[maybe_unused]]) const
+    {
+        return '\0'; // TODO getByte(uint32_t)
+    }
+    
+    uint32_t Code3C::Code3CData::size() const
+    {
+        return dataSegSize() + errSegSize();
+    }
+    
+    uint32_t Code3C::Code3CData::dataSegSize() const
+    {
+        return m_parent->m_datalen;
+    }
+    
+    uint32_t Code3C::Code3CData::errSegSize() const
+    {
+        return 0; // TODO errSegSize()
+    }
+    
+    
     
     Code3C::Code3C(const char *buffer, size_t bufsize, uint32_t model, int err):
         m_data(new char[bufsize]), m_datalen(bufsize), m_desc(code3c_models[model]),
@@ -114,7 +165,37 @@ namespace code3c
     
     Drawer* Code3C::draw() const
     {
-        return nullptr; // TODO Code3C::draw()
+        class Code3CDrawerSample : public Code3CDrawer
+        {
+            const CODE3C_MODEL_DESC::CODE3C_MODEL_DIMENSION &modelDimension;
+        public:
+            Code3CDrawerSample(const Code3CData& cData): X11Drawer(
+                cData.getDimension().axis_r * CODE3C_PIXEL_UNIT,
+                cData.getDimension().axis_r * CODE3C_PIXEL_UNIT,
+                cData
+                ), modelDimension(cData.getDimension())
+            {
+            }
+            
+            void setup() override
+            {
+                Code3CDrawer::setTitle("Code3C Drawing Frame");
+                
+                // Draw data
+                for (int t(0); t < modelDimension.axis_t; t++)
+                    draw_angle(t);
+                
+                // Fill logo
+                fill_circle(height()/2, width()/2, (modelDimension
+                    .absRad-modelDimension.effRad)*CODE3C_PIXEL_UNIT);
+            }
+            
+            void draw() override
+            {
+            }
+        } *cDrawerSample = new Code3CDrawerSample(m_dataMat);
+        
+        return cDrawerSample;
     }
     
     char const* Code3C::data() const

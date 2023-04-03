@@ -12,7 +12,7 @@
  * PARTICULAR PURPOSE.
  *
  * Remember that the program has been done using the 3C-CODE library, licensed under
- * the LGPL-v3 licensed, see <https://www.gnu.org/licenses/> for more details.
+ * the LGPL-v3 license, see <https://www.gnu.org/licenses/> for more details.
  */
 #include <iostream>
 #include "code3c/3ccode.hh"

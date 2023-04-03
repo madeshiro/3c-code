@@ -140,6 +140,11 @@ namespace code3c
              * @return
              */
             inline unsigned bitl() const { return m_parent->m_desc.bitl; }
+            
+            inline const CODE3C_MODEL_DESC::CODE3C_MODEL_DIMENSION&
+            getDimension() const {
+                return m_dimension;
+            }
         };
     protected:
         char* m_data;
