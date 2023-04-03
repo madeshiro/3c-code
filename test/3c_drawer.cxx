@@ -61,6 +61,7 @@ Drawer * drawer;
 
 /* test functions */
 int test_create_window();
+int test_create_data();
 
 
 typedef int (*TestFunction)(void); /* NOLINT */
@@ -78,6 +79,11 @@ static testFunctionMapEntry registeredFunctionEntries[] = {
             "create_window",
             test_create_window,
             0, 0
+        },
+        {
+            "create_data",
+            test_create_data,
+            1, 0
         }
 #endif
 };
@@ -112,9 +118,8 @@ int test_3c_drawer(int argc [[maybe_unused]], char** argv [[maybe_unused]])
 
 int test_create_data()
 {
-    char buf[256];
-    scanf("%s", buf);
-    Code3C code3C(buf, CODE3C_MODEL_1);
+    Code3C code3C("https://www.google.fr/?search=ent.uca.fr/my/moodle",
+                  CODE3C_MODEL_2);
     drawer = code3C.draw();
     drawer->run();
     

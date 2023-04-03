@@ -78,18 +78,4 @@ namespace code3c
         this->setHeigh(height);
         this->setWidth(width);
     }
-    
-    void Drawer::draw_angle(int t)
-    {
-        for (int r(0); r < m_data.m(); r++)
-        {
-            char _byte(m_data[t, r]);
-            int red = 0xff * (_byte | (1 << 2));
-            int green = 0xff * (_byte | (1 << 1));
-            int blue = 0xff * (_byte | (1 << 0));
-            
-            set_color(0xffffff & ~rgb(red, green, blue));
-            //draw_slice(width() / 2, height() / 2, /**/ delta_r, delta_t);
-        }
-    }
 }

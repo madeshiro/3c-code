@@ -186,6 +186,12 @@ namespace code3c
     
     /* draw functions */
     
+    void X11Drawer::background(unsigned long color)
+    {
+        set_color(color);
+        XFillRectangle(m_display, m_db, m_gc, 0, 0, width(), height());
+    }
+    
     void X11Drawer::set_color(unsigned long color)
     {
         XSetForeground(m_display, m_gc, color);
@@ -199,14 +205,15 @@ namespace code3c
     void X11Drawer::draw_slice(int origin_x, int origin_y, int radius, int degree,
                                double rotation)
     {
+        int precision = 8;
         rotation -= (M_PI*((double)degree)/360.0);
         
-        XPoint xPoints[2*degree+2];
+        XPoint xPoints[precision*degree+2];
         veclf coord(2, new double*[2] { new double(0), new double(0) });
         
         xPoints[0] = {(short) origin_x, (short) origin_y};
-        xPoints[(2*degree)+1] = {(short) origin_x, (short) origin_y};
-        for (int _ = 1; _ <= (2*degree); _++)
+        xPoints[(precision*degree)+1] = {(short) origin_x, (short) origin_y};
+        for (int _ = 1; _ <= (precision*degree); _++)
         {
             double delta_degree = ((double) _-1)/(360.0);
             
@@ -218,8 +225,6 @@ namespace code3c
             
             xPoints[_].x = coord[0] + origin_x;
             xPoints[_].y = -coord[1] + origin_y;
-            
-            // printf("XPoint(x=%d, y=%d)\n", xPoints[_].x, xPoints[_].y);
         }
         
         XFillPolygon(m_display, m_db, m_gc, xPoints, degree+2, Convex,

@@ -47,6 +47,6 @@
 
 // DEFINE CONSTANTS //
 
-#define CODE3C_PIXEL_UNIT 5 // Amount of pixel for each data unit
+#define CODE3C_PIXEL_UNIT 4 // Amount of pixel for each data unit
 
 #endif //HH_LIB_3CCODELIB

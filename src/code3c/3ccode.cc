@@ -8,12 +8,17 @@ namespace code3c
                                    uint32_t size, int err)
     {
         int errSize = (int) (desc.error_margin[err]*size)+1;
-        int totalSize = errSize + size;
+        int totalSize = (errSize + size)*8;
         
         for (const auto& dim : desc.dimensions)
         {
-            if (totalSize <= dim.capacity)
+            if (totalSize <= desc.bitl*dim.capacity)
+            {
+                // Debug print
+                printf("Capacity is: %d bits (%dB) ",
+                       desc.bitl*dim.capacity, desc.bitl*dim.capacity/8);
                 return dim;
+            }
         }
         
         throw "Overflowing dimension required !";
@@ -24,73 +29,68 @@ namespace code3c
                                    noexcept (false):
         matb(dim.axis_t,dim.axis_r), m_dimension(dim), m_parent(parent)
     {
+        // Debug print
+        // printf("\ndata: [");
+        
         int range[2] = {0, 0};
         size_t bit(0), indexbuf(0);
         // size_t bufsize(((size_t)dataSegSize() << ((dim.axis_t/4)-2))
         //     | ((size_t) errSegSize()));
         
-        int qcal1 = dim.axis_t/4,
-            qcal2 = dim.axis_t/2,
+        int qcal1 = 1*dim.axis_t/4,
+            qcal2 = 1*dim.axis_t/2,
             qcal3 = 3*dim.axis_t/4;
-        int tcal1 = dim.axis_t/3;
+        int tcal1 = 2+1*dim.axis_t/3;
         
-        uint header(((m_parent->m_desc.model_id-1) << 2) | m_parent->m_errmodel);
-        switch (parent->m_desc.model_id)
-        {
-            case CODE3C_MODEL_1:
-                header <<= 16;
-                break;
-            case CODE3C_MODEL_2:
-                header <<= 22;
-                break;
-            case CODE3C_MODEL_3:
-                header <<= 26;
-                break;
-        }
+        uint64_t header(((m_parent->m_desc.model_id-1) << 2) | m_parent->m_errmodel);
+        header <<= ((2*m_dimension.axis_r) - 4);
+        header |= dataSegSize();
         
         for (int i(0); i < dim.axis_t; i++)
         {
-            if (i == 0 || i == qcal3) {
+            if (i == 0 || i == qcal3)
+            {
                 // Setup Calibration (radius)
                 range[0] = 0;
                 range[1] = 0;
                 
                 for (int j(0); j < dim.axis_r; j++)
                 {
-                    this->m_mat[i][j] = 0b111 * j % 2;
+                    this->m_mat[i][j] = mask() * (j % 2);
                 }
-            } else if (i <= qcal1 || (i >= qcal2 && i <= qcal3)) {
+            } else if (i <= qcal1 || (i >= qcal2 && i <= qcal3))
+            {
                 // Setup Calibration (angle)
                 range[0] = 1;
                 range[1] = dim.axis_r;
                 
-                this->m_mat[i][0] = 0b111 * i%2;
+                this->m_mat[i][0] = mask() * (i%2);
             } else if (i == tcal1 || i == tcal1+1) {
+                range[0] = 0;
+                range[1] = 0;
+                
                 // Set-up header
-                for (int j(0); j < dim.axis_r; header >>= 1, j++)
+                for (int j(0); j < dim.axis_r; j++, header>>=1)
                 {
-                    this->m_mat[i][j] = header|0b1;
+                    this->m_mat[i][j] = mask() & ~((header&0b1)*mask());
                 }
             } else {
                 range[0] = 0;
-                
-                // if (degree > 270.0f && degree < 360.0f) {
-                //     // Set-up data size's header
-                //     range[1] = dim.axis_r-1;
-                //     this->m_mat[i][dim.axis_r-1] = bufsize & 0b1;
-                //     bufsize >>= 1;
-                // } else {
-                    range[1] = dim.axis_r;
-                // }
+                range[1] = dim.axis_r;
             }
             
             // Write data
-            for (int j(range[0]); j < range[1]; j++)
+            for (int j(range[0]); j < range[1] && indexbuf < size(); j++)
             {
-                char _byte(0);
-                for (size_t b(0); b < bitl(); b++, _byte <<= 1)
+                char _byte = 0;
+                // printf(" "); // Debug print
+                for (size_t b(0); b < bitl() && indexbuf < size(); b++)
                 {
-                    _byte |= ((m_parent->m_data[indexbuf] & (0b1 << (bit%8))) << b);
+                    // Debug print
+                    // printf("%d", ((m_parent->m_data[indexbuf] >> bit%8) & 0b1));
+                    
+                    _byte <<= 1;
+                    _byte |= ((m_parent->m_data[indexbuf] >> bit%8) & 0b1);
                     
                     bit++;
                     indexbuf = bit/8;
@@ -99,6 +99,8 @@ namespace code3c
                 this->m_mat[i][j] = _byte;
             }
         }
+        // Debug print
+        // printf("]\n");
     }
     
     Code3C::Code3CData::Code3CData(const code3c::Code3C::Code3CData &mat):
@@ -130,11 +132,11 @@ namespace code3c
     
     
     Code3C::Code3C(const char *buffer, size_t bufsize, uint32_t model, int err):
-        m_data(new char[bufsize]), m_datalen(bufsize), m_desc(code3c_models[model]),
+        m_data(strncpy(new char[bufsize], buffer, bufsize)),
+        m_datalen(bufsize), m_desc(code3c_models[model]),
         m_dataMat(this, Code3CData::getdim(code3c_models[model], bufsize, err)),
         m_errmodel(err)
     {
-        strncpy(m_data, buffer, bufsize);
     }
     
     Code3C::Code3C(const char *utf8str, uint32_t model, int err):
@@ -167,33 +169,91 @@ namespace code3c
     {
         class Code3CDrawerSample : public Code3CDrawer
         {
+            const Code3C* parent;
             const CODE3C_MODEL_DESC::CODE3C_MODEL_DIMENSION &modelDimension;
         public:
-            Code3CDrawerSample(const Code3CData& cData): X11Drawer(
-                cData.getDimension().axis_r * CODE3C_PIXEL_UNIT,
-                cData.getDimension().axis_r * CODE3C_PIXEL_UNIT,
+            Code3CDrawerSample(const Code3C* parent, const Code3CData& cData):
+            parent(parent),
+            X11Drawer(
+                2 * cData.getDimension().absRad * CODE3C_PIXEL_UNIT,
+                2 * cData.getDimension().absRad * CODE3C_PIXEL_UNIT,
                 cData
                 ), modelDimension(cData.getDimension())
             {
             }
             
+            unsigned long bit_to_color(char _byte)
+            {
+                switch (parent->m_desc.model_id)
+                {
+                    case CODE3C_MODEL_1: // WB
+                        return 0xffffff&~((_byte&0b1)*0xffffff);
+                    case CODE3C_MODEL_2: // WB2C
+                    {
+                        int cyan = 0xffff * ((_byte >> 1) & 1);
+                        int red  = 0xff   * ((_byte >> 0) & 1);
+                        return ~rgb(red, cyan>>8, cyan);
+                    }
+                    case CODE3C_MODEL_3: // WB-RGB
+                    {
+                        int red   = 0xff * ((_byte >> 2) & 1);
+                        int green = 0xff * ((_byte >> 1) & 1);
+                        int blue  = 0xff * ((_byte >> 0) & 1);
+                        return ~rgb(red, green, blue);
+                    }
+                    default:
+                        throw "Unsupported model";
+                }
+            }
+            
+            void draw_angle(int t)
+            {
+                for (int r(m_data.m()-1); r >= 0; r--)
+                {
+                    char _byte(m_data[t, r]);
+                    
+                    // Debug print
+                    // printf(" ");
+                    // for (int i = parent->m_desc.bitl-1; i >= 0; i--)
+                    //     printf("%d", (_byte >> i)&1);
+                    
+                    int offRad(modelDimension.absRad-modelDimension.effRad
+                        +modelDimension.deltaRad);
+                    int currentRad((offRad+(r*modelDimension.deltaRad))
+                        *CODE3C_PIXEL_UNIT);
+                    
+                    set_color(bit_to_color(_byte));
+                    draw_slice(width() / 2, height() / 2, currentRad,
+                               180/modelDimension.rev,
+                               t*M_PI/(modelDimension.rev));
+                }
+                // printf("\n"); // Debug print
+            }
+            
             void setup() override
             {
                 Code3CDrawer::setTitle("Code3C Drawing Frame");
+                Code3CDrawer::background(0xbe55ab);
+                set_color(0);
+                Code3CDrawer::fill_circle(width()/2, height()/2, 8+width()/2);
                 
                 // Draw data
                 for (int t(0); t < modelDimension.axis_t; t++)
                     draw_angle(t);
                 
+                set_color(0xff0000);
+                draw_line(0, 0, width()/2, height()/2);
+                
                 // Fill logo
-                fill_circle(height()/2, width()/2, (modelDimension
+                set_color(0xbe55ab);
+                fill_circle(width()/2, height()/2, (modelDimension
                     .absRad-modelDimension.effRad)*CODE3C_PIXEL_UNIT);
             }
             
             void draw() override
             {
             }
-        } *cDrawerSample = new Code3CDrawerSample(m_dataMat);
+        } *cDrawerSample = new Code3CDrawerSample(this, m_dataMat);
         
         return cDrawerSample;
     }

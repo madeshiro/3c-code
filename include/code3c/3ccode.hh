@@ -45,7 +45,7 @@ namespace code3c
                 const int axis_t = rev*2, axis_r = effRad/deltaRad;
                 const uint32_t capacity =
                         axis_t*axis_r - (3*axis_r) - rev + 2;
-            } dimensions[3];
+            } dimensions[4];
             float error_margin[3] = {
                     .08, .15, .25
             };
@@ -53,25 +53,28 @@ namespace code3c
             {
                     0,  CODE3C_COLORMODE_WB,
                     {
-                        {90, 15, 10, 1},
-                        {180, 40, 26, 2},
-                        {360, 90, 60, 4}
+                        {30,  50, 20, 4}, //  30 slices, 20 units, 4 units per data
+                        {30,  60, 30, 2}, //  60 slices, 30 units, 2 units per data
+                        {60, 100, 60, 2}, // 120 slices, 60 units, 2 units per data
+                        {90, 140, 80, 2}  // 180 slices, 80 units, 2 units per data
                     }
             },
             {
                     1, CODE3C_COLORMODE_WB2C,
                     {
-                        {90, 15, 10, 1},
-                        {180, 40, 26, 2},
-                        {360, 90, 60, 4}
+                        {30,  50, 20, 4}, //  30 slices, 20 units, 4 units per data
+                        {30,  60, 30, 2}, //  60 slices, 30 units, 2 units per data
+                        {60, 100, 60, 2}, // 120 slices, 60 units, 2 units per data
+                        {90, 140, 80, 2}  // 180 slices, 80 units, 2 units per data
                     }
             },
             {
                     2, CODE3C_COLORMODE_WB6C,
                     {
-                        {90, 15, 10, 1},
-                        {180, 40, 26, 2},
-                        {360, 90, 60, 4}
+                        {30,  50, 20, 4}, //  30 slices, 20 units, 4 units per data
+                        {30,  60, 30, 2}, //  60 slices, 30 units, 2 units per data
+                        {60, 100, 60, 2}, // 120 slices, 60 units, 2 units per data
+                        {90, 140, 80, 2}  // 180 slices, 80 units, 2 units per data
                     }
             }
     };
@@ -149,9 +152,10 @@ namespace code3c
     protected:
         char* m_data;
         size_t m_datalen;
-        Code3CData m_dataMat;
-        CODE3C_MODEL_DESC& m_desc;
         int m_errmodel;
+        CODE3C_MODEL_DESC& m_desc;
+        
+        Code3CData m_dataMat;
         
         // HuffmanTable m_huftable;
         // HuffmanTree m_huftree;

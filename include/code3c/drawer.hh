@@ -53,14 +53,6 @@ namespace code3c
         char key;
         int keyCode;
         MouseEvent mouseEvent;
-        
-        /**
-         *
-         * @param _byte
-         * @param t
-         * @param r
-         */
-        virtual void draw_angle(int t);
     private:
         int delta_r;
         int delta_t;
@@ -153,6 +145,7 @@ namespace code3c
         
         /* draw functions */
         
+        virtual void background(unsigned long color);
         virtual void set_color(unsigned long color) override;
         virtual void draw_text(const char* str, int x, int y) override;
         virtual void draw_slice(int origin_x, int origin_y, int radius, int degree,
