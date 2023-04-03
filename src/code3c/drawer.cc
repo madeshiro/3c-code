@@ -44,10 +44,6 @@ namespace code3c
     {
     }
     
-    Drawer::~Drawer()
-    {
-    }
-    
     unsigned long Drawer::fps() const
     {
         return m_fps;

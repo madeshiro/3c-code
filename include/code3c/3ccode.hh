@@ -37,10 +37,10 @@
 
 namespace code3c
 {
-    static struct CODE3C_MODEL_DESC {
+    static struct CODE3C_MODEL_DESC { /* NOLINT */
             int model_id;
             unsigned bitl, mask;
-            struct CODE3C_MODEL_DIMENSION {
+            struct CODE3C_MODEL_DIMENSION { /* NOLINT */
                 const int rev, absRad, effRad, deltaRad;
                 const int axis_t = rev*2, axis_r = effRad/deltaRad;
                 const uint32_t capacity =
@@ -101,7 +101,7 @@ namespace code3c
             Code3CData(Code3C* parent, const CODE3C_MODEL_DESC::CODE3C_MODEL_DIMENSION&)
                 noexcept(false);
             Code3CData(const Code3CData& mat);
-            ~Code3CData() = default;
+            ~Code3CData() override = default;
             
             /**
              * Get the byte at the specified cursor pos.

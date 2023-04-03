@@ -118,7 +118,7 @@ namespace code3c
         return m_column;
     }
     
-    template < typename T >
+    template < typename T > /* NOLINT */
     mat<T>& mat<T>::operator=(const mat<T> & mat1)
     {
         if (mat1.n() != n() && mat1.m() != m())
@@ -335,7 +335,21 @@ namespace code3c
         mat<T>(vec1)
     {
     }
-    
+
+    template < typename T >
+    vec<T>& vec<T>::operator=(const vec<T> & vec1)
+    {
+        mat<T>::operator=(vec1);
+        return *this;
+    }
+
+    template < typename T >
+    vec<T>& vec<T>::operator=(const mat<T>& mat1)
+    {
+        mat<T>::operator=(mat1);
+        return *this;
+    }
+
     template < typename T >
     vec<T> vec<T>::operator+(const vec<T> & vec1)
     {

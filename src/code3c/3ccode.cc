@@ -1,5 +1,5 @@
 #include "code3c/3ccode.hh"
-#include <string.h>
+#include <cstring>
 
 namespace code3c
 {
@@ -7,8 +7,8 @@ namespace code3c
         Code3C::Code3CData::getdim(const code3c::CODE3C_MODEL_DESC & desc,
                                    uint32_t size, int err)
     {
-        int errSize = (int) (desc.error_margin[err]*size)+1;
-        int totalSize = (errSize + size)*8;
+        auto errSize = static_cast<uint32_t>((desc.error_margin[err]*(float)size)+1);
+        uint32_t totalSize = (errSize + size)*8;
         
         for (const auto& dim : desc.dimensions)
         {
@@ -56,7 +56,7 @@ namespace code3c
                 
                 for (int j(0); j < dim.axis_r; j++)
                 {
-                    this->m_mat[i][j] = mask() * (j % 2);
+                    this->m_mat[i][j] = static_cast<char>(mask() * (j % 2));
                 }
             } else if (i <= qcal1 || (i >= qcal2 && i <= qcal3))
             {
@@ -64,7 +64,7 @@ namespace code3c
                 range[0] = 1;
                 range[1] = dim.axis_r;
                 
-                this->m_mat[i][0] = mask() * (i%2);
+                this->m_mat[i][0] = static_cast<char>(mask() * (i%2));
             } else if (i == tcal1 || i == tcal1+1) {
                 range[0] = 0;
                 range[1] = 0;
@@ -72,7 +72,7 @@ namespace code3c
                 // Set-up header
                 for (int j(0); j < dim.axis_r; j++, header>>=1)
                 {
-                    this->m_mat[i][j] = mask() & ~((header&0b1)*mask());
+                    this->m_mat[i][j] = static_cast<char>(mask() & ~((header&0b1)*mask()));
                 }
             } else {
                 range[0] = 0;
@@ -90,7 +90,7 @@ namespace code3c
                     // printf("%d", ((m_parent->m_data[indexbuf] >> bit%8) & 0b1));
                     
                     _byte <<= 1;
-                    _byte |= ((m_parent->m_data[indexbuf] >> bit%8) & 0b1);
+                    _byte |= (m_parent->m_data[indexbuf] >> bit % 8) & 0b1;
                     
                     bit++;
                     indexbuf = bit/8;
@@ -147,7 +147,8 @@ namespace code3c
     Code3C::Code3C(const char32_t *unistr [[maybe_unused]], uint32_t model, int err):
         m_data(nullptr), m_desc(code3c_models[model]),
         m_dataMat(this, Code3CData::getdim(code3c_models[model], 0, err)),
-        m_errmodel(err)
+        m_errmodel(err),
+        m_datalen(/* todo data len */ 0)
     {
         // TODO UTF8
     }
@@ -159,10 +160,7 @@ namespace code3c
     
     Code3C::~Code3C()
     {
-        if (m_data != nullptr)
-        {
-            delete[] m_data;
-        }
+        delete[] m_data;
     }
     
     Drawer* Code3C::draw() const

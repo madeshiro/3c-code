@@ -16,7 +16,7 @@
  */
 #ifndef HH_LIB_BITMAT
 #define HH_LIB_BITMAT
-#include <math.h>
+#include <cmath>
 
 namespace code3c
 {
@@ -32,7 +32,7 @@ namespace code3c
     protected:
         T **m_mat;
     public:
-        mat(int n);
+        explicit mat(int n);
         mat(int n, int m);
         explicit mat(int n, T**);
         explicit mat(int n, int m, T**);
@@ -43,12 +43,13 @@ namespace code3c
         virtual mat<T> invert() const noexcept(false);
 
         virtual mat<T> transposed() const;
-        virtual mat<T> submatrix(int rows[], int nrows, int columns[], int ncolomns) const;
+        virtual mat<T> submatrix(int rows[], int nrows,
+                                 int columns[], int ncolomns) const;
         
         virtual int n() const noexcept(true) final;
         virtual int m() const noexcept(true) final;
         
-        virtual mat<T>& operator =(const mat<T>&);
+        virtual mat<T>& operator =(const mat<T>&); /* NOLINT */
         virtual bool operator ==(const mat<T>&) const;
         virtual bool operator !=(const mat<T>&) const;
         
@@ -56,6 +57,7 @@ namespace code3c
         virtual mat<T>& operator +=(const mat<T>&);
         virtual mat<T>  operator -(const mat<T>&);
         virtual mat<T>& operator -=(const mat<T>&);
+
         virtual mat<T>  operator -() const;
         
         mat<T> operator *(T) const;
@@ -73,7 +75,7 @@ namespace code3c
 
         virtual mat<T> operator ~() const noexcept(false);
 
-        virtual operator T() const;
+        virtual explicit operator T() const;
     };
     
     template < typename T >
@@ -119,17 +121,19 @@ namespace code3c
     class vec : public mat<T>
     {
     public:
-        vec(int n);
+        explicit vec(int n);
         vec(int n, T** _vec);
-        vec(const mat<T>& mat1) noexcept(false);
+        explicit vec(const mat<T>& mat1) noexcept(false);
         vec(const vec<T>& vec1);
-        virtual ~vec() override = default;
+        ~vec() override = default;
+
+        vec<T>& operator =(const vec<T>&);
+        vec<T>& operator =(const mat<T>&) override;
 
         virtual vec<T>  operator +(const vec<T>&);
         virtual vec<T>& operator +=(const vec<T>&);
         virtual vec<T>  operator -(const vec<T>&);
         virtual vec<T>& operator -=(const vec<T>&);
-        // virtual vec<T>  operator -() const;
         
         virtual T& operator[](int i);
         virtual T operator[](int i) const;

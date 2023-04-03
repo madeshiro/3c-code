@@ -1,13 +1,14 @@
 #include "code3c/drawer.hh"
 #include <unistd.h>
-#include <time.h>
-#include <string.h>
+#include <ctime>
+#include <cstring>
 #include <X11/Xutil.h>
 
 namespace code3c
 {
     X11Drawer::X11Drawer(int width, int height, const code3c::matb &data):
-            Drawer(width, height, data), m_frameRate(fps())
+            Drawer(width, height, data), m_frameRate(fps()),
+            m_gcvalues(), m_attributes()
     {
         m_display = XOpenDisplay(NULL);
         m_screen = DefaultScreen(m_display);
@@ -31,7 +32,7 @@ namespace code3c
         wmDeleteWindow = XInternAtom(m_display, "WM_DELETE_WINDOW", true);
         XSetWMProtocols(m_display, m_window, &wmDeleteWindow, 1);
         
-        if ((m_font = XLoadQueryFont(m_display, "9x15")) == NULL)
+        if ((m_font = XLoadQueryFont(m_display, "9x15")) == nullptr)
             throw "Unable to find \"9x15\" font";
     }
     
@@ -81,7 +82,7 @@ namespace code3c
         bool done(false);
         XEvent event;
         
-        this->show();
+        this->show(true);
         this->setup();
         do
         {
@@ -199,7 +200,7 @@ namespace code3c
     
     void X11Drawer::draw_text(const char *str, int x, int y)
     {
-        XDrawString(m_display, m_db, m_gc, x, y, str, strlen(str));
+        XDrawString(m_display, m_db, m_gc, x, y, str, (int) strlen(str));
     }
     
     void X11Drawer::draw_slice(int origin_x, int origin_y, int radius, int degree,
@@ -223,8 +224,8 @@ namespace code3c
             matlf rot = mat2rotate<double>(rotation+(delta_degree*2*M_PI));
             coord = rot * coord;
             
-            xPoints[_].x = coord[0] + origin_x;
-            xPoints[_].y = -coord[1] + origin_y;
+            xPoints[_].x = static_cast<short>(coord[0] + origin_x);
+            xPoints[_].y = static_cast<short>(-coord[1] + origin_y);
         }
         
         XFillPolygon(m_display, m_db, m_gc, xPoints, degree+2, Convex,

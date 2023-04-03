@@ -35,7 +35,7 @@ namespace code3c
     {
         int mouseX, mouseY;
         int pmouseX, pmouseY;
-        int mouseButton;
+        unsigned int mouseButton;
         int wheelCount;
     };
     
@@ -51,21 +51,21 @@ namespace code3c
     
         // Event variables
         char key;
-        int keyCode;
+        unsigned int keyCode;
         MouseEvent mouseEvent;
     private:
         int delta_r;
         int delta_t;
     public:
         Drawer(int width, int height, const matb& data);
-        virtual ~Drawer();
+        virtual ~Drawer() = default;
         
         virtual unsigned long fps() const final;
         virtual int height() const final;
         virtual int width() const final;
         virtual const matb& getData() const final;
         
-        virtual void show(bool b = true) = 0;
+        virtual void show(bool b) = 0;
         virtual void clear() = 0;
         
         virtual void setTitle(const char*) = 0;
@@ -124,31 +124,31 @@ namespace code3c
         unsigned long m_frameRate;
     public:
         X11Drawer(int width, int height, const matb& data);
-        virtual ~X11Drawer() noexcept override;
+        ~X11Drawer() noexcept override;
         
-        virtual void show(bool b = true) override;
-        virtual void setTitle(const char*) override;
-        virtual void setHeigh(int height) override;
-        virtual void setWidth(int width) override;
+        void show(bool b) override;
+        void setTitle(const char*) override;
+        void setHeigh(int height) override;
+        void setWidth(int width) override;
         
-        virtual void run() override;
-        virtual void exit() override;
-        virtual void clear() override;
+        void run() override;
+        void exit() override;
+        void clear() override;
         virtual void cleardb();
+
+        unsigned long frameRate() const override;
         
-        virtual unsigned long frameRate() const override;
+        void setup() override = 0;
+        void draw() override = 0;
         
-        virtual void setup() override = 0;
-        virtual void draw() override = 0;
-        
-        virtual void savePNG(const char* name) const override;
+        void savePNG(const char* name) const override;
         
         /* draw functions */
         
         virtual void background(unsigned long color);
-        virtual void set_color(unsigned long color) override;
-        virtual void draw_text(const char* str, int x, int y) override;
-        virtual void draw_slice(int origin_x, int origin_y, int radius, int degree,
+        void set_color(unsigned long color) override;
+        void draw_text(const char* str, int x, int y) override;
+        void draw_slice(int origin_x, int origin_y, int radius, int degree,
                                 double rotation) override;
         virtual void fill_circle(int x, int y, int radius);
         virtual void draw_line(int x1, int y1, int x2, int y2);
