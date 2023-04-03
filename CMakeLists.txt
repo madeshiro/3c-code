@@ -108,8 +108,9 @@ set(CODE3C_DEPENDENCIES
         -lm
         )
 if(UNIX)
+    find_package(X11 REQUIRED)
     set(CODE3C_DEPENDENCIES ${CODE3C_DEPENDENCIES}
-            -lX11)
+            X11::X11)
 endif()
 
 include_directories(${PNG_INCLUDE_DIRS})
