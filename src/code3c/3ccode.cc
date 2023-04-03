@@ -37,10 +37,10 @@ namespace code3c
         // size_t bufsize(((size_t)dataSegSize() << ((dim.axis_t/4)-2))
         //     | ((size_t) errSegSize()));
         
-        int qcal1 = 1*dim.axis_t/4,
-            qcal2 = 1*dim.axis_t/2,
-            qcal3 = 3*dim.axis_t/4;
-        int tcal1 = 3*dim.axis_t/8;
+        int qcal1 = 1*dim.axis_t/4, // q1: rad calibration and begin angle calibration
+            qcal2 = 1*dim.axis_t/2, // q2: end angle calibration
+            qcal3 = 3*dim.axis_t/4; // q3: rad calibration
+        int tcal1 = 3*dim.axis_t/8; // header position
         
         uint64_t header(((m_parent->m_desc.model_id-1) << 2) | m_parent->m_errmodel);
         header <<= ((2*m_dimension.axis_r) - 4);
@@ -128,8 +128,6 @@ namespace code3c
     {
         return 0; // TODO errSegSize()
     }
-    
-    
     
     Code3C::Code3C(const char *buffer, size_t bufsize, uint32_t model, int err):
         m_data(strncpy(new char[bufsize], buffer, bufsize)),
