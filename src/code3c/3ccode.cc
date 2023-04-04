@@ -202,7 +202,7 @@ namespace code3c
                         throw std::runtime_error("Unsupported model");
                 }
             }
-            
+
             void draw_angle(int t)
             {
                 for (int r(m_data.m()-1); r >= 0; r--)
@@ -222,7 +222,7 @@ namespace code3c
                     set_color(bit_to_color(_byte));
                     draw_slice(width() / 2, height() / 2, currentRad,
                                180/modelDimension.rev,
-                               t*M_PI/(modelDimension.rev));
+                               t*180/(modelDimension.rev));
                 }
                 // printf("\n"); // Debug print
             }
@@ -233,7 +233,7 @@ namespace code3c
                 Code3CDrawer::background(0xbe55ab);
                 set_color(0);
                 Code3CDrawer::fill_circle(width()/2, height()/2, 8+width()/2);
-                
+
                 // Draw data
                 for (int t(0); t < modelDimension.axis_t; t++)
                     draw_angle(t);

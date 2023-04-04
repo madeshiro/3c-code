@@ -27,18 +27,18 @@ public:
             for (int i(0); i < 2*30; i++)
             {
                 set_color(color);
-                draw_slice(350, 350, r, 6, 2 * M_PI * i / 60.0);
+                draw_slice(350, 350, r, 6, 360*i / 60.0);
                 color = ~color;
             }
         }
         set_color(0xff0000);
         draw_slice(350, 350, 350, 6, 0);
-        draw_slice(350, 350, 350, 6, -M_PI/2.0);
-        draw_slice(350, 350, 350, 12, 3.0*M_PI/4.0);
+        draw_slice(350, 350, 350, 6, -90);
+        draw_slice(350, 350, 350, 12, 3*360/8.0);
         for (int i = 0; i < 15; i++)
         {
-            draw_slice(350, 350, 105, 6, 2*M_PI*i/60.0);
-            draw_slice(350, 350, 105, 6, M_PI+ 2*M_PI*i/60.0);
+            draw_slice(350, 350, 105, 6, 180*i/60);
+            draw_slice(350, 350, 105, 6, 180*(1+i)/60);
         }
         set_color(0);
         draw_line(350, 350, 700, 350);

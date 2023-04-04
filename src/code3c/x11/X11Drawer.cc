@@ -203,36 +203,17 @@ namespace code3c
     {
         XDrawString(m_display, m_db, m_gc, x, y, str, (int) strlen(str));
     }
-    
-    void X11Drawer::draw_slice(int origin_x, int origin_y, int radius, int degree,
-                               double rotation)
+
+    void X11Drawer::draw_slice(
+            int origin_x, int origin_y, int radius, int degree, int rotation
+            )
     {
-        int precision = 8;
-        rotation -= (M_PI*((double)degree)/360.0);
-        
-        XPoint xPoints[precision*degree+2];
-        veclf coord(2, new double*[2] { new double(0), new double(0) });
-        
-        xPoints[0] = {(short) origin_x, (short) origin_y};
-        xPoints[(precision*degree)+1] = {(short) origin_x, (short) origin_y};
-        for (int _ = 1; _ <= (precision*degree); _++)
-        {
-            double delta_degree = ((double) _-1)/(360.0);
-            
-            coord[0] = radius;
-            coord[1] = 0;
-            
-            matlf rot = mat2rotate<double>(rotation+(delta_degree*2*M_PI));
-            coord = rot * coord;
-            
-            xPoints[_].x = static_cast<short>(coord[0] + origin_x);
-            xPoints[_].y = static_cast<short>(-coord[1] + origin_y);
-        }
-        
-        XFillPolygon(m_display, m_db, m_gc, xPoints, degree+2, Convex,
-                     CoordModeOrigin);
+        rotation -= degree/2;
+        XFillArc(m_display, m_db, m_gc, origin_x-radius, origin_y-radius,
+                 radius*2,radius*2,
+                 64*rotation, 64*degree);
     }
-    
+
     void X11Drawer::fill_circle(int x, int y, int radius)
     {
         XFillArc(m_display, m_db, m_gc, x-radius, y-radius, radius*2, radius*2, 0,

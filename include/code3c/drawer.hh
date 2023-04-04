@@ -101,7 +101,7 @@ namespace code3c
         virtual void set_color(unsigned long color) = 0;
         virtual void draw_text(const char* str, int x, int y)  = 0;
         virtual void draw_slice(int origin_x, int origin_y, int radius, int degree,
-                                double rotation) = 0;
+                                int rotation) = 0;
     };
 
 #ifdef CODE3C_UNIX
@@ -149,7 +149,7 @@ namespace code3c
         void set_color(unsigned long color) override;
         void draw_text(const char* str, int x, int y) override;
         void draw_slice(int origin_x, int origin_y, int radius, int degree,
-                                double rotation) override;
+                        int rotation) override;
         virtual void fill_circle(int x, int y, int radius);
         virtual void draw_line(int x1, int y1, int x2, int y2);
     };
