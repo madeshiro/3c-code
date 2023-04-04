@@ -172,8 +172,8 @@ namespace code3c
             Code3CDrawerSample(const Code3C* parent, const Code3CData& cData):
             parent(parent),
             X11Drawer(
-                2 * cData.getDimension().absRad * CODE3C_PIXEL_UNIT,
-                2 * cData.getDimension().absRad * CODE3C_PIXEL_UNIT,
+                40+2 * cData.getDimension().absRad * CODE3C_PIXEL_UNIT,
+                40+2 * cData.getDimension().absRad * CODE3C_PIXEL_UNIT,
                 cData
                 ), modelDimension(cData.getDimension())
             {
@@ -232,7 +232,9 @@ namespace code3c
                 Code3CDrawer::setTitle("Code3C Drawing Frame");
                 Code3CDrawer::background(0xbe55ab);
                 set_color(0);
-                Code3CDrawer::fill_circle(width()/2, height()/2, 8+width()/2);
+                Code3CDrawer::fill_circle(width()/2, height()/2, 6+(width()-40)/2);
+                Code3CDrawer::draw_line(0, height()/2, width(), height()/2);
+                Code3CDrawer::draw_line(width()/2, 0, width()/2, height());
 
                 // Draw data
                 for (int t(0); t < modelDimension.axis_t; t++)
