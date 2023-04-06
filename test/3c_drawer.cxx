@@ -62,6 +62,7 @@ Drawer * drawer;
 /* test functions */
 int test_create_window();
 int test_create_data();
+int test_draw_pixel();
 
 
 typedef int (*TestFunction)(void); /* NOLINT */
@@ -84,6 +85,11 @@ static testFunctionMapEntry registeredFunctionEntries[] = {
             "create_data",
             test_create_data,
             1, 0
+        },
+        {
+            "draw_pixel",
+            test_draw_pixel,
+            2, 0
         }
 #endif
 };
@@ -130,5 +136,10 @@ int test_create_window()
 {
     TestDrawer testDrawer;
     testDrawer.run();
+    return 0;
+}
+
+int test_draw_pixel()
+{
     return 0;
 }

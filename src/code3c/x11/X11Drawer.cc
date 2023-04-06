@@ -199,6 +199,12 @@ namespace code3c
         XSetForeground(m_display, m_gc, color);
     }
     
+    void X11Drawer::draw_pixel(unsigned long color, int x, int y)
+    {
+        foreground(color);
+        XDrawPoint(m_display, m_db, m_gc, x, y);
+    }
+    
     void X11Drawer::draw_text(const char *str, int x, int y)
     {
         XDrawString(m_display, m_db, m_gc, x, y, str, (int) strlen(str));
