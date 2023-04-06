@@ -25,6 +25,12 @@ png_descp read_png(FILE* fin)
         return NULL;
     }
     
+    desc->info = png_create_info_struct(desc->png);
+    if (!desc->info) {
+        free(desc);
+        return NULL;
+    }
+    
     if (setjmp(png_jmpbuf(desc->png))) {
         free(desc);
         return NULL;
@@ -84,4 +90,5 @@ void free_png_desc(png_descp desc)
 {
     if (desc->png && desc->info)
         png_destroy_read_struct(&desc->png, &desc->info, NULL);
+    free(desc);
 }

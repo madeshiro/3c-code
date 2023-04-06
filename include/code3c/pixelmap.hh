@@ -36,6 +36,7 @@ namespace code3c
     {
         int x, y;
         unsigned long color;
+        unsigned char alpha;
     };
     
     class PixelMap

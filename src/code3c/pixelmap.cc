@@ -61,7 +61,7 @@ namespace code3c
     
     Pixel& PixelMap::operator[](int x, int y)
     {
-        return m_pixels[x*y];
+        return m_pixels[y*width()+x];
     }
     
     Pixel PixelMap::operator[](int i) const
@@ -71,12 +71,32 @@ namespace code3c
     
     Pixel PixelMap::operator[](int x, int y) const
     {
-        return m_pixels[x*y];
+        return m_pixels[y*width()+x];
     }
     
     PixelMap PixelMap::loadFromPNG(const char *pngfile) noexcept(false)
     {
-        return {10, 10}; // Todo loadFromPNG
+        png_descp desc = open_png(pngfile);
+        if (!desc)
+            return {0,0};
+        
+        PixelMap pixelMap(desc->width, desc->height);
+        for (int y = 0; y < desc->height; y++)
+        {
+            for (int x = 0, i = 0; x < desc->width; x++, i+=4)
+            {
+                int r = 0xff & desc->rows[y][i];
+                int g = 0xff & desc->rows[y][i+1];
+                int b = 0xff & desc->rows[y][i+2];
+                png_byte a = 0xff & desc->rows[y][i+3];
+                unsigned long rgb = (r << 16) | (g << 8) | b;
+                pixelMap[x,y] = {x, y, rgb, a};
+            }
+            
+        }
+        
+        free_png_desc(desc);
+        return pixelMap;
     }
     
     void PixelMap::saveInPng(const code3c::PixelMap &map, FILE *dest)
