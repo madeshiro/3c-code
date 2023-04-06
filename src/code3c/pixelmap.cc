@@ -111,15 +111,42 @@ namespace code3c
                 unsigned long rgb = (r << 16) | (g << 8) | b;
                 pixelMap[x,y] = {x, y, rgb, a};
             }
-            
         }
         
         free_png_desc(desc);
         return pixelMap;
     }
     
-    void PixelMap::saveInPng(const code3c::PixelMap &map, FILE *dest)
+    void PixelMap::saveInPng(const PixelMap &map, FILE *dest)
     {
-        // Todo saveInPng
+        png_descp desc = create_png(dest, map.width(), map.height());
+        if (desc)
+        {
+            auto buffer_rows = (png_bytepp) malloc(sizeof(png_bytep)*map.height());
+            for (int y = 0; y < map.height(); y++)
+                buffer_rows[y] = (png_bytep) malloc(sizeof(png_byte)*4*map.width());
+            
+            for (int y = 0; y < map.width(); y++)
+            {
+                for (int x = 0, i = 0; x < map.height(); x++, i+=4)
+                {
+                    buffer_rows[y][i+0] = (map[x,y].color & 0xff0000) >> 16; // red
+                    buffer_rows[y][i+1] = (map[x,y].color & 0x00ff00) >>  8; // green
+                    buffer_rows[y][i+2] = (map[x,y].color & 0x0000ff) >>  0; // blue
+                    buffer_rows[y][i+3]   = map[x,y].alpha; // alpha
+                }
+            }
+            
+            png_write_image(desc->png, buffer_rows);
+            png_write_end(desc->png, NULL);
+            png_write_flush(desc->png);
+            
+            // Free memory and close handlers
+            for (int y = 0; y < map.height(); y++)
+                free(buffer_rows[y]);
+            free(buffer_rows);
+            free_png_desc(desc);
+        }
+        else fclose(dest);
     }
 }

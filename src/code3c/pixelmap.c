@@ -8,7 +8,6 @@ png_descp open_png(const char* fname)
     if (png_file)
     {
         desc = read_png(png_file);
-        fclose(png_file);
     }
     return desc;
 }
@@ -21,9 +20,13 @@ png_descp read_png(FILE* fin)
             );
     
     if (!desc->png) {
+        desc->png = NULL;
         free(desc);
         return NULL;
     }
+    
+    desc->_file = fin;
+    desc->mode = PNG_DESC_MODE_READ;
     
     desc->info = png_create_info_struct(desc->png);
     if (!desc->info) {
@@ -80,15 +83,63 @@ png_descp read_png(FILE* fin)
     return desc;
 }
 
-png_descp create_png(__attribute__((unused)) FILE* fio)
+png_descp create_png(FILE* fio, int width, int height)
 {
-    // TODO create_png
-    return NULL;
+    // Create descriptor
+    png_descp desc = (png_descp) malloc(sizeof(png_desc));
+    if (!desc)
+        return NULL;
+    desc->_file = fio;
+    desc->mode = PNG_DESC_MODE_WRITE;
+    
+    // Create png struct
+    desc->png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    if (!desc->png) {
+        free(desc);
+        return NULL;
+    }
+    
+    // Create png info
+    desc->info = png_create_info_struct(desc->png);
+    if (!desc->info) {
+        free(desc);
+        return NULL;
+    }
+    
+    if (setjmp(png_jmpbuf(desc->png))) {
+        free(desc);
+        return NULL;
+    }
+    
+    png_init_io(desc->png, fio);
+    png_set_IHDR(
+            desc->png,
+            desc->info,
+            width, height, 8,    // width, height, depth
+            PNG_COLOR_TYPE_RGBA, // Support alpha
+            PNG_INTERLACE_NONE,
+            PNG_COMPRESSION_TYPE_DEFAULT,
+            PNG_FILTER_TYPE_DEFAULT
+            );
+    png_write_info(desc->png, desc->info);
+    
+    return desc;
 }
 
 void free_png_desc(png_descp desc)
 {
+    // Close png handlers
     if (desc->png && desc->info)
-        png_destroy_read_struct(&desc->png, &desc->info, NULL);
+    {
+        if (desc->mode == PNG_DESC_MODE_READ)
+            png_destroy_read_struct(&desc->png, &desc->info, NULL);
+        if (desc->mode == PNG_DESC_MODE_WRITE)
+            png_destroy_write_struct(&desc->png, &desc->info);
+    }
+    
+    // Close file
+    if (desc->_file)
+        fclose(desc->_file);
+    
     free(desc);
 }

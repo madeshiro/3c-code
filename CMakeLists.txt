@@ -145,7 +145,7 @@ create_test_sourcelist(ctest_testmodule ${3CCODE_TARGET}_testmodule.cxx
         test/3c_generation.cxx
         test/3c_drawer.cxx
         test/mat_operation.cxx
-        test/png_reading.cxx
+        test/png_in_out.cxx
 )
 
 add_executable(${3CCODE_TARGET}_testmodule ${ctest_testmodule})

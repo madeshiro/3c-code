@@ -6,6 +6,7 @@ using namespace code3c;
 
 int test_png_read();
 int test_png_resize();
+int test_png_save();
 
 typedef int (*TestFunction)(void); /* NOLINT */
 typedef struct /* NOLINT */
@@ -27,11 +28,16 @@ static testFunctionMapEntry registeredFunctionEntries[] = {
                 "png_resize",
                 test_png_resize,
                 1, 0
+        },
+        {
+            "png_save",
+            test_png_save,
+            2, 0
         }
 #endif
 };
 
-int test_png_reading(int argc [[maybe_unused]], char** argv [[maybe_unused]])
+int test_png_in_out(int argc [[maybe_unused]], char** argv [[maybe_unused]])
 {
     uint32_t status(0u), pass(0),
             found(sizeof(registeredFunctionEntries)/sizeof(testFunctionMapEntry));
@@ -131,5 +137,17 @@ int test_png_resize()
     } pngDrawer(scaled);
     
     pngDrawer.run();
+    return 0;
+}
+
+int test_png_save()
+{
+    FILE* dest = fopen("isima_resize.png", "wb");
+    if (dest)
+    {
+        PixelMap map(PixelMap::loadFromPNG("gitlab_isima.png"));
+        PixelMap::saveInPng(map.resize(2.0f), dest);
+    } else return 1;
+    
     return 0;
 }
