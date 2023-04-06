@@ -26,12 +26,12 @@ public:
             color = (r%2 ? ~0 : 0);
             for (int i(0); i < 2*30; i++)
             {
-                set_color(color);
+                foreground(color);
                 draw_slice(350, 350, r, 6, 360*i / 60.0);
                 color = ~color;
             }
         }
-        set_color(0xff0000);
+        foreground(0xff0000);
         draw_slice(350, 350, 350, 6, 0);
         draw_slice(350, 350, 350, 6, -90);
         draw_slice(350, 350, 350, 12, 3*360/8.0);
@@ -40,11 +40,11 @@ public:
             draw_slice(350, 350, 105, 6, 180*i/60);
             draw_slice(350, 350, 105, 6, 180*(1+i)/60);
         }
-        set_color(0);
+        foreground(0);
         draw_line(350, 350, 700, 350);
-        set_color(0xbe55ab);
+        foreground(0xbe55ab);
         fill_circle(350, 350, 100);
-        set_color(0);
+        foreground(0);
     }
     
     void draw() override

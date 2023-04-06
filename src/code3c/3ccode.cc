@@ -30,13 +30,8 @@ namespace code3c
                                    noexcept (false):
         matb(dim.axis_t,dim.axis_r), m_dimension(dim), m_parent(parent)
     {
-        // Debug print
-        // printf("\ndata: [");
-        
         int range[2] = {0, 0};
         size_t bit(0), indexbuf(0);
-        // size_t bufsize(((size_t)dataSegSize() << ((dim.axis_t/4)-2))
-        //     | ((size_t) errSegSize()));
         
         int qcal1 = 1*dim.axis_t/4, // q1: rad calibration and begin angle calibration
             qcal2 = 1*dim.axis_t/2, // q2: end angle calibration
@@ -59,23 +54,29 @@ namespace code3c
                 {
                     this->m_mat[i][j] = static_cast<char>(mask() * (j % 2));
                 }
-            } else if (i <= qcal1 || (i >= qcal2 && i <= qcal3))
+            }
+            else if (i <= qcal1 || (i >= qcal2 && i <= qcal3))
             {
                 // Setup Calibration (angle)
                 range[0] = 1;
                 range[1] = dim.axis_r;
                 
-                this->m_mat[i][0] = static_cast<char>(mask() * (i%2));
-            } else if (i == tcal1 || i == tcal1+1) {
+                this->m_mat[i][0] = static_cast<char>(mask() * ((i + (i >= qcal2)) % 2));
+            }
+            else if (i == tcal1 || i == tcal1 + 1)
+            {
                 range[0] = 0;
                 range[1] = 0;
                 
                 // Set-up header
-                for (int j(0); j < dim.axis_r; j++, header>>=1)
+                for (int j(0); j < dim.axis_r; j++, header >>= 1)
                 {
-                    this->m_mat[i][j] = static_cast<char>(mask() & ~((header&0b1)*mask()));
+                    this->m_mat[i][j] = static_cast<char>(mask() &
+                                                          ~((header & 0b1) * mask()));
                 }
-            } else {
+            }
+            else
+            {
                 range[0] = 0;
                 range[1] = dim.axis_r;
             }
@@ -84,24 +85,18 @@ namespace code3c
             for (int j(range[0]); j < range[1] && indexbuf < size(); j++)
             {
                 char _byte = 0;
-                // printf(" "); // Debug print
                 for (size_t b(0); b < bitl() && indexbuf < size(); b++)
                 {
-                    // Debug print
-                    // printf("%d", ((m_parent->m_data[indexbuf] >> bit%8) & 0b1));
-                    
                     _byte <<= 1;
                     _byte |= (m_parent->m_data[indexbuf] >> bit % 8) & 0b1;
                     
                     bit++;
-                    indexbuf = bit/8;
+                    indexbuf = bit / 8;
                 }
                 
                 this->m_mat[i][j] = _byte;
             }
         }
-        // Debug print
-        // printf("]\n");
     }
     
     Code3C::Code3CData::Code3CData(const code3c::Code3C::Code3CData &mat):
@@ -209,48 +204,47 @@ namespace code3c
                 {
                     char _byte(m_data[t, r]);
                     
-                    // Debug print
-                    // printf(" ");
-                    // for (int i = parent->m_desc.bitl-1; i >= 0; i--)
-                    //     printf("%d", (_byte >> i)&1);
-                    
                     int offRad(modelDimension.absRad-modelDimension.effRad
                         +modelDimension.deltaRad);
                     int currentRad((offRad+(r*modelDimension.deltaRad))
                         *CODE3C_PIXEL_UNIT);
                     
-                    set_color(bit_to_color(_byte));
+                    foreground(bit_to_color(_byte));
                     draw_slice(width() / 2, height() / 2, currentRad,
                                180/modelDimension.rev,
                                t*180/(modelDimension.rev));
                 }
-                // printf("\n"); // Debug print
             }
             
             void setup() override
             {
-                Code3CDrawer::setTitle("Code3C Drawing Frame");
-                Code3CDrawer::background(0xbe55ab);
-                set_color(0);
-                Code3CDrawer::fill_circle(width()/2, height()/2, 6+(width()-40)/2);
-                Code3CDrawer::draw_line(0, height()/2, width(), height()/2);
-                Code3CDrawer::draw_line(width()/2, 0, width()/2, height());
+                // Setup window
+                setTitle("Code3C Drawing Frame");
+                background(0xffffff);
+                
+                // Draw 3ccode outline
+                foreground(0);
+                fill_circle(width()/2, height()/2, 6+(width()-40)/2);
+                draw_line(0, height()/2, width(), height()/2);
+                draw_line(width()/2, 0, width()/2, height());
 
                 // Draw data
                 for (int t(0); t < modelDimension.axis_t; t++)
                     draw_angle(t);
                 
-                set_color(0xff0000);
+                // Debug : header landmark
+                foreground(0xff0000);
                 draw_line(0, 0, width()/2, height()/2);
                 
                 // Fill logo
-                set_color(0xbe55ab);
+                foreground(0xbe55ab);
                 fill_circle(width()/2, height()/2, (modelDimension
                     .absRad-modelDimension.effRad)*CODE3C_PIXEL_UNIT);
             }
             
             void draw() override
             {
+                // Nothing to do here
             }
         } *cDrawerSample = new Code3CDrawerSample(this, m_dataMat);
         

@@ -98,7 +98,7 @@ namespace code3c
         virtual void savePNG(const char* name) const = 0;
         
         /* Draw functions */
-        virtual void set_color(unsigned long color) = 0;
+        virtual void foreground(unsigned long color) = 0;
         virtual void draw_text(const char* str, int x, int y)  = 0;
         virtual void draw_slice(int origin_x, int origin_y, int radius, int degree,
                                 int rotation) = 0;
@@ -146,7 +146,7 @@ namespace code3c
         /* draw functions */
         
         virtual void background(unsigned long color);
-        void set_color(unsigned long color) override;
+        void foreground(unsigned long color) override;
         void draw_text(const char* str, int x, int y) override;
         void draw_slice(int origin_x, int origin_y, int radius, int degree,
                         int rotation) override;

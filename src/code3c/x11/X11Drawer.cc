@@ -176,9 +176,9 @@ namespace code3c
     void X11Drawer::cleardb()
     {
         // Clear double buffer
-        set_color(0xffffff);
+        foreground(0xffffff);
         XFillRectangle(m_display, m_db, m_gc, 0, 0, width(), height());
-        set_color(0);
+        foreground(0);
     }
     
     void X11Drawer::savePNG(const char *name) const
@@ -190,11 +190,11 @@ namespace code3c
     
     void X11Drawer::background(unsigned long color)
     {
-        set_color(color);
+        foreground(color);
         XFillRectangle(m_display, m_db, m_gc, 0, 0, width(), height());
     }
     
-    void X11Drawer::set_color(unsigned long color)
+    void X11Drawer::foreground(unsigned long color)
     {
         XSetForeground(m_display, m_gc, color);
     }
