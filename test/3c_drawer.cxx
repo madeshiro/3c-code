@@ -128,7 +128,7 @@ int test_create_data()
                   CODE3C_MODEL_2);
     drawer = code3C.draw();
     drawer->run();
-    
+    delete drawer;
     return 0;
 }
 
@@ -141,5 +141,40 @@ int test_create_window()
 
 int test_draw_pixel()
 {
+    class PixelTestDrawer : public Code3CDrawer
+    {
+    public:
+        PixelTestDrawer() : Code3CDrawer(400, 400, matb(20))
+        {
+        }
+        
+        void setup() override
+        {
+            setTitle("Code3C Pixel drawing - Test Window");
+            background(0xffffff);
+        }
+        
+        void draw() override
+        {
+            background(0xffffff);
+            unsigned long colors[4] = {
+                    0xff0000,
+                    0x00ff00,
+                    0x0000ff,
+                    0x00ffff
+            };
+            
+            for (int y = 0; y < height(); y++)
+            {
+                unsigned long color = colors[(y/10)%4];
+                for (int x = 0; x < width(); x++)
+                {
+                    draw_pixel(color, x, y);
+                }
+            }
+        }
+    } testDrawer;
+    testDrawer.run();
+    
     return 0;
 }
