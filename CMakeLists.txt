@@ -78,7 +78,9 @@ set(LIBSOURCES
         src/code3c/drawer.cc
         src/code3c/huffman.cc
         src/code3c/bitmat.cc
-        src/code3c/in3ccode.cc)
+        src/code3c/in3ccode.cc
+        src/code3c/pixelmap.cc
+        src/code3c/pixelmap.c)
 
 set(LIBHEADERS
         include/code3c/3ccode.hh
@@ -86,7 +88,8 @@ set(LIBHEADERS
         include/code3c/huffman.hh
         include/code3c/3ccodelib.hh
         include/code3c/bitmat.hh
-        include/code3c/in3ccode.hh)
+        include/code3c/in3ccode.hh
+        include/code3c/pixelmap.hh)
 
 if(UNIX)
     add_definitions(-DCODE3C_UNIX)
