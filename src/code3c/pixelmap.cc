@@ -45,14 +45,32 @@ namespace code3c
         return m_size;
     }
     
-    void PixelMap::resize(float scale)
+    PixelMap PixelMap::resize(float scale) const
     {
-        // Todo PixelMap::resize(float)
+        return resize(static_cast<int>(width()*scale),
+               static_cast<int>(height()*scale));
     }
     
-    void PixelMap::resize(int width, int height)
+    PixelMap PixelMap::resize(int width, int height) const
     {
-        // Todo PixelMap::resize(int, int)
+        if (width <= 0)
+            width = this->width();
+        if (height <= 0)
+            height = this->height();
+        
+        PixelMap pixelMap(width, height);
+        for (int x = 0; x < width; x++)
+        {
+            int srcX = (x*m_width)/width;
+            for (int y = 0; y < height; y++)
+            {
+                int srcY = (y*m_height)/height;
+                Pixel pixelSrc = (*this)[srcX, srcY];
+                pixelMap[x,y] = pixelSrc;
+            }
+        }
+        
+        return pixelMap;
     }
     
     Pixel& PixelMap::operator[](int i)

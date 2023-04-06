@@ -58,14 +58,14 @@ namespace code3c
          * Resize the Pixelmap according to the specified scale.
          * @param scale the resizing scale
          */
-        virtual void resize(float scale);
+        virtual PixelMap resize(float scale) const;
         /**
          * Resize the Pixelmap to another width x height.
          *
          * @param width New width to apply (put 0 to remain unchanged)
          * @param height New height to apply (put 0 to remain unchanged)
          */
-        virtual void resize(int width, int height);
+        virtual PixelMap resize(int width, int height) const;
         
         Pixel& operator[](int i);
         Pixel& operator[](int x, int y);

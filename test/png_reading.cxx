@@ -98,5 +98,38 @@ int test_png_read()
 
 int test_png_resize()
 {
+    PixelMap map(PixelMap::loadFromPNG("gitlab_isima.png"));
+    PixelMap scaled(map.resize(169*2,0));
+    class PNGDrawer : public Code3CDrawer
+    {
+        PixelMap &map;
+    public:
+        explicit PNGDrawer(PixelMap &map):
+            Code3CDrawer(map.width(), map.height(), matb(20)),
+            map(map)
+        {
+        }
+        
+        void setup() override
+        {
+            setTitle("PNG Test Window");
+            background(0xffffff);
+            
+            for (int x = 0; x < map.width(); x++)
+            {
+                for (int y = 0; y < map.height(); y++)
+                {
+                    if (map[x,y].alpha != 0)
+                        draw_pixel(map[x,y].color, x, y);
+                }
+            }
+        }
+        
+        void draw() override
+        {
+        }
+    } pngDrawer(scaled);
+    
+    pngDrawer.run();
     return 0;
 }
