@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include "code3c/pixelmap.hh"
 
 namespace code3c
@@ -78,7 +79,7 @@ namespace code3c
     {
         png_descp desc = open_png(pngfile);
         if (!desc)
-            return {0,0};
+            throw std::runtime_error("Unable to load png file");
         
         PixelMap pixelMap(desc->width, desc->height);
         for (int y = 0; y < desc->height; y++)
