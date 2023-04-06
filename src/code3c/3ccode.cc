@@ -1,6 +1,7 @@
 #include "code3c/3ccode.hh"
 #include <cstring>
 #include <stdexcept>
+#include "code3c/pixelmap.hh"
 
 namespace code3c
 {
@@ -240,6 +241,28 @@ namespace code3c
                 foreground(0xbe55ab);
                 fill_circle(width()/2, height()/2, (modelDimension
                     .absRad-modelDimension.effRad)*CODE3C_PIXEL_UNIT);
+                
+                // Draw logo
+                int logoDiameter = (modelDimension.absRad - modelDimension.effRad) *
+                                   CODE3C_PIXEL_UNIT * 2;
+                int origX = (width() - logoDiameter) / 2;
+                int origY = (height() - logoDiameter) / 2;
+                
+                // Remind to change png filename to default ressource file
+                PixelMap map = PixelMap::loadFromPNG("honteux.png");
+                PixelMap logo = map.resize(logoDiameter, logoDiameter);
+                
+                int rlogo = logoDiameter / 2;
+                for (int x = 0, xx=origX; x < logoDiameter; x++, xx++)
+                {
+                    int rx = abs(rlogo-x);
+                    for (int y = 0, yy=origY; y < logoDiameter; y++, yy++)
+                    {
+                        int ry = abs(rlogo-y);
+                        if (((rx*rx)+(ry*ry)) < (rlogo*rlogo))
+                            draw_pixel(logo[x,y].color, xx, yy);
+                    }
+                }
             }
             
             void draw() override
