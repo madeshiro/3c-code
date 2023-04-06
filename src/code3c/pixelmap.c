@@ -1,5 +1,5 @@
 #include <malloc.h>
-//#include "code3c/pixelmap.hh"
+#include "code3c/pixelmap.hh"
 
 png_descp open_png(const char* fname)
 {
