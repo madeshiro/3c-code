@@ -73,6 +73,21 @@ namespace code3c
         return pixelMap;
     }
     
+    PixelMap& PixelMap::operator=(const PixelMap &map)
+    {
+        m_width  = map.m_width;
+        m_height = map.m_width;
+        m_size   = map.m_size;
+        
+        delete[] m_pixels;
+        m_pixels = new Pixel[m_size];
+        
+        for (uint32_t i(0); i < m_size; i++)
+            m_pixels[i] = map.m_pixels[i];
+        
+        return *this;
+    }
+    
     Pixel& PixelMap::operator[](int i)
     {
         return m_pixels[i];

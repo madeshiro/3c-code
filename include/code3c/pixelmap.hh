@@ -89,6 +89,8 @@ namespace code3c
          */
         virtual PixelMap resize(int width, int height) const;
         
+        PixelMap& operator =(const PixelMap& map);
+        
         Pixel& operator[](int i);
         Pixel& operator[](int x, int y);
         Pixel operator[](int i) const;
