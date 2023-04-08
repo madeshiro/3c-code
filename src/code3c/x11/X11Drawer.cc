@@ -41,6 +41,11 @@ namespace code3c
             throw std::runtime_error("Unable to find \"9x15\" font");
     }
     
+    X11Drawer::X11Drawer(const X11Drawer &x11Drawer):
+            X11Drawer(x11Drawer.m_width, x11Drawer.m_height, x11Drawer.m_data)
+    {
+    }
+    
     X11Drawer::~X11Drawer() noexcept
     {
         XFreeGC(m_display, m_gc);
