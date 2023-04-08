@@ -184,6 +184,7 @@ namespace code3c
         void key_binding(bool _register);
     public:
         X11Drawer(int width, int height, const matb& data);
+        X11Drawer(const X11Drawer& x11Drawer);
         ~X11Drawer() noexcept override;
         
         void show(bool b) override;
