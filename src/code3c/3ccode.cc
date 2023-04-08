@@ -249,7 +249,7 @@ namespace code3c
                 int origY = (height() - logoDiameter) / 2;
                 
                 // Remind to change png filename to default ressource file
-                PixelMap map = PixelMap::loadFromPNG("honteux.png");
+                PixelMap map = PixelMap::loadFromPNG("castex.png");
                 PixelMap logo = map.resize(logoDiameter, logoDiameter);
                 
                 int rlogo = logoDiameter / 2;

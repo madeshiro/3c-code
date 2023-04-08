@@ -18,9 +18,13 @@ namespace code3c
                                        500, 500, width, height, 2,
                                        BlackPixel(m_display, m_screen),
                                        WhitePixel(m_display, m_screen));
-        long mask = ExposureMask | KeyPressMask | ButtonPressMask | StructureNotifyMask |
-                    PointerMotionMask | ButtonReleaseMask;
+        m_keyboard = XkbGetMap(m_display, XkbAllClientInfoMask,
+                               XkbUseCoreKbd);
+        if (!m_keyboard) throw std::runtime_error("Unable to alloc X11 keyboard");
+        long mask = ExposureMask | KeyPressMask | KeyReleaseMask | ButtonPressMask |
+                    StructureNotifyMask |PointerMotionMask | ButtonReleaseMask;
         XSelectInput(m_display, m_window, mask);
+        XAutoRepeatOff(m_display);
         
         m_gcvalues.foreground = BlackPixel(m_display, m_screen);
         m_gcvalues.background = WhitePixel(m_display, m_screen);
@@ -42,6 +46,41 @@ namespace code3c
         XFreeGC(m_display, m_gc);
         XFreeFont(m_display, m_font);
         XCloseDisplay(m_display);
+    }
+    
+    void X11Drawer::key_binding(bool _register)
+    {
+        int mask(0);
+        switch(keySym)
+        {
+            case XK_Control_L:
+                mask = DRAWER_KEY_CTRLL;
+                break;
+            case XK_Control_R:
+                mask = DRAWER_KEY_CTRLR;
+                break;
+            case XK_Alt_L:
+                mask = DRAWER_KEY_ALTL;
+                break;
+            case XK_Alt_R:
+                mask = DRAWER_KEY_ALTR;
+                break;
+            case XK_Shift_L:
+            case XK_Shift_R:
+                mask = DRAWER_KEY_SHIFT;
+                break;
+            default:
+            {
+                if (key > 0)
+                    mask = (int) key; // NOLINT(cert-str34-c)
+                break;
+            }
+        }
+        
+        if (_register)
+            register_key(mask);
+        else
+            delete_key(mask);
     }
     
     void X11Drawer::show(bool b)
@@ -98,12 +137,19 @@ namespace code3c
                         case KeyPress:
                         case KeyRelease:
                         {
-                            XLookupString(&event.xkey, &key, 1, NULL, NULL);
                             keyCode = event.xkey.keycode;
+                            XLookupString(&event.xkey, &key, 1, NULL, NULL);
+                            XkbLookupKeySym(m_display, keyCode, 0, &keyMod, &keySym);
                             if (event.type == KeyPress)
+                            {
+                                key_binding(true);
                                 onKeyPressed();
+                            }
                             if (event.type == KeyRelease)
+                            {
                                 onKeyReleased();
+                                key_binding(false);
+                            }
                             break;
                         }
                         case MotionNotify:
@@ -113,6 +159,8 @@ namespace code3c
                             mouseEvent.mouseX = event.xbutton.x;
                             mouseEvent.mouseY = event.xbutton.y;
                             onMouseMoved();
+                            if (mouseEvent.button1Pressed)
+                                onMouseDragged();
                             break;
                         }
                         case ButtonRelease:

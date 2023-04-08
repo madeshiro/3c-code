@@ -50,10 +50,6 @@ public:
     void draw() override
     {
     }
-    
-    void onMouseWheel() override
-    {
-    }
 };
 
 /* test variables */
@@ -63,6 +59,7 @@ Drawer * drawer;
 int test_create_window();
 int test_create_data();
 int test_draw_pixel();
+int test_key_binding();
 
 
 typedef int (*TestFunction)(void); /* NOLINT */
@@ -90,6 +87,11 @@ static testFunctionMapEntry registeredFunctionEntries[] = {
             "draw_pixel",
             test_draw_pixel,
             2, 0
+        },
+        {
+            "key_binding",
+            test_key_binding,
+            3, 0
         }
 #endif
 };
@@ -176,5 +178,37 @@ int test_draw_pixel()
     } testDrawer;
     testDrawer.run();
     
+    return 0;
+}
+
+int test_key_binding()
+{
+    class KeyBindingDrawer : public Code3CDrawer
+    {
+        void onCtrlAPressed()
+        {
+            printf("Touch ALT_L+A pressed !\n");
+            fflush(stdout);
+        }
+    public:
+        KeyBindingDrawer(): Code3CDrawer(400, 400, matb(10))
+        {
+            bindKey((DRAWER_KEY_ALTL | 'a'),
+                    reinterpret_cast<delegate>(&KeyBindingDrawer::onCtrlAPressed)
+                    );
+        }
+        
+        void setup() override
+        {
+            setTitle("Key Binding Test");
+            background(0xffffff);
+        }
+        
+        void draw() override
+        {
+        
+        }
+    } keyBindingDrawer;
+    keyBindingDrawer.run();
     return 0;
 }
