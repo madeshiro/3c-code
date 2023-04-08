@@ -151,6 +151,7 @@ namespace code3c
         
         /* Draw functions */
         virtual void foreground(unsigned long color) = 0;
+        virtual void background(unsigned long color) = 0;
         virtual void draw_pixel(unsigned long color, int x, int y) = 0;
         virtual void draw_text(const char* str, int x, int y)  = 0;
         virtual void draw_slice(int origin_x, int origin_y, int radius, int degree,
@@ -204,7 +205,7 @@ namespace code3c
         
         /* draw functions */
         
-        virtual void background(unsigned long color);
+        void background(unsigned long color) override;
         void foreground(unsigned long color) override;
         void draw_pixel(unsigned long color, int x, int y) override;
         void draw_text(const char* str, int x, int y) override;
