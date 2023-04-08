@@ -39,9 +39,53 @@ namespace code3c
     {
     }
     
-    Drawer::Drawer(int width, int height, const code3c::matb &data) :
-            m_data(data), m_width(width), m_height(height)
+    void Drawer::onMouseDragged()
     {
+    }
+    
+    Drawer::Drawer(int width, int height, const code3c::matb &data) :
+            m_data(data), m_width(width), m_height(height),
+            m_keybind()
+    {
+    }
+    
+    Drawer::Drawer(const Drawer & drawer):
+        m_data(drawer.m_data), m_width(drawer.m_width), m_height(drawer.m_height),
+        m_fps(drawer.m_fps),
+        key(0), keyCode(0), keys_pressed(0)
+    {
+    }
+    
+    bool Drawer::register_key(int mask)
+    {
+        // Invalid mask
+        if ((mask & keys_pressed) != 0)
+            return false;
+        
+        keys_pressed |= mask;
+        if (m_keybind.contains(keys_pressed))
+        {
+            (this->*(m_keybind[keys_pressed]))();
+        }
+        return true;
+    }
+    
+    void Drawer::delete_key(int mask)
+    {
+        if ((keys_pressed & mask) != mask)
+            return;
+        
+        keys_pressed -= mask;
+    }
+    
+    void Drawer::bindKey(int mask, code3c::Drawer::delegate fn)
+    {
+        m_keybind.insert(std::pair<int, delegate>(mask, fn));
+    }
+    
+    void Drawer::unbindKey(int mask)
+    {
+        m_keybind.erase(mask);
     }
     
     unsigned long Drawer::fps() const

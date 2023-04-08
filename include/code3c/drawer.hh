@@ -17,17 +17,49 @@
 #ifndef HH_LIB_GDRAWER_3CCODE
 #define HH_LIB_GDRAWER_3CCODE
 #include "code3c/bitmat.hh"
+#include <cstdint>
 #include <png.h>
+#include <map>
 
 #ifdef CODE3C_UNIX
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include <X11/XKBlib.h>
 #endif
+
+// DRAWER_KEY_cc format: xcckk
+// x: special key id (e.g 1 = F#)
+// c: ctrl key
+// kk: key char
+#define DRAWER_KEY_CTRLL    0x00100
+#define DRAWER_KEY_CTRLR    0x00200
+#define DRAWER_KEY_SHIFT    0x00400
+#define DRAWER_KEY_ALTR     0x00800
+#define DRAWER_KEY_ALTL     0x01000
+#define DRAWER_KEY_ESC      0x02000
+#define DRAWER_KEY_F1       0x10000
+#define DRAWER_KEY_F2       0x20000
+#define DRAWER_KEY_F3       0x30000
+#define DRAWER_KEY_F4       0x40000
+#define DRAWER_KEY_F5       0x50000
+#define DRAWER_KEY_F6       0x60000
+#define DRAWER_KEY_F7       0x70000
+#define DRAWER_KEY_F8       0x80000
+#define DRAWER_KEY_F9       0x90000
+#define DRAWER_KEY_F10      0xA0000
+#define DRAWER_KEY_F11      0xB0000
+#define DRAWER_KEY_F12      0xC0000
 
 namespace code3c
 {
-    unsigned long rgb(const char* hex);
+    /**
+     *
+     * @param r
+     * @param g
+     * @param b
+     * @return
+     */
     unsigned long rgb(int r, int g, int b);
     
     class Drawer;
@@ -37,6 +69,9 @@ namespace code3c
         int pmouseX, pmouseY;
         unsigned int mouseButton;
         int wheelCount;
+        
+        bool button1Pressed;
+        bool button2Pressed;
     };
     
     class Drawer /* abstract */
@@ -53,11 +88,25 @@ namespace code3c
         char key;
         unsigned int keyCode;
         MouseEvent mouseEvent;
+        
+        // Key mapping
+        int keys_pressed;
+        
+        bool register_key(int mask);
+        void delete_key(int mask);
+        
+        // Key binding
+        typedef void (Drawer::*delegate)();
+        std::map<int, delegate> m_keybind;
+        
+        void bindKey(int mask, delegate fn);
+        void unbindKey(int mask);
     private:
         int delta_r;
         int delta_t;
     public:
         Drawer(int width, int height, const matb& data);
+        Drawer(const Drawer&);
         virtual ~Drawer() = default;
         
         virtual unsigned long fps() const final;
@@ -87,6 +136,7 @@ namespace code3c
         
         virtual void onMouseMoved();
         virtual void onMouseWheel();
+        virtual void onMouseDragged();
         virtual void onMouseClicked();
         virtual void onMousePressed();
         virtual void onMouseReleased();
@@ -113,16 +163,20 @@ namespace code3c
         XGCValues m_gcvalues;
         XFontStruct * m_font;
         
+        XkbDescPtr m_keyboard;
         Display *m_display;
         Window m_window;
         int m_screen;
         Pixmap m_db; // Double Buffer
         GC m_gc;
         
-        
         // Miscellanous
         Atom wmDeleteWindow;
+        KeySym keySym;
+        unsigned int keyMod;
         unsigned long m_frameRate;
+        
+        void key_binding(bool _register);
     public:
         X11Drawer(int width, int height, const matb& data);
         ~X11Drawer() noexcept override;

@@ -66,7 +66,7 @@ namespace code3c
         m_hamming->build_xbuffer(hamming_buf, &errOff);
         m_hamming->build_pbuffer(&hamming_buf[errOff], nullptr);
 
-        // For debugging 
+        // For debugging
         cDebug("\nHamming data:\n\t\t- dataSeg: %d\n\t\t- errSeg: %d\n",
                dataSegSize(), errSegSize());
 
