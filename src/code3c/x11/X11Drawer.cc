@@ -1,8 +1,8 @@
 #include "code3c/drawer.hh"
+
 #include <unistd.h>
 #include <ctime>
 #include <cstring>
-#include <X11/Xutil.h>
 #include <stdexcept>
 
 namespace code3c
@@ -231,7 +231,26 @@ namespace code3c
     
     void X11Drawer::savePNG(const char *name) const
     {
-    
+        XImage * img = XGetImage(m_display, m_db, 0, 0, m_width, m_height, AllPlanes, XYPixmap);
+        if (img)
+        {
+            PixelMap pixelMap(width(), height());
+            for (int x(0); x < width(); x++)
+            {
+                for (int y(0); y < height(); y++)
+                {
+                    pixelMap[x,y] = {
+                            x, y,
+                            XGetPixel(img, x, y),
+                            0xff
+                    };
+                }
+            }
+            FILE * dest = fopen(name, "wb");
+            if (dest)
+                PixelMap::saveInPng(pixelMap, dest);
+            XFree(img);
+        }
     }
     
     /* draw functions */

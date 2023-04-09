@@ -167,7 +167,7 @@ namespace code3c
         public:
             Code3CDrawerSample(const Code3C* parent, const Code3CData& cData):
             parent(parent),
-            X11Drawer(
+            Code3CDrawer(
                 40+2 * cData.getDimension().absRad * CODE3C_PIXEL_UNIT,
                 40+2 * cData.getDimension().absRad * CODE3C_PIXEL_UNIT,
                 cData
@@ -263,6 +263,14 @@ namespace code3c
                             draw_pixel(logo[x,y].color, xx, yy);
                     }
                 }
+
+                // Save in file
+                char fname[256];
+                sprintf(fname, "%dx%d_%dpx*%dpx (%dB).png",
+                        modelDimension.rev, modelDimension.effRad,
+                        width(), height(),
+                        parent->m_desc.bitl*modelDimension.capacity/8);
+                savePNG(fname);
             }
             
             void draw() override
