@@ -175,6 +175,16 @@ int test_draw_pixel()
                 }
             }
         }
+
+        void onKeyPressed() override
+        {
+            if (key == 'a')
+            {
+                printf("Save screen\n");
+                fflush(stdout);
+                savePNG("test_drawing.png");
+            }
+        }
     } testDrawer;
     testDrawer.run();
     

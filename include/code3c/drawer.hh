@@ -17,6 +17,8 @@
 #ifndef HH_LIB_GDRAWER_3CCODE
 #define HH_LIB_GDRAWER_3CCODE
 #include "code3c/bitmat.hh"
+#include "code3c/pixelmap.hh"
+
 #include <cstdint>
 #include <png.h>
 #include <map>
