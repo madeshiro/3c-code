@@ -164,6 +164,13 @@ namespace code3c
         {
             const Code3C* parent;
             const CODE3C_MODEL_DESC::CODE3C_MODEL_DIMENSION &modelDimension;
+            
+            void save_ui()
+            {
+                char fname[256];
+                sprintf(fname, "3ccode-generated-%lx.png", hash());
+                savePNG(fname);
+            }
         public:
             Code3CDrawerSample(const Code3C* parent, const Code3CData& cData):
             parent(parent),
@@ -173,6 +180,8 @@ namespace code3c
                 cData
                 ), modelDimension(cData.getDimension())
             {
+                bindKey((DRAWER_KEY_CTRLL | 's'),
+                        reinterpret_cast<delegate>(&Code3CDrawerSample::save_ui));
             }
             
             unsigned long bit_to_color(char _byte)

@@ -56,6 +56,24 @@ namespace code3c
     {
     }
     
+    uint64_t Drawer::hash() const
+    {
+        uint64_t hash(0);
+        hash |= ((uint64_t) m_data.n()) << 32;
+        hash |= ((uint64_t) m_data.m()) << 16;
+        
+        uint64_t strHash(0);
+        for (int x(0); x < m_data.n(); x++)
+        {
+            strHash += ((uint64_t) m_data[x,0]) << x%64;
+            for (int y(1); y < m_data.m(); y++)
+            {
+                strHash |= ((uint64_t)m_data[x,y-1]*(y+1)) << x%64;
+            }
+        }
+        return hash | (strHash & 0xffffffff);
+    }
+    
     bool Drawer::register_key(int mask)
     {
         // Invalid mask
