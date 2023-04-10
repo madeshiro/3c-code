@@ -88,6 +88,12 @@ namespace code3c
     {
         m_instance = GetModuleHandle(NULL);
         
+        // Compute real width and height
+        RECT rc = {0, 0, width, height};
+        AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
+        m_offH = rc.bottom-rc.top-height;
+        m_offW  = rc.right-rc.left-width;
+        
         // Register Win32 class
         WNDCLASS wc = { };
         if (!GetClassInfo(m_instance, "Win32Drawer", &wc))
@@ -102,12 +108,16 @@ namespace code3c
         m_window = CreateWindowEx(0,
                 "Win32Drawer",
                 "Win32Drawer Window",
-                WS_OVERLAPPEDWINDOW |
+                WS_OVERLAPPED |
+                    WS_CAPTION |
+                    WS_SYSMENU |
+                    WS_THICKFRAME |
+                    WS_MINIMIZEBOX |
                     WS_VISIBLE,
                 CW_USEDEFAULT,
                 CW_USEDEFAULT,
-                width,
-                height,
+                width + m_offW,
+                height + m_offH,
                 NULL, // Parent Window
                 NULL, // Menu: Try to create one for the future
                 m_instance,
@@ -117,7 +127,23 @@ namespace code3c
             throw std::runtime_error("Unable to create Win32 Window");
         if (!SetProp(m_window, "Win32Drawer", this))
             throw std::runtime_error("Unable to attach Win32Drawer to Win32 HWND");
-        m_hdc = GetDC(m_window);
+        m_hdc   = GetDC(m_window);
+        m_hdcdb = CreateCompatibleDC(m_hdc);
+        
+        ZeroMemory(&m_bmi, sizeof(BITMAPINFO));
+        m_bmi.bmiHeader.biSize     = sizeof(BITMAPINFOHEADER);
+        m_bmi.bmiHeader.biWidth    = width;
+        m_bmi.bmiHeader.biHeight   = height;
+        m_bmi.bmiHeader.biPlanes   = 1;
+        m_bmi.bmiHeader.biBitCount = 32;
+        m_bitmap = CreateDIBSection(m_hdc, &m_bmi, DIB_RGB_COLORS,
+                                    &m_bitmapBits,
+                                    NULL, 0);
+        
+        m_bf.BlendOp = AC_SRC_OVER;
+        m_bf.BlendFlags = 0;
+        m_bf.SourceConstantAlpha = 0xff;
+        m_bf.AlphaFormat = AC_SRC_ALPHA;
     }
     
     Win32Drawer::Win32Drawer(const Win32Drawer &w32Drawer):
@@ -129,6 +155,8 @@ namespace code3c
     {
         RemoveProp(m_window, "Win32Drawer");
         DestroyWindow(m_window);
+        DeleteObject(m_bitmap);
+        DeleteDC(m_hdcdb);
     }
     
     void Win32Drawer::key_binding(bool _register)
@@ -171,14 +199,16 @@ namespace code3c
     {
         m_height = height;
         SetWindowPos(m_window, NULL, 0, 0,
-                     m_width, m_height, SWP_NOMOVE | SWP_NOZORDER);
+                     m_width+m_offW, m_height+m_offH,
+                     SWP_NOMOVE | SWP_NOZORDER);
     }
     
     void Win32Drawer::setWidth(int width)
     {
         m_width = width;
         SetWindowPos(m_window, NULL, 0, 0,
-                     m_width, m_height, SWP_NOMOVE | SWP_NOZORDER);
+                     m_width+m_offW, m_height+m_offH,
+                     SWP_NOMOVE | SWP_NOZORDER);
     }
     
     unsigned long Win32Drawer::frameRate() const
@@ -191,9 +221,12 @@ namespace code3c
         MSG msg;
         
         this->setup();
+        this->show(true);
         do
         {
             clock_t begin(clock());
+            m_hdcdb = CreateCompatibleDC(m_hdc);
+            
             /* run */ {
                 while (PeekMessage(&msg, m_window, 0, 0, PM_REMOVE) > 0)
                 {
@@ -212,8 +245,11 @@ namespace code3c
                 m_frameRate = (unsigned long) _frameRate;
             }
             
-            // Call Win32Drawer::draw()
-            PostMessage(m_window, WM_PAINT, 0, 0);
+            HGDIOBJ oldBmp = SelectObject(m_hdcdb, m_bitmap);
+            AlphaBlend(m_hdc, 0, 0, m_width, m_height, m_hdcdb,
+                              0, 0, m_width, m_height, m_bf);
+            SelectObject(m_hdcdb, oldBmp);
+            DeleteDC(m_hdcdb);
         }
         while (!done);
     }
@@ -237,7 +273,9 @@ namespace code3c
     
     void Win32Drawer::background(unsigned long color)
     {
-        // FillRect();
+        RECT rc = {0, 0, m_width, m_height};
+        HBRUSH brush = CreateSolidBrush(RGB(color>>16&0xff, color>>8&0xff, color&0xff));
+        FillRect(m_hdc, &rc, brush);
     }
     
     void Win32Drawer::foreground(unsigned long color)
@@ -247,7 +285,8 @@ namespace code3c
     
     void Win32Drawer::draw_pixel(unsigned long color, int x, int y)
     {
-    
+        uint32_t index = (width()*height()) - (width()*y+(width()-x));
+        ((UINT*)m_bitmapBits)[index] = (UINT) (0xff<<24) | color;
     }
     
     void Win32Drawer::draw_text(const char *str, int x, int y)

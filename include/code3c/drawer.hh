@@ -154,11 +154,13 @@ namespace code3c
          *
          * @param name
          */
-        virtual void savePNG(const char* name) const = 0;
+        virtual void savePNG(const char *name) const = 0;
         
         /* Draw functions */
         virtual void foreground(unsigned long color) = 0;
+        
         virtual void background(unsigned long color) = 0;
+        
         virtual void draw_pixel(unsigned long color, int x, int y) = 0;
         virtual void draw_text(const char* str, int x, int y)  = 0;
         virtual void draw_slice(int origin_x, int origin_y, int radius, int degree,
@@ -189,13 +191,14 @@ namespace code3c
         unsigned long m_frameRate;
         
         void key_binding(bool _register);
+    
     public:
         X11Drawer(int width, int height, const matb &data);
         X11Drawer(const X11Drawer &x11Drawer);
         ~X11Drawer() noexcept override;
         
         void show(bool b) override;
-        void setTitle(const char*) override;
+        void setTitle(const char *) override;
         void setHeigh(int height) override;
         void setWidth(int width) override;
         
@@ -203,7 +206,7 @@ namespace code3c
         void exit() override;
         void clear() override;
         virtual void cleardb();
-
+        
         unsigned long frameRate() const override;
         
         void setup() override = 0;
@@ -235,11 +238,19 @@ namespace code3c
 
         // Win32 Window variables
         HINSTANCE m_instance;
+        PAINTSTRUCT m_paint;
         HWND m_window;
         HDC m_hdc;
-        tagPAINTSTRUCT m_paint;
+
+        // Double Buffering
+        HDC m_hdcdb;
+        HBITMAP m_bitmap;
+        BITMAPINFO m_bmi;
+        BLENDFUNCTION m_bf;
+        void* m_bitmapBits;
 
         // Miscellanous
+        int m_offH, m_offW;
         unsigned long m_frameRate;
         bool done = false;
 

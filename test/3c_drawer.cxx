@@ -19,7 +19,11 @@ public:
     void setup() override
     {
         setTitle("Code3C Test Window");
-        
+    }
+    
+    void draw() override
+    {
+        background(0xffffff);
         unsigned long color;
         for (int r=350; r >= 100; r-=5)
         {
@@ -45,10 +49,6 @@ public:
         foreground(0xbe55ab);
         fill_circle(350, 350, 100);
         foreground(0);
-    }
-    
-    void draw() override
-    {
     }
 };
 

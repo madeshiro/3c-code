@@ -117,6 +117,10 @@ if(UNIX)
     set(CODE3C_DEPENDENCIES ${CODE3C_DEPENDENCIES}
             X11::X11)
 endif()
+if (WIN32)
+    set(CODE3C_DEPENDENCIES ${CODE3C_DEPENDENCIES}
+            -lMsimg32)
+endif()
 
 include_directories(${PNG_INCLUDE_DIRS})
 # include_directories(${GTK_INCLUDE_DIRS})
