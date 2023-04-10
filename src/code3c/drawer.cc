@@ -68,7 +68,7 @@ namespace code3c
             strHash += ((uint64_t) m_data[x,0]) << x%64;
             for (int y(1); y < m_data.m(); y++)
             {
-                strHash |= ((uint64_t)m_data[x,y-1]*(y+1)) << x%64;
+                strHash += ((uint64_t)m_data[x,y-1]*(y+1)) << x%64;
             }
         }
         return hash | (strHash & 0xffffffff);
