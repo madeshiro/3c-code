@@ -167,7 +167,7 @@ namespace code3c
         public:
             Code3CDrawerSample(const Code3C* parent, const Code3CData& cData):
             parent(parent),
-            X11Drawer(
+            Code3CDrawer(
                 40+2 * cData.getDimension().absRad * CODE3C_PIXEL_UNIT,
                 40+2 * cData.getDimension().absRad * CODE3C_PIXEL_UNIT,
                 cData
@@ -221,6 +221,10 @@ namespace code3c
             {
                 // Setup window
                 setTitle("Code3C Drawing Frame");
+            }
+            
+            void draw() override
+            {
                 background(0xffffff);
                 
                 // Draw 3ccode outline
@@ -263,11 +267,6 @@ namespace code3c
                             draw_pixel(logo[x,y].color, xx, yy);
                     }
                 }
-            }
-            
-            void draw() override
-            {
-                // Nothing to do here
             }
         } *cDrawerSample = new Code3CDrawerSample(this, m_dataMat);
         

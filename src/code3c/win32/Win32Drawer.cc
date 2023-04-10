@@ -1,1 +1,275 @@
+#include <unistd.h>
+#include <stdexcept>
 #include "code3c/drawer.hh"
+
+namespace code3c
+{
+    LRESULT WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+    {
+        auto *win = (Win32Drawer *) GetProp(hWnd, "Win32Drawer");
+        switch (msg)
+        {
+            case WM_PAINT:
+            {
+                BeginPaint(hWnd, &win->m_paint);
+                {
+                    win->draw();
+                }
+                EndPaint(hWnd, &win->m_paint);
+                break;
+            }
+            case WM_KEYDOWN:
+            case WM_KEYUP:
+            {
+                win->keyCode = wParam;
+                if (msg == WM_KEYDOWN)
+                {
+                    win->key_binding(true);
+                    win->onKeyPressed();
+                }
+                if (msg == WM_KEYUP)
+                {
+                    win->onKeyReleased();
+                    win->key_binding(false);
+                }
+                break;
+            }
+            case WM_MOUSEMOVE:
+            {
+                int mouseX, mouseY;
+                mouseX = GET_X_LPARAM(lParam);
+                mouseY = GET_Y_LPARAM(lParam);
+                
+                win->mouseEvent.pmouseX = win->mouseEvent.mouseX - mouseX;
+                win->mouseEvent.pmouseY = win->mouseEvent.mouseY - mouseY;
+                win->mouseEvent.mouseX = mouseX;
+                win->mouseEvent.mouseY = mouseY;
+                win->onMouseMoved();
+                if (win->mouseEvent.button1Pressed)
+                    win->onMouseDragged();
+                break;
+            }
+            case WM_LBUTTONDOWN:
+                win->mouseEvent.button1Pressed = true;
+                win->keyCode = VK_LBUTTON;
+                win->onMousePressed();
+                break;
+            case WM_RBUTTONDOWN:
+                win->mouseEvent.button2Pressed = true;
+                win->keyCode = VK_RBUTTON;
+                win->onMousePressed();
+                break;
+            case WM_LBUTTONUP:
+                win->mouseEvent.button1Pressed = false;
+                win->keyCode = VK_LBUTTON;
+                win->onMouseReleased();
+                break;
+            case WM_RBUTTONUP:
+                win->mouseEvent.button2Pressed = false;
+                win->keyCode = VK_RBUTTON;
+                win->onMousePressed();
+                break;
+            case WM_DESTROY:
+                PostQuitMessage(0);
+                win->done = true;
+                break;
+            case WM_QUIT:
+                win->done = true;
+                break;
+            default:
+                return DefWindowProc(hWnd, msg, wParam, lParam);
+        }
+        
+        return 0;
+    }
+    
+    Win32Drawer::Win32Drawer(int width, int height, const matb &data):
+            Drawer(width, height, data)
+    {
+        m_instance = GetModuleHandle(NULL);
+        
+        // Register Win32 class
+        WNDCLASS wc = { };
+        if (!GetClassInfo(m_instance, "Win32Drawer", &wc))
+        {
+            wc.lpfnWndProc = code3c::WndProc;
+            wc.hInstance = m_instance;
+            wc.lpszClassName = "Win32Drawer";
+            
+            RegisterClass(&wc);
+        }
+        
+        m_window = CreateWindowEx(0,
+                "Win32Drawer",
+                "Win32Drawer Window",
+                WS_OVERLAPPEDWINDOW |
+                    WS_VISIBLE,
+                CW_USEDEFAULT,
+                CW_USEDEFAULT,
+                width,
+                height,
+                NULL, // Parent Window
+                NULL, // Menu: Try to create one for the future
+                m_instance,
+                NULL  // Additional application data
+                );
+        if (!m_window)
+            throw std::runtime_error("Unable to create Win32 Window");
+        if (!SetProp(m_window, "Win32Drawer", this))
+            throw std::runtime_error("Unable to attach Win32Drawer to Win32 HWND");
+        m_hdc = GetDC(m_window);
+    }
+    
+    Win32Drawer::Win32Drawer(const Win32Drawer &w32Drawer):
+            Win32Drawer(w32Drawer.width(), w32Drawer.height(), w32Drawer.m_data)
+    {
+    }
+    
+    Win32Drawer::~Win32Drawer() noexcept
+    {
+        RemoveProp(m_window, "Win32Drawer");
+        DestroyWindow(m_window);
+    }
+    
+    void Win32Drawer::key_binding(bool _register)
+    {
+        int mask(0);
+        switch (keyCode)
+        {
+            case VK_CONTROL:
+                mask = DRAWER_KEY_CTRLL;
+                break;
+            case VK_MENU:
+                mask = DRAWER_KEY_ALTL;
+                break;
+            case VK_SHIFT:
+                mask = DRAWER_KEY_SHIFT;
+                break;
+            default:
+                if (keyCode >= 0x41 && keyCode <= 0x5a)
+                    mask = 'a' + (keyCode-0x41);
+                break;
+        }
+        
+        if (_register)
+            register_key(mask);
+        else
+            delete_key(mask);
+    }
+    
+    void Win32Drawer::show(bool b)
+    {
+        ShowWindow(m_window, b ? SW_SHOW : SW_HIDE);
+    }
+    
+    void Win32Drawer::setTitle(const char * title)
+    {
+        SetWindowText(m_window, title);
+    }
+    
+    void Win32Drawer::setHeigh(int height)
+    {
+        m_height = height;
+        SetWindowPos(m_window, NULL, 0, 0,
+                     m_width, m_height, SWP_NOMOVE | SWP_NOZORDER);
+    }
+    
+    void Win32Drawer::setWidth(int width)
+    {
+        m_width = width;
+        SetWindowPos(m_window, NULL, 0, 0,
+                     m_width, m_height, SWP_NOMOVE | SWP_NOZORDER);
+    }
+    
+    unsigned long Win32Drawer::frameRate() const
+    {
+        return m_frameRate;
+    }
+    
+    void Win32Drawer::run()
+    {
+        MSG msg;
+        
+        this->setup();
+        do
+        {
+            clock_t begin(clock());
+            /* run */ {
+                while (PeekMessage(&msg, m_window, 0, 0, PM_REMOVE) > 0)
+                {
+                    TranslateMessage(&msg);
+                    DispatchMessage(&msg);
+                }
+                
+                this->draw();
+                
+                unsigned long millis((clock() - begin) * 1000 / CLOCKS_PER_SEC);
+                if ((1000 / fps() > millis))
+                {
+                    usleep((1000 / fps() - millis) * 1000);
+                    millis += (1000 / fps() - millis);
+                }
+                
+                double _frameRate(1000.0 / (double) millis);
+                m_frameRate = (unsigned long) _frameRate;
+            }
+            
+            // Call Win32Drawer::draw()
+            PostMessage(m_window, WM_PAINT, 0, 0);
+        }
+        while (!done);
+    }
+    
+    void Win32Drawer::exit()
+    {
+    }
+    
+    void Win32Drawer::clear()
+    {
+        // Default behaviour in Win32
+        // Non-persistent drawing surface
+        RedrawWindow(m_window, NULL, NULL,
+                     RDW_ERASE | RDW_INVALIDATE | RDW_FRAME);
+    }
+    
+    void Win32Drawer::savePNG(const char *name) const
+    {
+    
+    }
+    
+    void Win32Drawer::background(unsigned long color)
+    {
+        // FillRect();
+    }
+    
+    void Win32Drawer::foreground(unsigned long color)
+    {
+    
+    }
+    
+    void Win32Drawer::draw_pixel(unsigned long color, int x, int y)
+    {
+    
+    }
+    
+    void Win32Drawer::draw_text(const char *str, int x, int y)
+    {
+    
+    }
+    
+    void Win32Drawer::draw_slice(
+            int origin_x, int origin_y, int radius, int degree, int rotation
+    )
+    {
+    }
+    
+    void Win32Drawer::fill_circle(int x, int y, int radius)
+    {
+    
+    }
+    
+    void Win32Drawer::draw_line(int x1, int y1, int x2, int y2)
+    {
+    
+    }
+}
