@@ -45,7 +45,7 @@ namespace code3c
     
     Drawer::Drawer(int width, int height, const code3c::matb &data) :
             m_data(data), m_width(width), m_height(height),
-            m_keybind()
+            m_keybind(), key(0), keyCode(0), keys_pressed(0)
     {
     }
     

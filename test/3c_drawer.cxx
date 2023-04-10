@@ -193,7 +193,7 @@ int test_key_binding()
     public:
         KeyBindingDrawer(): Code3CDrawer(400, 400, matb(10))
         {
-            bindKey((DRAWER_KEY_ALTL | 'a'),
+            bindKey((DRAWER_KEY_CTRLL | 'a'),
                     reinterpret_cast<delegate>(&KeyBindingDrawer::onCtrlAPressed)
                     );
         }
