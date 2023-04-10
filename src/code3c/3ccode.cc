@@ -272,14 +272,6 @@ namespace code3c
                             draw_pixel(logo[x,y].color, xx, yy);
                     }
                 }
-
-                // Save in file
-                char fname[256];
-                sprintf(fname, "%dx%d_%dpx*%dpx (%dB).png",
-                        modelDimension.rev, modelDimension.effRad,
-                        width(), height(),
-                        parent->m_desc.bitl*modelDimension.capacity/8);
-                savePNG(fname);
             }
             
             void draw() override
