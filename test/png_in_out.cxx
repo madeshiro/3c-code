@@ -81,6 +81,10 @@ int test_png_read()
         void setup() override
         {
             setTitle("PNG Test Window");
+        }
+        
+        void draw() override
+        {
             background(0xffffff);
             
             for (int x = 0; x < map.width(); x++)
@@ -91,10 +95,6 @@ int test_png_read()
                         draw_pixel(map[x,y].color, x, y);
                 }
             }
-        }
-        
-        void draw() override
-        {
         }
     } pngDrawer(map);
     

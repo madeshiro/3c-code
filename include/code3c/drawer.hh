@@ -162,11 +162,13 @@ namespace code3c
         virtual void background(unsigned long color) = 0;
         
         virtual void draw_pixel(unsigned long color, int x, int y) = 0;
-        virtual void draw_text(const char* str, int x, int y)  = 0;
-        virtual void draw_slice(int origin_x, int origin_y, int radius, int degree,
-                                int rotation) = 0;
-
-        virtual uint64_t hash() const;
+        
+        virtual void draw_text(const char *str, int x, int y) = 0;
+        
+        virtual void draw_slice(
+                int origin_x, int origin_y, int radius, int degree,
+                int rotation
+        ) = 0;
     };
 
 #ifdef CODE3C_UNIX
@@ -218,7 +220,7 @@ namespace code3c
         
         void background(unsigned long color) override;
         void foreground(unsigned long color) override;
-
+        
         void draw_pixel(unsigned long color, int x, int y) override;
         void draw_text(const char *str, int x, int y) override;
         void draw_slice(
@@ -228,19 +230,20 @@ namespace code3c
         virtual void fill_circle(int x, int y, int radius);
         virtual void draw_line(int x1, int y1, int x2, int y2);
     };
-
+    
     typedef X11Drawer Code3CDrawer;
 #endif //CODE3C_UNIX
 #ifdef CODE3C_WIN32
     class Win32Drawer : public Drawer
     {
         friend LRESULT WndProc(HWND, UINT, WPARAM, LPARAM);
-
+        
         // Win32 Window variables
         HINSTANCE m_instance;
         PAINTSTRUCT m_paint;
         HWND m_window;
         HDC m_hdc;
+        HPEN m_pen;
 
         // Double Buffering
         HDC m_hdcdb;
@@ -248,7 +251,7 @@ namespace code3c
         BITMAPINFO m_bmi;
         BLENDFUNCTION m_bf;
         void* m_bitmapBits;
-
+        
         // Miscellanous
         int m_offH, m_offW;
         unsigned long m_frameRate;

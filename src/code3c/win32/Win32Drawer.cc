@@ -144,6 +144,9 @@ namespace code3c
         m_bf.BlendFlags = 0;
         m_bf.SourceConstantAlpha = 0xff;
         m_bf.AlphaFormat = AC_SRC_ALPHA;
+        
+        m_pen = CreatePen(PS_SOLID, 1, 0x0);
+        SelectObject(m_hdc, m_pen);
     }
     
     Win32Drawer::Win32Drawer(const Win32Drawer &w32Drawer):
@@ -157,6 +160,7 @@ namespace code3c
         DestroyWindow(m_window);
         DeleteObject(m_bitmap);
         DeleteDC(m_hdcdb);
+        DeletePen(m_pen);
     }
     
     void Win32Drawer::key_binding(bool _register)
@@ -280,7 +284,10 @@ namespace code3c
     
     void Win32Drawer::foreground(unsigned long color)
     {
-    
+        COLORREF cr = RGB(color>>16&0xff, color>>8&0xff, color&0xff);
+        DeletePen(m_pen);
+        m_pen = CreatePen(PS_SOLID, 1, cr);
+        SelectPen(m_hdc, m_pen);
     }
     
     void Win32Drawer::draw_pixel(unsigned long color, int x, int y)
@@ -307,6 +314,11 @@ namespace code3c
     
     void Win32Drawer::draw_line(int x1, int y1, int x2, int y2)
     {
-    
+        POINT points[2] {
+                {x1, y1},
+                {x2, y2}
+        };
+        
+        Polyline(m_hdc, points, 2);
     }
 }
