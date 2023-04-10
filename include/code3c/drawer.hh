@@ -28,7 +28,14 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/XKBlib.h>
-#endif
+#endif // CODE3C_UNIX
+
+#ifdef CODE3C_WIN32
+#include <windef.h>
+#include <winuser.h>
+#include <wingdi.h>
+#include <windowsx.h>
+#endif // CODE3C_WIN32
 
 // DRAWER_KEY_cc format: xcckk
 // x: special key id (e.g 1 = F#)
@@ -156,7 +163,7 @@ namespace code3c
         virtual void draw_text(const char* str, int x, int y)  = 0;
         virtual void draw_slice(int origin_x, int origin_y, int radius, int degree,
                                 int rotation) = 0;
-        
+
         virtual uint64_t hash() const;
     };
 
@@ -166,7 +173,7 @@ namespace code3c
         // X11 Window variables
         XSetWindowAttributes m_attributes;
         XGCValues m_gcvalues;
-        XFontStruct * m_font;
+        XFontStruct *m_font;
         
         XkbDescPtr m_keyboard;
         Display *m_display;
@@ -183,8 +190,8 @@ namespace code3c
         
         void key_binding(bool _register);
     public:
-        X11Drawer(int width, int height, const matb& data);
-        X11Drawer(const X11Drawer& x11Drawer);
+        X11Drawer(int width, int height, const matb &data);
+        X11Drawer(const X11Drawer &x11Drawer);
         ~X11Drawer() noexcept override;
         
         void show(bool b) override;
@@ -202,10 +209,64 @@ namespace code3c
         void setup() override = 0;
         void draw() override = 0;
         
-        void savePNG(const char* name) const override;
+        void savePNG(const char *name) const override;
         
         /* draw functions */
         
+        void background(unsigned long color) override;
+        void foreground(unsigned long color) override;
+
+        void draw_pixel(unsigned long color, int x, int y) override;
+        void draw_text(const char *str, int x, int y) override;
+        void draw_slice(
+                int origin_x, int origin_y, int radius, int degree,
+                int rotation
+        ) override;
+        virtual void fill_circle(int x, int y, int radius);
+        virtual void draw_line(int x1, int y1, int x2, int y2);
+    };
+
+    typedef X11Drawer Code3CDrawer;
+#endif //CODE3C_UNIX
+#ifdef CODE3C_WIN32
+    class Win32Drawer : public Drawer
+    {
+        friend LRESULT WndProc(HWND, UINT, WPARAM, LPARAM);
+
+        // Win32 Window variables
+        HINSTANCE m_instance;
+        HWND m_window;
+        HDC m_hdc;
+        tagPAINTSTRUCT m_paint;
+
+        // Miscellanous
+        unsigned long m_frameRate;
+        bool done = false;
+
+        void key_binding(bool _register);
+    public:
+        Win32Drawer(int width, int height, const matb& data);
+        Win32Drawer(const Win32Drawer& w32Drawer);
+        ~Win32Drawer() noexcept override;
+
+        void show(bool b) override;
+        void setTitle(const char*) override;
+        void setHeigh(int height) override;
+        void setWidth(int width) override;
+
+        void run() override;
+        void exit() override;
+        void clear() override;
+
+        unsigned long frameRate() const override;
+
+        void setup() override = 0;
+        void draw() override = 0;
+
+        void savePNG(const char* name) const override;
+
+        /* draw functions */
+
         void background(unsigned long color) override;
         void foreground(unsigned long color) override;
         void draw_pixel(unsigned long color, int x, int y) override;
@@ -215,10 +276,7 @@ namespace code3c
         virtual void fill_circle(int x, int y, int radius);
         virtual void draw_line(int x1, int y1, int x2, int y2);
     };
-    typedef X11Drawer Code3CDrawer;
-#endif //CODE3C_UNIX
-#ifdef CODE3C_WIN32
-#error "Undefined class, Windows 1X not available"
+    typedef Win32Drawer Code3CDrawer;
 #endif //CODE3C_WIN32
 }
 

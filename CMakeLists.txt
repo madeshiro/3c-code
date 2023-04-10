@@ -129,7 +129,7 @@ add_library(${3CCODE_TARGET}.so SHARED ${LIBSOURCES} ${LIBHEADERS})
 set_target_properties(${3CCODE_TARGET}.so PROPERTIES OUTPUT_NAME ${3CCODE_TARGET})
 
 target_link_libraries(${3CCODE_TARGET} ${CODE3C_DEPENDENCIES})
-target_link_libraries(${3CCODE_TARGET} ${CODE3C_DEPENDENCIES})
+target_link_libraries(${3CCODE_TARGET}.so ${CODE3C_DEPENDENCIES})
 
 message("> add target {'name': '${3CCODE_TARGET}_gen', 'type': 'executable'}")
 add_executable(${3CCODE_TARGET}_gen ${SOURCES} ${HEADERS})

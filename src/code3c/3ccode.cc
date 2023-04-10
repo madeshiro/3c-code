@@ -278,6 +278,10 @@ namespace code3c
             {
                 // Setup window
                 setTitle("Code3C Drawing Frame");
+            }
+            
+            void draw() override
+            {
                 background(0xffffff);
                 
                 // Draw 3ccode outline
@@ -320,11 +324,6 @@ namespace code3c
                             draw_pixel(logo[x,y].color, xx, yy);
                     }
                 }
-            }
-            
-            void draw() override
-            {
-                // Nothing to do here
             }
         } *cDrawerSample = new Code3CDrawerSample(this, m_dataMat);
         
