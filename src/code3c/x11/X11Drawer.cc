@@ -171,12 +171,30 @@ namespace code3c
                         case ButtonRelease:
                         {
                             keyCode = event.xbutton.button;
+                            switch (keyCode)
+                            {
+                                case 1:
+                                    mouseEvent.button1Pressed = false;
+                                    break;
+                                case 2:
+                                    mouseEvent.button2Pressed = false;
+                                    break;
+                            }
                             onMouseReleased();
                             break;
                         }
                         case ButtonPress:
                         {
                             mouseEvent.mouseButton = event.xbutton.button;
+                            switch (keyCode)
+                            {
+                                case 1:
+                                    mouseEvent.button1Pressed = true;
+                                    break;
+                                case 2:
+                                    mouseEvent.button2Pressed = true;
+                                    break;
+                            }
                             if (mouseEvent.mouseButton < 4)
                             {
                                 onMousePressed();
