@@ -201,8 +201,6 @@ namespace code3c
                     DispatchMessage(&msg);
                 }
                 
-                this->draw();
-                
                 unsigned long millis((clock() - begin) * 1000 / CLOCKS_PER_SEC);
                 if ((1000 / fps() > millis))
                 {
