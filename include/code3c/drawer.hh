@@ -242,6 +242,7 @@ namespace code3c
         PAINTSTRUCT m_paint;
         HWND m_window;
         HDC m_hdc;
+        HPEN m_pen;
         
         // Double Buffering
         HDC m_hdcdb;
