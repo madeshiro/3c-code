@@ -239,9 +239,18 @@ namespace code3c
         
         // Win32 Window variables
         HINSTANCE m_instance;
+        PAINTSTRUCT m_paint;
         HWND m_window;
         HDC m_hdc;
-        tagPAINTSTRUCT m_paint;
+        
+        // Double Buffering
+        HDC m_hdcdb;
+        HBITMAP m_bitmap;
+        BITMAPINFO m_bmi;
+        BLENDFUNCTION m_bf;
+        void* m_bitmapBits;
+        
+        int m_offH, m_offW;
         
         // Miscellanous
         unsigned long m_frameRate;
