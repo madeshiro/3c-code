@@ -39,7 +39,7 @@ if (${3CCODE_ARCH} EQUAL 64)
     message("> architecture OK")
 endif()
 message("> detecting ${3CCODE_SYSTEM}...")
-if (UNIX)
+if (UNIX OR WIN32)
     message("> operating system OK")
 else()
     message(FATAL_ERROR "> operating system FAILED")
@@ -115,6 +115,10 @@ if(UNIX)
     set(CODE3C_DEPENDENCIES ${CODE3C_DEPENDENCIES}
             X11::X11)
 endif()
+if (WIN32)
+    set(CODE3C_DEPENDENCIES ${CODE3C_DEPENDENCIES}
+            -lMsimg32)
+endif()
 
 include_directories(${PNG_INCLUDE_DIRS})
 # include_directories(${GTK_INCLUDE_DIRS})
@@ -127,7 +131,7 @@ add_library(${3CCODE_TARGET}.so SHARED ${LIBSOURCES} ${LIBHEADERS})
 set_target_properties(${3CCODE_TARGET}.so PROPERTIES OUTPUT_NAME ${3CCODE_TARGET})
 
 target_link_libraries(${3CCODE_TARGET} ${CODE3C_DEPENDENCIES})
-target_link_libraries(${3CCODE_TARGET} ${CODE3C_DEPENDENCIES})
+target_link_libraries(${3CCODE_TARGET}.so ${CODE3C_DEPENDENCIES})
 
 message("> add target {'name': '${3CCODE_TARGET}_gen', 'type': 'executable'}")
 add_executable(${3CCODE_TARGET}_gen ${SOURCES} ${HEADERS})

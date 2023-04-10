@@ -19,7 +19,11 @@ public:
     void setup() override
     {
         setTitle("Code3C Test Window");
-        
+    }
+    
+    void draw() override
+    {
+        background(0x7f7f7f);
         unsigned long color;
         for (int r=350; r >= 100; r-=5)
         {
@@ -37,18 +41,14 @@ public:
         draw_slice(350, 350, 350, 12, 3*360/8.0);
         for (int i = 0; i < 15; i++)
         {
-            draw_slice(350, 350, 105, 6, 180*i/60);
-            draw_slice(350, 350, 105, 6, 180*(1+i)/60);
+            draw_slice(350, 350, 105, 6, 180*i/30);
+            draw_slice(350, 350, 105, 6, 180+180*i/30);
         }
         foreground(0);
         draw_line(350, 350, 700, 350);
         foreground(0xbe55ab);
         fill_circle(350, 350, 100);
         foreground(0);
-    }
-    
-    void draw() override
-    {
     }
 };
 
@@ -203,7 +203,7 @@ int test_key_binding()
     public:
         KeyBindingDrawer(): Code3CDrawer(400, 400, matb(10))
         {
-            bindKey((DRAWER_KEY_ALTL | 'a'),
+            bindKey((DRAWER_KEY_CTRLL | 'a'),
                     reinterpret_cast<delegate>(&KeyBindingDrawer::onCtrlAPressed)
                     );
         }

@@ -41,6 +41,11 @@ namespace code3c
             throw std::runtime_error("Unable to find \"9x15\" font");
     }
     
+    X11Drawer::X11Drawer(const X11Drawer &x11Drawer):
+            X11Drawer(x11Drawer.m_width, x11Drawer.m_height, x11Drawer.m_data)
+    {
+    }
+    
     X11Drawer::~X11Drawer() noexcept
     {
         XFreeGC(m_display, m_gc);
@@ -166,12 +171,30 @@ namespace code3c
                         case ButtonRelease:
                         {
                             keyCode = event.xbutton.button;
+                            switch (keyCode)
+                            {
+                                case 1:
+                                    mouseEvent.button1Pressed = false;
+                                    break;
+                                case 2:
+                                    mouseEvent.button2Pressed = false;
+                                    break;
+                            }
                             onMouseReleased();
                             break;
                         }
                         case ButtonPress:
                         {
                             mouseEvent.mouseButton = event.xbutton.button;
+                            switch (keyCode)
+                            {
+                                case 1:
+                                    mouseEvent.button1Pressed = true;
+                                    break;
+                                case 2:
+                                    mouseEvent.button2Pressed = true;
+                                    break;
+                            }
                             if (mouseEvent.mouseButton < 4)
                             {
                                 onMousePressed();
