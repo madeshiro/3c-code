@@ -155,6 +155,8 @@ namespace code3c
         virtual void draw_text(const char* str, int x, int y)  = 0;
         virtual void draw_slice(int origin_x, int origin_y, int radius, int degree,
                                 int rotation) = 0;
+        
+        virtual uint64_t hash() const;
     };
 
 #ifdef CODE3C_UNIX
