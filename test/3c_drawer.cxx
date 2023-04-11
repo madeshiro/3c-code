@@ -197,13 +197,13 @@ int test_key_binding()
     {
         void onCtrlAPressed()
         {
-            printf("Touch ALT_L+A pressed !\n");
+            printf("Touch CTRL + A pressed !\n");
             fflush(stdout);
         }
     public:
         KeyBindingDrawer(): Code3CDrawer(400, 400, matb(10))
         {
-            bindKey((DRAWER_KEY_CTRLL | 'a'),
+            bindKey((DRAWER_KEY_CTRL | 'a'),
                     reinterpret_cast<delegate>(&KeyBindingDrawer::onCtrlAPressed)
                     );
         }

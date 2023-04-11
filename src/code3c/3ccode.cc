@@ -168,7 +168,7 @@ namespace code3c
             void save_ui()
             {
                 char fname[256];
-                sprintf(fname, "3ccode-generated-%lx.png", hash());
+                sprintf(fname, "3ccode-generated-%llx.png", hash());
                 savePNG(fname);
             }
         public:
@@ -180,7 +180,7 @@ namespace code3c
                 cData
                 ), modelDimension(cData.getDimension())
             {
-                bindKey((DRAWER_KEY_CTRLL | 's'),
+                bindKey((DRAWER_KEY_CTRL | 's'),
                         reinterpret_cast<delegate>(&Code3CDrawerSample::save_ui));
             }
             
