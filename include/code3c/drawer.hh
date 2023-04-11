@@ -242,6 +242,7 @@ namespace code3c
         HWND m_window;
         HDC m_hdc;
         HPEN m_pen;
+        HBRUSH m_brush;
         
         // Double Buffering
         HDC m_hdcdb;
