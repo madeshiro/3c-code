@@ -147,6 +147,9 @@ namespace code3c
         
         m_pen = CreatePen(PS_SOLID, 1, 0x0);
         SelectObject(m_hdc, m_pen);
+
+        m_brush = CreateSolidBrush(0x0);
+        SelectObject(m_hdc, m_brush);
     }
     
     Win32Drawer::Win32Drawer(const Win32Drawer &w32Drawer):
@@ -272,7 +275,22 @@ namespace code3c
     
     void Win32Drawer::savePNG(const char *name) const
     {
-    
+        PixelMap pixelMap(width(), height());
+        for (int x(0); x < width(); x++)
+        {
+            for (int y(0); y < height(); y++)
+            {
+                COLORREF color(GetPixel(m_hdc, x, y));
+                pixelMap[x,y] = {
+                        x, y,
+                        rgb(GetRValue(color), GetGValue(color), GetBValue(color)),
+                        0xff
+                };
+            }
+        }
+        FILE * dest = fopen(name, "wb");
+        if (dest)
+            PixelMap::saveInPng(pixelMap, dest);
     }
     
     void Win32Drawer::background(unsigned long color)
@@ -285,9 +303,14 @@ namespace code3c
     void Win32Drawer::foreground(unsigned long color)
     {
         COLORREF cr = RGB(color>>16&0xff, color>>8&0xff, color&0xff);
+
         DeletePen(m_pen);
         m_pen = CreatePen(PS_SOLID, 1, cr);
         SelectPen(m_hdc, m_pen);
+
+        DeleteBrush(m_brush);
+        m_brush = CreateSolidBrush(cr);
+        SelectBrush(m_hdc, m_brush);
     }
     
     void Win32Drawer::draw_pixel(unsigned long color, int x, int y)
@@ -309,7 +332,7 @@ namespace code3c
     
     void Win32Drawer::fill_circle(int x, int y, int radius)
     {
-    
+        Ellipse(m_hdc, x-radius, y-radius, x+radius, y+radius);
     }
     
     void Win32Drawer::draw_line(int x1, int y1, int x2, int y2)

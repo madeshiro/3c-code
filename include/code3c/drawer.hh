@@ -162,13 +162,11 @@ namespace code3c
         virtual void background(unsigned long color) = 0;
         
         virtual void draw_pixel(unsigned long color, int x, int y) = 0;
+        virtual void draw_text(const char* str, int x, int y)  = 0;
+        virtual void draw_slice(int origin_x, int origin_y, int radius, int degree,
+                                int rotation) = 0;
         
-        virtual void draw_text(const char *str, int x, int y) = 0;
-        
-        virtual void draw_slice(
-                int origin_x, int origin_y, int radius, int degree,
-                int rotation
-        ) = 0;
+        virtual uint64_t hash() const;
     };
 
 #ifdef CODE3C_UNIX
@@ -244,6 +242,7 @@ namespace code3c
         HWND m_window;
         HDC m_hdc;
         HPEN m_pen;
+        HBRUSH m_brush;
 
         // Double Buffering
         HDC m_hdcdb;
@@ -251,12 +250,12 @@ namespace code3c
         BITMAPINFO m_bmi;
         BLENDFUNCTION m_bf;
         void* m_bitmapBits;
-        
+
         // Miscellanous
         int m_offH, m_offW;
         unsigned long m_frameRate;
         bool done = false;
-
+        
         void key_binding(bool _register);
     public:
         Win32Drawer(int width, int height, const matb& data);
@@ -273,14 +272,14 @@ namespace code3c
         void clear() override;
 
         unsigned long frameRate() const override;
-
+        
         void setup() override = 0;
         void draw() override = 0;
-
+        
         void savePNG(const char* name) const override;
-
+        
         /* draw functions */
-
+        
         void background(unsigned long color) override;
         void foreground(unsigned long color) override;
         void draw_pixel(unsigned long color, int x, int y) override;
