@@ -321,13 +321,21 @@ namespace code3c
     
     void Win32Drawer::draw_text(const char *str, int x, int y)
     {
-    
+        // Todo (Win32) draw_text
     }
     
     void Win32Drawer::draw_slice(
             int origin_x, int origin_y, int radius, int degree, int rotation
     )
     {
+        rotation -= (degree/2);
+
+        BeginPath(m_hdc);
+        MoveToEx(m_hdc, origin_x, origin_y, NULL);
+        AngleArc(m_hdc, origin_x, origin_y, radius, rotation, degree);
+        LineTo(m_hdc, origin_x, origin_y);
+        EndPath(m_hdc);
+        StrokeAndFillPath(m_hdc);
     }
     
     void Win32Drawer::fill_circle(int x, int y, int radius)
