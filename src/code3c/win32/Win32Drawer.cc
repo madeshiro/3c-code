@@ -303,6 +303,9 @@ namespace code3c
     void Win32Drawer::foreground(unsigned long color)
     {
         COLORREF cr = RGB(color>>16&0xff, color>>8&0xff, color&0xff);
+        SetBkColor(m_hdc, cr);
+        SetBkMode(m_hdc, TRANSPARENT);
+        SetTextColor(m_hdc, color);
 
         DeletePen(m_pen);
         m_pen = CreatePen(PS_SOLID, 1, cr);
@@ -321,7 +324,8 @@ namespace code3c
     
     void Win32Drawer::draw_text(const char *str, int x, int y)
     {
-        // Todo (Win32) draw_text
+        RECT rc = {x, y, 0, 0};
+        DrawText(m_hdc, str, -1, &rc, DT_NOCLIP );
     }
     
     void Win32Drawer::draw_slice(
