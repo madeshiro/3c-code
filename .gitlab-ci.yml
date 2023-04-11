@@ -58,4 +58,4 @@ deploy-job:
       - "${build_dir}/*.a"
       - "${build_dir}/*.so"
     when: on_success
-    expire_in: 30 days
+    expire_in: 2 weeks
