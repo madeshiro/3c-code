@@ -59,16 +59,12 @@ namespace code3c
         switch(keySym)
         {
             case XK_Control_L:
-                mask = DRAWER_KEY_CTRLL;
-                break;
             case XK_Control_R:
-                mask = DRAWER_KEY_CTRLR;
+                mask = DRAWER_KEY_CTRL;
                 break;
             case XK_Alt_L:
-                mask = DRAWER_KEY_ALTL;
-                break;
             case XK_Alt_R:
-                mask = DRAWER_KEY_ALTR;
+                mask = DRAWER_KEY_ALT;
                 break;
             case XK_Shift_L:
             case XK_Shift_R:

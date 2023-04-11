@@ -172,10 +172,10 @@ namespace code3c
         switch (keyCode)
         {
             case VK_CONTROL:
-                mask = DRAWER_KEY_CTRLL;
+                mask = DRAWER_KEY_CTRL;
                 break;
             case VK_MENU:
-                mask = DRAWER_KEY_ALTL;
+                mask = DRAWER_KEY_ALT;
                 break;
             case VK_SHIFT:
                 mask = DRAWER_KEY_SHIFT;

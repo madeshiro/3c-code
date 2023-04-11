@@ -37,28 +37,26 @@
 #include <windowsx.h>
 #endif // CODE3C_WIN32
 
-// DRAWER_KEY_cc format: xcckk
+// DRAWER_KEY_cc format: xckk
 // x: special key id (e.g 1 = F#)
 // c: ctrl key
 // kk: key char
-#define DRAWER_KEY_CTRLL    0x00100
-#define DRAWER_KEY_CTRLR    0x00200
-#define DRAWER_KEY_SHIFT    0x00400
-#define DRAWER_KEY_ALTR     0x00800
-#define DRAWER_KEY_ALTL     0x01000
-#define DRAWER_KEY_ESC      0x02000
-#define DRAWER_KEY_F1       0x10000
-#define DRAWER_KEY_F2       0x20000
-#define DRAWER_KEY_F3       0x30000
-#define DRAWER_KEY_F4       0x40000
-#define DRAWER_KEY_F5       0x50000
-#define DRAWER_KEY_F6       0x60000
-#define DRAWER_KEY_F7       0x70000
-#define DRAWER_KEY_F8       0x80000
-#define DRAWER_KEY_F9       0x90000
-#define DRAWER_KEY_F10      0xA0000
-#define DRAWER_KEY_F11      0xB0000
-#define DRAWER_KEY_F12      0xC0000
+#define DRAWER_KEY_CTRL     0x0100
+#define DRAWER_KEY_SHIFT    0x0200
+#define DRAWER_KEY_ALT      0x0400
+#define DRAWER_KEY_ESC      0x0800
+#define DRAWER_KEY_F1       0x1000
+#define DRAWER_KEY_F2       0x2000
+#define DRAWER_KEY_F3       0x3000
+#define DRAWER_KEY_F4       0x4000
+#define DRAWER_KEY_F5       0x5000
+#define DRAWER_KEY_F6       0x6000
+#define DRAWER_KEY_F7       0x7000
+#define DRAWER_KEY_F8       0x8000
+#define DRAWER_KEY_F9       0x9000
+#define DRAWER_KEY_F10      0xA000
+#define DRAWER_KEY_F11      0xB000
+#define DRAWER_KEY_F12      0xC000
 
 namespace code3c
 {
