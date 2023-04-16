@@ -1,0 +1,8 @@
+# Project exclude paths
+/cmake-build-*
+
+# Project specifications
+*.pdf
+
+# CLion IDE settings
+/.idea
