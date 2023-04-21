@@ -80,7 +80,8 @@ set(LIBSOURCES
         src/code3c/bitmat.cc
         src/code3c/in3ccode.cc
         src/code3c/pixelmap.cc
-        src/code3c/pixelmap.c)
+        src/code3c/pixelmap.c
+        src/code3c/hamming743.cc)
 
 set(LIBHEADERS
         include/code3c/3ccode.hh
@@ -89,7 +90,8 @@ set(LIBHEADERS
         include/code3c/3ccodelib.hh
         include/code3c/bitmat.hh
         include/code3c/in3ccode.hh
-        include/code3c/pixelmap.hh)
+        include/code3c/pixelmap.hh
+        include/code3c/hamming743.hh)
 
 if(UNIX)
     add_definitions(-DCODE3C_UNIX)
@@ -146,6 +148,7 @@ create_test_sourcelist(ctest_testmodule ${3CCODE_TARGET}_testmodule.cxx
         test/3c_drawer.cxx
         test/mat_operation.cxx
         test/png_in_out.cxx
+        test/hamming.cxx
 )
 
 add_executable(${3CCODE_TARGET}_testmodule ${ctest_testmodule})

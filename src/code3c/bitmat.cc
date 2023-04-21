@@ -8,12 +8,14 @@ namespace code3c
     template class mat<char>;
     template class mat<int>;
     template class mat<long>;
+    template class mat<bool>;
 
     template class vec<float>;
     template class vec<double>;
     template class vec<char>;
     template class vec<int>;
     template class vec<long>;
+    template class vec<bool>;
 
     template < typename T >
     mat<T>::mat(int n):
@@ -119,8 +121,8 @@ namespace code3c
         return m_column;
     }
     
-    template < typename T > /* NOLINT */
-    mat<T>& mat<T>::operator=(const mat<T> & mat1)
+    /* NOLINT */ template < typename T >
+    /* NOLINT */ mat<T>& mat<T>::operator=(const mat<T> & mat1)
     {
         if (mat1.n() != n() && mat1.m() != m())
             throw std::runtime_error("Invalid Dimension for assignment");
@@ -148,7 +150,7 @@ namespace code3c
     {
         return !operator==(mat1);
     }
-    
+
     template < typename T >
     mat<T> mat<T>::operator+(const mat<T> &mat1)
     {
@@ -158,13 +160,32 @@ namespace code3c
                 mat2.m_mat[i][j] = m_mat[i][j] + mat1[i, j];
         return mat2;
     }
-    
+
+    template<>
+    mat<bool> mat<bool>::operator+(const mat<bool> &mat1)
+    {
+        mat<bool> mat2(m_row, m_column);
+        for (int i(0); i < n(); i++)
+            for (int j(0); j < m(); j++)
+                mat2.m_mat[i][j] = m_mat[i][j] xor mat1[i, j];
+        return mat2;
+    }
+
     template < typename T >
     mat<T>& mat<T>::operator+=(const mat<T> & mat1)
     {
         for (int i(0); i < n(); i++)
             for (int j(0); j < m(); j++)
                 m_mat[i][j] += mat1[i, j];
+        return *this;
+    }
+
+    template <>
+    mat<bool>& mat<bool>::operator+=(const mat<bool> & mat1)
+    {
+        for (int i(0); i < n(); i++)
+            for (int j(0); j < m(); j++)
+                m_mat[i][j] xor_eq mat1[i, j];
         return *this;
     }
     
@@ -187,6 +208,16 @@ namespace code3c
                 mat2.m_mat[i][j] = m_mat[i][j] - mat1[i,j];
         return mat2;
     }
+
+    template <>
+    mat<bool> mat<bool>::operator-(const mat<bool> & mat1)
+    {
+        mat<bool> mat2(m_row, m_column);
+        for (int i(0); i < n(); i++)
+            for (int j(0); j < m(); j++)
+                mat2.m_mat[i][j] = m_mat[i][j] xor mat1[i,j];
+        return mat2;
+    }
     
     template < typename T >
     mat<T>& mat<T>::operator-=(const mat<T> & mat1)
@@ -194,6 +225,15 @@ namespace code3c
         for (int i(0); i < n(); i++)
             for (int j(0); j < m(); j++)
                 m_mat[i][j] -= mat1[i,j];
+        return *this;
+    }
+
+    template <>
+    mat<bool>& mat<bool>::operator-=(const mat<bool> & mat1)
+    {
+        for (int i(0); i < n(); i++)
+            for (int j(0); j < m(); j++)
+                m_mat[i][j] xor_eq mat1[i,j];
         return *this;
     }
     
@@ -206,6 +246,16 @@ namespace code3c
                 mat1[i, j]*=val;
         return mat1;
     }
+
+    template <>
+    mat<bool> mat<bool>::operator*(bool val) const
+    {
+        mat<bool> mat1(*this);
+        for (int i(0); i < n(); i++)
+            for (int j(0); j < m(); j++)
+                mat1[i, j] and_eq val;
+        return mat1;
+    }
     
     template < typename T >
     mat<T>& mat<T>::operator*=(T val)
@@ -213,6 +263,15 @@ namespace code3c
         for (int i(0); i < n(); i++)
             for (int j(0); j < m(); j++)
                 m_mat[i][j]*=val;
+        return *this;
+    }
+
+    template <>
+    mat<bool>& mat<bool>::operator*=(bool val)
+    {
+        for (int i(0); i < n(); i++)
+            for (int j(0); j < m(); j++)
+                m_mat[i][j] and_eq val;
         return *this;
     }
     
@@ -231,6 +290,26 @@ namespace code3c
                 for (int k(0); k < m(); k++)
                     _sum += m_mat[i][k] * mat1[k, j];
                 mat2.m_mat[i][j] = _sum;
+            }
+        }
+        return mat2;
+    }
+
+    template <>
+    mat<bool> mat<bool>::operator*(const mat<bool> &mat1) const
+    {
+        if (m() != mat1.n())
+            throw std::runtime_error("Invalid dimension for matrix multiplication");
+
+        mat<bool> mat2(m_row, mat1.m_column);
+        for (int i(0); i < n(); i++)
+        {
+            for (int j(0); j < mat1.m(); j++)
+            {
+                bool _val(false);
+                for (int k(0); k < m(); k++)
+                    _val xor_eq (m_mat[i][k] and mat1[k, j]);
+                mat2.m_mat[i][j] = _val;
             }
         }
         return mat2;
