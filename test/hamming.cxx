@@ -1,9 +1,10 @@
 #include <iostream>
-#include <code3c/hamming743.hh>
+#include <code3c/hamming13_8_5.hh>
 
 using code3c::matbase2;
 using code3c::vecbase2;
 using code3c::Hamming743;
+using code3c::Hamming13_8_5;
 
 // Global variables
 static matbase2 matgen(7, 4, new bool*[7] {
@@ -126,11 +127,56 @@ int hamm_detect_err()
 
 int hamm743_test_HG()
 {
-    matbase2 _check(3, 4, new bool*[3] {
+    matbase2 _check743(3, 4, new bool*[3] {
         new bool[4] {0, 0, 0, 0}, /* NOLINT */
         new bool[4] {0, 0, 0, 0}, /* NOLINT */
         new bool[4] {0, 0, 0, 0}  /* NOLINT */
     });
 
-    return (Hamming743::H()*Hamming743::G()) == _check ? 0 : -1;
+    matbase2 _check13_8_5(5, 8, new bool*[5] {
+        new bool[8] {0, 0, 0, 0, 0, 0, 0, 0}, /* NOLINT */
+        new bool[8] {0, 0, 0, 0, 0, 0, 0, 0}, /* NOLINT */
+        new bool[8] {0, 0, 0, 0, 0, 0, 0, 0}, /* NOLINT */
+        new bool[8] {0, 0, 0, 0, 0, 0, 0, 0}, /* NOLINT */
+        new bool[8] {0, 0, 0, 0, 0, 0, 0, 0}  /* NOLINT */
+    });
+
+    if ((Hamming743::H()*Hamming743::G()) != _check743) return 7;
+    if (Hamming13_8_5::H()*Hamming13_8_5::G() != _check13_8_5) return 13;
+    int mindiff(13);
+    for (int i(0); i < 5; i++)
+    {
+        for (int j(i+1); j < 5; j++)
+        {
+            int diff(0);
+            for (int k(0); k < 13; k++)
+            {
+                if (Hamming13_8_5::H()[i, k] != Hamming13_8_5::H()[j, k])
+                    diff++;
+            }
+            if (diff < mindiff)
+                mindiff = diff;
+        }
+    }
+    // printf("Minimum difference: %d\n", mindiff);
+    if (mindiff < 5)
+        return mindiff;
+
+    return 0;
+}
+
+int hamm_detect_err_13_8_5()
+{
+    for (int i(0); i < 7; i++)
+    {
+        for (unsigned char x(1); x != 0; x++)
+        {
+            Hamming13_8_5::hword hword(static_cast<char16_t>(x), true);
+            matbase2 m(hword.get_mat());
+            m[i, 0] = m[i, 0]; // Generate error on the ith bit
+            if (hword.err() != (i+1))
+                return (i+1);
+        }
+    }
+    return 0;
 }
