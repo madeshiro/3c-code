@@ -3,6 +3,7 @@
 
 using code3c::matbase2;
 using code3c::vecbase2;
+using code3c::Hamming743;
 
 // Global variables
 static matbase2 matgen(7, 4, new bool*[7] {
@@ -22,6 +23,7 @@ static matbase2 matctrl(3, 7, new bool*[3] {
 });
 
 // Test functions
+int hamm743_test_HG();
 int hamm_detect_err();
 
 // Utils functions
@@ -68,9 +70,14 @@ typedef struct /* NOLINT */
 
 static testFunctionMapEntry registeredFunctionEntries[] = {
         {
+            "hamming_check_setup",
+            hamm743_test_HG,
+            0, 0
+        },
+        {
             "hamming_error_detection",
             hamm_detect_err,
-            0, 0
+            1, 0
         }
 };
 
@@ -115,4 +122,15 @@ int hamm_detect_err()
         }
     }
     return 0;
+}
+
+int hamm743_test_HG()
+{
+    matbase2 _check(3, 4, new bool*[3] {
+        new bool[4] {0, 0, 0, 0}, /* NOLINT */
+        new bool[4] {0, 0, 0, 0}, /* NOLINT */
+        new bool[4] {0, 0, 0, 0}  /* NOLINT */
+    });
+
+    return (Hamming743::H()*Hamming743::G()) == _check ? 0 : -1;
 }
