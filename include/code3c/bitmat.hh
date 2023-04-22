@@ -162,7 +162,7 @@ namespace code3c
     extern template class vec<char>;
     extern template class vec<int>;
     extern template class vec<long>;
-    
+
     template < typename T >
     mat<T> mat2translation(T dx, T dy)
     {
