@@ -155,7 +155,7 @@ namespace code3c
          * @param xbuf
          * @param xbitl
          */
-        virtual void set_buffer(const char* xbuf, size_t xbitl);
+        virtual void set_buffer(const char* xbuf, size_t xbytel);
 
         /**
          *

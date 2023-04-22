@@ -27,6 +27,7 @@ static matbase2 matctrl(3, 7, new bool*[3] {
 int hamm743_test_HG();
 int hamm_detect_err();
 int hamm_detect_err_743();
+int hamm_detect_err_313();
 
 // Utils functions
 uint32_t hdiff(char w1, char w2)
@@ -85,6 +86,11 @@ static testFunctionMapEntry registeredFunctionEntries[] = {
             "hamming_error_detection_743",
             hamm_detect_err_743,
             2, 0
+        },
+        {
+            "hamming_error_detection_313",
+            hamm_detect_err_313,
+            3, 0
         }
 };
 

@@ -256,14 +256,60 @@ namespace code3c
         }
     }
 
-    void Hamming::set_buffer(const char *xbuf, size_t xbitl)
+    void Hamming::set_buffer(const char *xbuf, size_t xbytel)
     {
+        if (m_hwords)
+        {
+            for (size_t i(0); i < m_hwordsl; i++)
+                delete m_hwords[i];
+            delete[] m_hwords;
+        }
 
+        m_hwords = new hword*[xbytel*8/dim_k()];
+
+        size_t ihwords(0);
+        for (size_t ib(0); ib < 8*xbytel; ihwords++)
+        {
+            char x(0);
+            for (size_t _(0); _ < dim_k(); _++, ib++)
+            {
+                char c = xbuf[ib/8];
+                x |= (c>>(ib%8)) & 1;
+                x <<= 1;
+            }
+            m_hwords[ihwords] = new hword(x, *this);
+        }
     }
 
     void Hamming::set_buffer(const char *xbuf, const char *mbuf, size_t xbitl)
     {
+        if (m_hwords)
+        {
+            for (size_t i(0); i < m_hwordsl; i++)
+                delete m_hwords[i];
+            delete[] m_hwords;
+        }
 
+        m_hwords = new hword*[xbitl/dim_k()];
+
+        size_t ihwords(0);
+        for (size_t ib(0), ip(0); ib < xbitl; ihwords++)
+        {
+            char x(0), p(0);
+            for (size_t _(0); _ < dim_k(); _++, ib++)
+            {
+                char c = xbuf[ib/8];
+                x |= (c>>(ib%8)) & 1;
+                x <<= 1;
+            }
+            for (size_t _(0); _ < (dim_n()-dim_k()); _++, ip++)
+            {
+                char c = mbuf[ip/8];
+                p |= (c>>(ip%8)) & 1;
+                p <<= 1;
+            }
+            m_hwords[ihwords] = new hword(x, p, *this);
+        }
     }
 
     const Hamming::hword& Hamming::operator[](size_t _i) const
