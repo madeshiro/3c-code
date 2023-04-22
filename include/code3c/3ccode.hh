@@ -35,7 +35,7 @@
 #define CODE3C_ERRLVL_B    1 // 33%
 
 #ifdef CODE3C_DEBUG
-#define cDebug(x...) printf(x);
+#define cDebug(x...) printf(x)
 #else
 #define cDebug(x...)
 #endif
