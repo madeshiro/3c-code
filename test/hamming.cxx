@@ -1,10 +1,10 @@
 #include <iostream>
-#include <code3c/hamming13_8_5.hh>
+#include <code3c/hamming743.hh>
 
 using code3c::matbase2;
 using code3c::vecbase2;
+using code3c::Hamming313;
 using code3c::Hamming743;
-using code3c::Hamming13_8_5;
 
 // Global variables
 static matbase2 matgen(7, 4, new bool*[7] {
@@ -26,6 +26,7 @@ static matbase2 matctrl(3, 7, new bool*[3] {
 // Test functions
 int hamm743_test_HG();
 int hamm_detect_err();
+int hamm_detect_err_743();
 
 // Utils functions
 uint32_t hdiff(char w1, char w2)
@@ -79,6 +80,11 @@ static testFunctionMapEntry registeredFunctionEntries[] = {
             "hamming_error_detection",
             hamm_detect_err,
             1, 0
+        },
+        {
+            "hamming_error_detection_743",
+            hamm_detect_err_743,
+            2, 0
         }
 };
 
@@ -87,7 +93,7 @@ int test_hamming(int argc [[maybe_unused]], char** argv [[maybe_unused]])
     uint32_t status(0u), pass(0),
              found(sizeof(registeredFunctionEntries)/sizeof(testFunctionMapEntry));
 
-    std::cout << "Running 3C Generation tests..." << std::endl;
+    std::cout << "Running Hamming tests..." << std::endl;
     std::cout << "Found " << found << " test(s) to run" << std::endl;
 
     for (testFunctionMapEntry &entry : registeredFunctionEntries)
@@ -133,50 +139,22 @@ int hamm743_test_HG()
         new bool[4] {0, 0, 0, 0}  /* NOLINT */
     });
 
-    matbase2 _check13_8_5(5, 8, new bool*[5] {
-        new bool[8] {0, 0, 0, 0, 0, 0, 0, 0}, /* NOLINT */
-        new bool[8] {0, 0, 0, 0, 0, 0, 0, 0}, /* NOLINT */
-        new bool[8] {0, 0, 0, 0, 0, 0, 0, 0}, /* NOLINT */
-        new bool[8] {0, 0, 0, 0, 0, 0, 0, 0}, /* NOLINT */
-        new bool[8] {0, 0, 0, 0, 0, 0, 0, 0}  /* NOLINT */
+    matbase2 _check313(2, 1, new bool*[2] {
+        new bool[1] {0}, /* NOLINT */
+        new bool[1] {0}, /* NOLINT */
     });
 
-    if ((Hamming743::H()*Hamming743::G()) != _check743) return 7;
-    if (Hamming13_8_5::H()*Hamming13_8_5::G() != _check13_8_5) return 13;
-    int mindiff(13);
-    for (int i(0); i < 5; i++)
-    {
-        for (int j(i+1); j < 5; j++)
-        {
-            int diff(0);
-            for (int k(0); k < 13; k++)
-            {
-                if (Hamming13_8_5::H()[i, k] != Hamming13_8_5::H()[j, k])
-                    diff++;
-            }
-            if (diff < mindiff)
-                mindiff = diff;
-        }
-    }
-    // printf("Minimum difference: %d\n", mindiff);
-    if (mindiff < 5)
-        return mindiff;
-
+    if ((Hamming743::H_() * Hamming743::G_()) != _check743) return 7;
+    if ((Hamming313::H_() * Hamming313::G_()) != _check313) return 3;
     return 0;
 }
 
-int hamm_detect_err_13_8_5()
+int hamm_detect_err_313()
 {
-    for (int i(0); i < 7; i++)
-    {
-        for (unsigned char x(1); x != 0; x++)
-        {
-            Hamming13_8_5::hword hword(static_cast<char16_t>(x), true);
-            matbase2 m(hword.get_mat());
-            m[i, 0] = m[i, 0]; // Generate error on the ith bit
-            if (hword.err() != (i+1))
-                return (i+1);
-        }
-    }
-    return 0;
+    return 0; // TODO tests 313
+}
+
+int hamm_detect_err_743()
+{
+    return 0; // TODO tests 743
 }

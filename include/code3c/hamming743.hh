@@ -23,18 +23,57 @@ namespace code3c
     typedef mat<bool> matbase2;
     typedef vec<bool> vecbase2;
 
-    class Hamming743
+    class Hamming
     {
+    public:
+        virtual const matbase2& G() const = 0;
+        virtual const matbase2& H() const = 0;
+
         class hword final
         {
-            char m_word;
-            matbase2 m_matb;
-
-            static matbase2 wtom(char w, uint blen);
-            static char mtow(const matbase2&);
         public:
-            hword();
-            hword(char word, bool is_x);
+            typedef char        hword_t;
+            typedef char16_t    lhword_t;
+        private:
+            hword_t m_hword;
+            matbase2 m_matb;
+            matbase2 const & m_g;
+            matbase2 const & m_h;
+        public: // static functions
+            static matbase2 wtom(hword_t w, uint blen);
+            static hword_t mtow(const matbase2&);
+            static hword_t xptow(char x, char p, uint n);
+            static lhword_t wtoxp(char w, uint n,
+                                  char*x = nullptr, char*p = nullptr);
+        public: // class functions
+            explicit hword(const Hamming& hamm);
+            /**
+             *
+             * @param x the initial message
+             */
+            hword(hword_t x, const Hamming& hamm);
+            /**
+             *
+             * @param x the initial message
+             * @param p the parity control bits
+             */
+            hword(hword_t x, hword_t p, const Hamming& hamm);
+            /**
+             *
+             * @param _vec the encoded message 'm'
+             */
+            hword(const matbase2& _vec, const Hamming& hamm);
+
+            /**
+             *
+             * @param _vec the encoded message 'm'
+             */
+            hword(const matbase2& _vec, const matbase2& G, const matbase2& H);
+            /**
+             * Copy constructor
+             * @param _hword the hword to copy
+             */
+            hword(const hword& _hword);
             ~hword() = default;
 
             /**
@@ -44,41 +83,118 @@ namespace code3c
             bool parity() const;
 
             /**
-             * Get initial message (4bits)
+             * Get the initial message (k bits)
              * @return
              */
-            char x() const;
+            hword_t x() const;
 
             /**
-             * Get encode message (8bits)
+             * Get full encode message (n bits)
              * @return
              */
-            char m() const;
+            hword_t m() const;
 
             /**
-             * Get control bits sequence (4bits)
+             * Get parity bits (n-k bits)
              * @return
              */
-            char ctrl() const;
-        } m_hword[2];
+            hword_t p() const;
+
+            /**
+             * Get the position of the bit in error. If there is no error,
+             * the method return 0.
+             * @return the position of the bit in error, or 0 if unexisting.
+             */
+            hword_t err() const;
+
+            /**
+             * Get the encoded vector
+             * @return
+             */
+            const matbase2& getVector() const;
+
+            /**
+             *
+             * @param pos (pos+1)
+             * @return
+             */
+            hword invert_bit(uint pos) const;
+
+            inline uint dim_n() const { return m_g.n(); }
+            inline uint dim_k() const { return m_g.m(); }
+
+            /**
+             * Operator calling invert_bit(uint)
+             * @return
+             */
+            inline hword operator <=>(uint pos) const
+            { return invert_bit(pos);}
+
+            explicit inline operator const matbase2&() const
+            { return m_matb; }
+            explicit inline operator hword_t() const
+            { return m_hword; }
+
+            hword& operator =(const hword&);
+            bool operator ==(const hword&) const;
+            bool operator !=(const hword&) const;
+        };
+    private:
+        size_t m_hwordsl;
+        hword** m_hwords;
     public:
-        static matbase2 G();
-        static matbase2 H();
+        Hamming();
+        Hamming(const Hamming& hamm);
+        virtual ~Hamming();
 
-        explicit Hamming743(char word2x4);
-        explicit Hamming743(char word4ctrl4[2]);
-
-        /**
-         * Get the lowest 4bit of the 8bit word
-         * @return
-         */
-        const hword& Lword() const;
+        virtual inline uint dim_n() const final { return G().n(); }
+        virtual inline uint dim_k() const final { return G().m(); }
 
         /**
-         * Get the higher 4bit of the 8bit word
-         * @return
+         *
+         * @param xbuf
+         * @param xbitl
          */
-        const hword& Hword() const;
+        virtual void set_buffer(const char* xbuf, size_t xbitl);
+
+        /**
+         *
+         * @param xbuf
+         * @param mbuf
+         * @param xbitl
+         */
+        virtual void set_buffer(const char* xbuf, const char* mbuf, size_t xbitl);
+
+        const hword& operator [](size_t _i) const;
+
+        inline size_t length() const
+        { return m_hwordsl; }
+    };
+
+    class Hamming743 : public Hamming
+    {
+    public:
+        static const matbase2& G_();
+        static const matbase2& H_();
+
+        const matbase2& G() const override;
+        const matbase2& H() const override;
+
+        Hamming743() = default;
+        Hamming743(const Hamming743& hamm) = default;
+    };
+
+    class Hamming313 : public Hamming
+    {
+    public:
+        static const matbase2& G_();
+        static const matbase2& H_();
+
+        const matbase2& G() const override;
+        const matbase2& H() const override;
+
+        Hamming313() = default;
+        Hamming313(const Hamming313& hamm) = default;
     };
 }
 

@@ -1,37 +1,78 @@
+#include <stdexcept>
 #include "code3c/hamming743.hh"
 
 namespace code3c
 {
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "modernize-use-bool-literals"
-    matbase2 Hamming743::G()
+    const matbase2& Hamming743::G_()
     {
         static matbase2 _G(7, 4, new bool*[7] { /* NOLINT */
+            new bool[4] {1, 1, 0, 1},
+            new bool[4] {1, 0, 1, 1},
             new bool[4] {1, 0, 0, 0},
+            new bool[4] {0, 1, 1, 1},
             new bool[4] {0, 1, 0, 0},
             new bool[4] {0, 0, 1, 0},
-            new bool[4] {0, 0, 0, 1},
-            new bool[4] {1, 1, 0, 1},
-            new bool[4] {0, 1, 1, 1},
-            new bool[4] {1, 0, 1, 1}
+            new bool[4] {0, 0, 0, 1}
         });
 
         return _G;
     }
 
-    matbase2 Hamming743::H()
+    const matbase2& Hamming743::G() const
+    {
+        return G_();
+    }
+
+    const matbase2& Hamming743::H_()
     {
         static matbase2 _H(3, 7, new bool*[3] { /* NOLINT */
-            new bool[7] {1, 1, 0, 1, 1, 0, 0},
-            new bool[7] {0, 1, 1, 1, 0, 1, 0},
-            new bool[7] {1, 0, 1, 1, 0, 0, 1}
+            new bool[7] {0, 0, 0, 1, 1, 1, 1},
+            new bool[7] {0, 1, 1, 0, 0, 1, 1},
+            new bool[7] {1, 0, 1, 0, 1, 0, 1}
         });
 
         return _H;
     }
-#pragma clang diagnostic pop
 
-    matbase2 Hamming743::hword::wtom(char w, uint blen)
+    const matbase2& Hamming743::H() const
+    {
+        return H_();
+    }
+
+    const matbase2& Hamming313::G_()
+    {
+        static matbase2 _G(3, 1, new bool*[3] { /* NOLINT */
+            new bool(1),
+            new bool(1),
+            new bool(1)
+        });
+
+        return _G;
+    }
+
+    const matbase2& Hamming313::G() const
+    {
+        return G_();
+    }
+
+    const matbase2& Hamming313::H_()
+    {
+        static matbase2 _H(2, 3, new bool*[2] { /* NOLINT */
+            new bool[3] {0,1,1},
+            new bool[3] {1,0,1}
+        });
+
+        return _H;
+    }
+
+    const matbase2& Hamming313::H() const
+    {
+        return H_();
+    }
+
+    matbase2 Hamming::hword::wtom(hword_t w, uint blen)
     {
         matbase2 _wtom(blen, 1);
         for (uint i(0); i < blen; i++)
@@ -39,73 +80,194 @@ namespace code3c
         return _wtom;
     }
 
-    char Hamming743::hword::mtow(const matbase2 & m)
+    char Hamming::hword::mtow(const matbase2 & m)
     {
-        char _mtow('\0');
+        char _mtow(0);
         for (int i(0); i < m.n(); i++)
             _mtow |= ((m[i, 0]&0b1) << (m.n()-1-i));
         return _mtow;
     }
 
-    Hamming743::hword::hword():
-        m_word('\0'), m_matb(7, 1)
+    Hamming::hword::hword_t Hamming::hword::xptow(char x, char p, uint n)
     {
-    }
+        hword_t _hword(0);
 
-    Hamming743::hword::hword(char word, bool is_x):
-        m_word(word), m_matb(7, 1)
-    {
-        if (is_x)
+        uint pow2(0);
+        while (1 << pow2 < n) pow2++;
+
+        for (uint i(0), pos(n); i < n; i++, pos--)
         {
-            m_matb = G()*wtom(word, 4u);
-            m_word = mtow(m_matb);
-            m_word = (m_word<<1) | ((m_word&0b111 % 2) == 0);
+            if (!(pos xor (1 << pow2)))
+            {
+                _hword |= (p&1) << i;
+                p >>= 1;
+                pow2--;
+            }
+            else
+            {
+                _hword |= (x&1) << i;
+                x >>= 1;
+            }
         }
-        else
+
+        return _hword;
+    }
+
+    Hamming::hword::lhword_t Hamming::hword::wtoxp(char w, uint n, char *x, char *p)
+    {
+        char _x(0), _p(0);
+
+        uint pow2(0), _pi;
+        while (1 << pow2 < n) pow2++;
+        _pi = pow2;
+
+        for (uint i(0), pos(n), _xi(0); i < n; i++, pos--, w>>=1)
         {
-            m_matb = wtom(word >> 1, 7u);
+            if (!(pos xor (1 << pow2)))
+            {
+                _p |= (w&1) << (_pi-pow2);
+                pow2--;
+            }
+            else
+            {
+                _x |= (w&1) << _xi;
+                _xi++;
+            }
+        }
+
+        if (x) *x = _x;
+        if (p) *p = _p;
+        return (_x << 8) & _p;
+    }
+
+    Hamming::hword::hword(const Hamming &hamm):
+            m_hword(0), m_matb(hamm.G().n(), 1), m_g(hamm.G()), m_h(hamm.H()) {}
+
+    Hamming::hword::hword(hword_t x, const Hamming& hamm):
+            m_hword(0), m_matb(hamm.G().n(), 1), m_g(hamm.G()), m_h(hamm.H())
+    {
+        matbase2 xmatb(wtom(x, hamm.G().m()));
+        m_matb = m_g*xmatb;
+        m_hword = mtow(m_matb);
+    }
+
+    Hamming::hword::hword(hword_t x, hword_t p, const Hamming& hamm):
+            m_hword(xptow(x,p,hamm.G().n())), m_matb(hamm.G().n(), 1),
+            m_g(hamm.G()), m_h(hamm.H())
+    {
+    }
+
+    Hamming::hword::hword(const matbase2& _vec, const Hamming& hamm):
+            m_hword(mtow(_vec)), m_matb(_vec), m_g(hamm.G()), m_h(hamm.H())
+    {
+    }
+
+    Hamming::hword::hword(const matbase2& _vec, const matbase2& G, const matbase2& H):
+            m_hword(mtow(_vec)), m_matb(_vec), m_g(G), m_h(H)
+    {
+    }
+
+    Hamming::hword::hword(const hword &_hword) = default;
+
+    bool Hamming::hword::parity() const
+    {
+        uint _sum(0);
+        char _p(p());
+        for (uint i(0); i < dim_n()-dim_k(); i++, _p>>=1)
+            _sum += _p&1;
+        return _sum%2 == 0;
+    }
+
+    Hamming::hword::hword_t Hamming::hword::x() const
+    {
+        return (wtoxp(m_hword, dim_n()) >> 8) & 0xff;
+    }
+
+    Hamming::hword::hword_t Hamming::hword::p() const
+    {
+        return wtoxp(m_hword, dim_n()) & 0xff;
+    }
+
+    Hamming::hword::hword_t Hamming::hword::err() const
+    {
+        return hword::mtow(m_h*m_matb);
+    }
+
+    Hamming::hword::hword_t Hamming::hword::m() const
+    {
+        return m_hword;
+    }
+
+    const matbase2& Hamming::hword::getVector() const
+    {
+        return m_matb;
+    }
+
+    Hamming::hword Hamming::hword::invert_bit(uint pos) const
+    {
+        matbase2 _matb(m_matb);
+        _matb[pos-1, 0] = !_matb[pos-1, 0];
+        return {_matb, m_g, m_h};
+    }
+
+    Hamming::hword& Hamming::hword::operator=(const hword & _hword)
+    {
+        if (m_g == _hword.m_g)
+        {
+            m_hword = _hword.m_hword;
+            m_matb = _hword.m_matb;
+        }
+        else throw std::runtime_error("Invalid G matrix");
+
+        return *this;
+    }
+
+    bool Hamming::hword::operator==(const code3c::Hamming::hword & _hword) const
+    {
+        return m_g == _hword.m_g && m_matb == _hword.m_matb && m_hword == _hword.m_hword;
+    }
+
+    bool Hamming::hword::operator!=(const code3c::Hamming::hword & _hword) const
+    {
+        return !operator ==(_hword);
+    }
+#pragma clang diagnostic pop
+
+    Hamming::Hamming(): m_hwordsl(0), m_hwords(nullptr)
+    {
+    }
+
+    Hamming::Hamming(const code3c::Hamming &hamm):
+        m_hwordsl(hamm.m_hwordsl), m_hwords(new hword*[hamm.m_hwordsl])
+    {
+        for (size_t i(0); i < m_hwordsl; i++)
+        {
+            m_hwords[i] = new hword(*hamm.m_hwords[i]);
         }
     }
 
-    bool Hamming743::hword::parity() const
+    Hamming::~Hamming()
     {
-        return m_word & 1;
+        if (m_hwords)
+        {
+            for (size_t i(0); i < m_hwordsl; i++)
+                delete m_hwords[i];
+            delete[] m_hwords;
+        }
     }
 
-    char Hamming743::hword::x() const
+    void Hamming::set_buffer(const char *xbuf, size_t xbitl)
     {
-        return (m_word >> 4) & 0xf;
+
     }
 
-    char Hamming743::hword::m() const
+    void Hamming::set_buffer(const char *xbuf, const char *mbuf, size_t xbitl)
     {
-        return m_word;
+
     }
 
-    char Hamming743::hword::ctrl() const
+    const Hamming::hword& Hamming::operator[](size_t _i) const
     {
-        return m_word & 0xf;
-    }
-
-    Hamming743::Hamming743(char word2x4)
-    {
-        m_hword[0] = hword(word2x4>>4, true);
-        m_hword[1] = hword(word2x4>>0, true);
-    }
-
-    Hamming743::Hamming743(char *word4ctrl4)
-    {
-        m_hword[0] = hword(word4ctrl4[0], false);
-        m_hword[1] = hword(word4ctrl4[1], false);
-    }
-
-    const Hamming743::hword& Hamming743::Hword() const
-    {
-        return m_hword[0];
-    }
-
-    const Hamming743::hword& Hamming743::Lword() const
-    {
-        return m_hword[1];
+        return *m_hwords[_i];
     }
 }
