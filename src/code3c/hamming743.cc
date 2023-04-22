@@ -229,9 +229,8 @@ namespace code3c
 
     bool Hamming::hword::operator!=(const code3c::Hamming::hword & _hword) const
     {
-        return !operator ==(_hword);
+        return !operator==(_hword);
     }
-#pragma clang diagnostic pop
 
     Hamming::Hamming(): m_hwordsl(0), m_hwords(nullptr)
     {
@@ -256,6 +255,16 @@ namespace code3c
         }
     }
 
+    Hamming::hword** Hamming::begin()
+    {
+        return m_hwords;
+    }
+
+    Hamming::hword** Hamming::end()
+    {
+        return &m_hwords[m_hwordsl];
+    }
+
     void Hamming::set_buffer(const char *xbuf, size_t xbytel)
     {
         if (m_hwords)
@@ -265,7 +274,7 @@ namespace code3c
             delete[] m_hwords;
         }
 
-        m_hwords = new hword*[xbytel*8/dim_k()];
+        m_hwords  = new hword*[xbytel*8/dim_k()];
 
         size_t ihwords(0);
         for (size_t ib(0); ib < 8*xbytel; ihwords++)
@@ -279,6 +288,8 @@ namespace code3c
             }
             m_hwords[ihwords] = new hword(x, *this);
         }
+
+        m_hwordsl = ihwords;
     }
 
     void Hamming::set_buffer(const char *xbuf, const char *mbuf, size_t xbitl)
@@ -316,4 +327,5 @@ namespace code3c
     {
         return *m_hwords[_i];
     }
+#pragma clang diagnostic pop // "modernize-use-bool-literals"
 }

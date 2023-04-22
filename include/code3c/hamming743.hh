@@ -150,6 +150,9 @@ namespace code3c
         virtual inline uint dim_n() const final { return G().n(); }
         virtual inline uint dim_k() const final { return G().m(); }
 
+        hword** begin();
+        hword** end();
+
         /**
          *
          * @param xbuf
@@ -171,6 +174,9 @@ namespace code3c
         { return m_hwordsl; }
     };
 
+    /**
+     * 14% redundancy
+     */
     class Hamming743 : public Hamming
     {
     public:
@@ -184,6 +190,9 @@ namespace code3c
         Hamming743(const Hamming743& hamm) = default;
     };
 
+    /**
+     * 33% redundancy
+     */
     class Hamming313 : public Hamming
     {
     public:

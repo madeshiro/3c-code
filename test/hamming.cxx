@@ -157,10 +157,32 @@ int hamm743_test_HG()
 
 int hamm_detect_err_313()
 {
-    return 0; // TODO tests 313
+    Hamming313 h313;
+    h313.set_buffer("This is a test sample", 21);
+    for (uint i(1); i <= 3; i++)
+    {
+        for (Hamming743::hword *hword: h313)
+        {
+            Hamming743::hword ehword = *hword <=> i;
+            if (ehword.err() != i)
+                return i;
+        }
+    }
+    return 0;
 }
 
 int hamm_detect_err_743()
 {
-    return 0; // TODO tests 743
+    Hamming743 h743;
+    h743.set_buffer("This is a test sample", 21);
+    for (uint i(1); i <= 7; i++)
+    {
+        for (Hamming743::hword *hword: h743)
+        {
+            Hamming743::hword ehword = *hword <=> i;
+            if (ehword.err() != i)
+                return i;
+        }
+    }
+    return 0;
 }
