@@ -124,7 +124,7 @@ int test_3c_drawer(int argc [[maybe_unused]], char** argv [[maybe_unused]])
 
 int test_create_data()
 {
-    Code3C code3C("https://www.google.fr/?search=ent.uca.fr/my/moodle",
+    Code3C code3C("bonjour",
                   CODE3C_MODEL_2);
     drawer = code3C.draw();
     drawer->run();

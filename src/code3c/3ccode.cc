@@ -9,7 +9,8 @@ namespace code3c
         Code3C::Code3CData::getdim(const code3c::CODE3C_MODEL_DESC & desc,
                                    uint32_t size, int err)
     {
-        auto errSize = static_cast<uint32_t>((desc.error_margin[err]*(float)size)+1);
+        uint32_t errSize = (desc.hamming[err]->dim_n()-desc.hamming[err]->dim_k())
+                *(size*8/desc.hamming[err]->dim_k())/8;
         uint32_t totalSize = (errSize + size)*8;
         
         for (const auto& dim : desc.dimensions)
@@ -17,7 +18,7 @@ namespace code3c
             if (totalSize <= desc.bitl*dim.capacity)
             {
                 // Debug print
-                printf("Capacity is: %d bits (%dB) ",
+                cDebug("Capacity is: %d bits (%dB) ",
                        desc.bitl*dim.capacity, desc.bitl*dim.capacity/8);
                 return dim;
             }
@@ -29,11 +30,24 @@ namespace code3c
     Code3C::Code3CData::Code3CData(Code3C* parent,
                                    const CODE3C_MODEL_DESC::CODE3C_MODEL_DIMENSION& dim)
                                    noexcept (false):
-        matb(dim.axis_t,dim.axis_r), m_dimension(dim), m_parent(parent)
+        matb(dim.axis_t,dim.axis_r), m_dimension(dim), m_parent(parent),
+        m_hamming(parent->m_desc.hamming[parent->m_errmodel]->copy())
     {
         int range[2] = {0, 0};
         size_t bit(0), indexbuf(0);
-        
+        size_t errOff;
+
+        // Build data using Hamming algorithm
+        m_hamming->set_buffer(parent->data(), parent->m_datalen);
+        char* hamming_buf = new char[m_hamming->bitl()/8+1];
+        m_hamming->build_xbuffer(hamming_buf, &errOff);
+        m_hamming->build_pbuffer(&hamming_buf[errOff], nullptr);
+
+        // For debugging 
+        cDebug("\nHamming data:\n\t\t- errSeg: %d\n\t\t- dataSeg: %d\n",
+               errSegSize(), dataSegSize());
+
+        // Compute specials sections positions
         int qcal1 = 1*dim.axis_t/4, // q1: rad calibration and begin angle calibration
             qcal2 = 1*dim.axis_t/2, // q2: end angle calibration
             qcal3 = 3*dim.axis_t/4; // q3: rad calibration
@@ -83,13 +97,13 @@ namespace code3c
             }
             
             // Write data
-            for (int j(range[0]); j < range[1] && indexbuf < size(); j++)
+            for (int j(range[0]); j < range[1] /*&& indexbuf < size()*/; j++)
             {
                 char _byte = 0;
-                for (size_t b(0); b < bitl() && indexbuf < size(); b++)
+                for (size_t b(0); b < bitl() /*&& indexbuf < size()*/; b++)
                 {
                     _byte <<= 1;
-                    _byte |= (m_parent->m_data[indexbuf] >> bit % 8) & 0b1;
+                    _byte |= (hamming_buf[indexbuf%size()] >> bit % 8) & 0b1;
                     
                     bit++;
                     indexbuf = bit / 8;
@@ -118,12 +132,12 @@ namespace code3c
     
     uint32_t Code3C::Code3CData::dataSegSize() const
     {
-        return m_parent->m_datalen;
+        return m_hamming->xbitl()/8;
     }
     
     uint32_t Code3C::Code3CData::errSegSize() const
     {
-        return 0; // TODO errSegSize()
+        return m_hamming->pbitl()/8+1;
     }
     
     Code3C::Code3C(const char *buffer, size_t bufsize, uint32_t model, int err):

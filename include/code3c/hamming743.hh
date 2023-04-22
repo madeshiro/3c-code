@@ -150,8 +150,19 @@ namespace code3c
         virtual inline uint dim_n() const final { return G().n(); }
         virtual inline uint dim_k() const final { return G().m(); }
 
+        inline size_t bitl() const
+        { return m_hwordsl * dim_n(); }
+
+        inline size_t xbitl() const
+        { return m_hwordsl * dim_k(); }
+
+        inline size_t pbitl() const
+        { return m_hwordsl * (dim_n()-dim_k()); }
+
         hword** begin();
         hword** end();
+
+        virtual Hamming* copy() const = 0;
 
         /**
          *
@@ -167,6 +178,9 @@ namespace code3c
          * @param xbitl
          */
         virtual void set_buffer(const char* xbuf, const char* mbuf, size_t xbitl);
+
+        char* build_xbuffer(char* xbuffer, size_t* size);
+        char* build_pbuffer(char* pbuffer, size_t* size);
 
         const hword& operator [](size_t _i) const;
 
@@ -188,6 +202,9 @@ namespace code3c
 
         Hamming743() = default;
         Hamming743(const Hamming743& hamm) = default;
+
+        inline Hamming* copy() const override
+        { return new Hamming743(*this); }
     };
 
     /**
@@ -204,6 +221,9 @@ namespace code3c
 
         Hamming313() = default;
         Hamming313(const Hamming313& hamm) = default;
+
+        inline Hamming* copy() const override
+        { return new Hamming313(*this); }
     };
 }
 

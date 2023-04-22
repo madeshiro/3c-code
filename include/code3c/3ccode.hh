@@ -21,6 +21,7 @@
 #include "drawer.hh"
 #include "huffman.hh"
 #include "bitmat.hh"
+#include "hamming743.hh"
 
 #define CODE3C_MODEL_1 0 /*< */
 #define CODE3C_MODEL_2 1 /*< */
@@ -30,10 +31,14 @@
 #define CODE3C_COLORMODE_WB2C   2, 3   /*< WHITE, BLACK AND TWO COLORS: 2bits */
 #define CODE3C_COLORMODE_WB6C   3, 7   /*< WHITE, BLACK AND SIX COLORS: 3bits */
 
-#define CODE3C_ERRLVL_A    0
-#define CODE3C_ERRLVL_B    1
-#define CODE3C_ERRLVL_C    2
+#define CODE3C_ERRLVL_A    0 // 14%
+#define CODE3C_ERRLVL_B    1 // 33%
 
+#ifdef CODE3C_DEBUG
+#define cDebug(x...) printf(x);
+#else
+#define cDebug(x...)
+#endif
 
 namespace code3c
 {
@@ -46,8 +51,9 @@ namespace code3c
                 const uint32_t capacity =
                         axis_t*axis_r - (3*axis_r) - rev + 2;
             } dimensions[4];
-            float error_margin[3] = {
-                    .08, .15, .25
+            Hamming* hamming[2] = {
+                    new Hamming743(),
+                    new Hamming313()
             };
     } code3c_models[3] = {
             {
@@ -87,13 +93,13 @@ namespace code3c
     {
         // TODO Code3CReader x Code3C (not prior)
         // friend class Code3CReader;
-        // template < CODE3C_MODEL_DESC::CODE3C_MODEL_DIMENSION model_dimension >
-        // Code3C(matb<model_dimension.axis_t, model_dimension.axis_r>);
     public:
         class Code3CData : public matb
         {
             const CODE3C_MODEL_DESC::CODE3C_MODEL_DIMENSION& m_dimension;
             Code3C* m_parent;
+
+            Hamming* m_hamming;
         public:
             static const CODE3C_MODEL_DESC::CODE3C_MODEL_DIMENSION&
                 getdim(const CODE3C_MODEL_DESC&, uint32_t, int err);
@@ -150,8 +156,10 @@ namespace code3c
             }
         };
     protected:
+        // Buffers
         char* m_data;
         size_t m_datalen;
+
         int m_errmodel;
         CODE3C_MODEL_DESC& m_desc;
         

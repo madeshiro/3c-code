@@ -123,7 +123,7 @@ namespace code3c
 
         for (uint i(0), pos(n), _xi(0); i < n; i++, pos--, w>>=1)
         {
-            if (!(pos xor (1 << pow2)))
+            if (pos == (1 << (pow2-1)))
             {
                 _p |= (w&1) << (_pi-pow2);
                 pow2--;
@@ -137,7 +137,7 @@ namespace code3c
 
         if (x) *x = _x;
         if (p) *p = _p;
-        return (_x << 8) & _p;
+        return (_x << 8) | _p;
     }
 
     Hamming::hword::hword(const Hamming &hamm):
@@ -283,8 +283,8 @@ namespace code3c
             for (size_t _(0); _ < dim_k(); _++, ib++)
             {
                 char c = xbuf[ib/8];
-                x |= (c>>(ib%8)) & 1;
                 x <<= 1;
+                x |= (c>>(ib%8)) & 1;
             }
             m_hwords[ihwords] = new hword(x, *this);
         }
@@ -310,17 +310,61 @@ namespace code3c
             for (size_t _(0); _ < dim_k(); _++, ib++)
             {
                 char c = xbuf[ib/8];
-                x |= (c>>(ib%8)) & 1;
                 x <<= 1;
+                x |= (c>>(ib%8)) & 1;
             }
             for (size_t _(0); _ < (dim_n()-dim_k()); _++, ip++)
             {
                 char c = mbuf[ip/8];
-                p |= (c>>(ip%8)) & 1;
                 p <<= 1;
+                p |= (c>>(ip%8)) & 1;
             }
             m_hwords[ihwords] = new hword(x, p, *this);
         }
+    }
+
+    char* Hamming::build_xbuffer(char* xbuffer, size_t* size)
+    {
+        if (m_hwordsl)
+        {
+            for (size_t i(0), ib(0); i < m_hwordsl; i++)
+            {
+                hword * word(m_hwords[i]);
+                hword::hword_t x(word->x());
+                for (size_t _(0); _ < word->dim_k(); _++, ib++)
+                {
+                    char *c = &xbuffer[ib/8];
+                    *c <<= 1;
+                    *c |= (x >> (word->dim_k()-_-1))& 1;
+                }
+            }
+        }
+
+        if (size)
+                *size = xbitl()/8;
+        return xbuffer;
+    }
+
+    char* Hamming::build_pbuffer(char* pbuffer, size_t* size)
+    {
+        if (m_hwordsl)
+        {
+            for (size_t i(0), ib(0); i < m_hwordsl; i++)
+            {
+                hword * word(m_hwords[i]);
+                hword::hword_t p(word->p());
+                for (size_t _(0); _ < word->dim_n()-word->dim_k(); _++, ib++)
+                {
+                    char *c = &pbuffer[ib / 8];
+                    *c <<= 1;
+                    *c |= (p >> (word->dim_n()-word->dim_k()-_-1))& 1;
+                }
+            }
+        }
+
+        if (size)
+                *size = pbitl()/8+1;
+        return pbuffer;
     }
 
     const Hamming::hword& Hamming::operator[](size_t _i) const
