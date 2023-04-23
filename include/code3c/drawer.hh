@@ -76,7 +76,7 @@ namespace code3c
         int pmouseX, pmouseY;
         unsigned int mouseButton;
         int wheelCount;
-        
+
         bool button1Pressed;
         bool button2Pressed;
     };
@@ -95,17 +95,17 @@ namespace code3c
         char key;
         unsigned int keyCode;
         MouseEvent mouseEvent;
-        
+
         // Key mapping
         int keys_pressed;
-        
+
         bool register_key(int mask);
         void delete_key(int mask);
-        
+
         // Key binding
         typedef void (Drawer::*delegate)();
         std::map<int, delegate> m_keybind;
-        
+
         void bindKey(int mask, delegate fn);
         void unbindKey(int mask);
     private:
@@ -156,14 +156,14 @@ namespace code3c
         
         /* Draw functions */
         virtual void foreground(unsigned long color) = 0;
-        
+
         virtual void background(unsigned long color) = 0;
-        
+
         virtual void draw_pixel(unsigned long color, int x, int y) = 0;
         virtual void draw_text(const char* str, int x, int y)  = 0;
         virtual void draw_slice(int origin_x, int origin_y, int radius, int degree,
                                 int rotation) = 0;
-        
+
         virtual uint64_t hash() const;
     };
 
@@ -181,15 +181,15 @@ namespace code3c
         int m_screen;
         Pixmap m_db; // Double Buffer
         GC m_gc;
-        
+
         // Miscellanous
         Atom wmDeleteWindow;
         KeySym keySym;
         unsigned int keyMod;
         unsigned long m_frameRate;
-        
+
         void key_binding(bool _register);
-    
+
     public:
         X11Drawer(int width, int height, const matb &data);
         X11Drawer(const X11Drawer &x11Drawer);
@@ -204,7 +204,7 @@ namespace code3c
         void exit() override;
         void clear() override;
         virtual void cleardb();
-        
+
         unsigned long frameRate() const override;
         
         void setup() override = 0;
@@ -216,7 +216,7 @@ namespace code3c
         
         void background(unsigned long color) override;
         void foreground(unsigned long color) override;
-        
+
         void draw_pixel(unsigned long color, int x, int y) override;
         void draw_text(const char *str, int x, int y) override;
         void draw_slice(
@@ -226,14 +226,14 @@ namespace code3c
         virtual void fill_circle(int x, int y, int radius);
         virtual void draw_line(int x1, int y1, int x2, int y2);
     };
-    
+
     typedef X11Drawer Code3CDrawer;
 #endif //CODE3C_UNIX
 #ifdef CODE3C_WIN32
     class Win32Drawer : public Drawer
     {
         friend LRESULT WndProc(HWND, UINT, WPARAM, LPARAM);
-        
+
         // Win32 Window variables
         HINSTANCE m_instance;
         PAINTSTRUCT m_paint;
@@ -253,7 +253,7 @@ namespace code3c
         int m_offH, m_offW;
         unsigned long m_frameRate;
         bool done = false;
-        
+
         void key_binding(bool _register);
     public:
         Win32Drawer(int width, int height, const matb& data);
@@ -270,14 +270,14 @@ namespace code3c
         void clear() override;
 
         unsigned long frameRate() const override;
-        
+
         void setup() override = 0;
         void draw() override = 0;
-        
+
         void savePNG(const char* name) const override;
-        
+
         /* draw functions */
-        
+
         void background(unsigned long color) override;
         void foreground(unsigned long color) override;
         void draw_pixel(unsigned long color, int x, int y) override;

@@ -210,7 +210,7 @@ namespace code3c
         {
             const Code3C* parent;
             const CODE3C_MODEL_DESC::CODE3C_MODEL_DIMENSION &modelDimension;
-            
+
             void save_ui()
             {
                 char fname[256];
@@ -279,7 +279,7 @@ namespace code3c
                 // Setup window
                 setTitle("Code3C Drawing Frame");
             }
-            
+
             void draw() override
             {
                 background(0xffffff);
