@@ -45,6 +45,7 @@ namespace code3c
     static struct CODE3C_MODEL_DESC { /* NOLINT */
             int model_id;
             unsigned bitl, mask;
+            const char* default_logo;
             struct CODE3C_MODEL_DIMENSION { /* NOLINT */
                 const int rev, absRad, effRad, deltaRad;
                 const int axis_t = rev*2, axis_r = effRad/deltaRad;
@@ -58,6 +59,7 @@ namespace code3c
     } code3c_models[3] = {
             {
                     0,  CODE3C_COLORMODE_WB,
+                    "3ccode-wb.png",
                     {
                         {30,  60, 30, 3}, /** 60 slices, 30 units, 3 units per data
                                            *  dimension 120x120 (pu²)
@@ -83,6 +85,7 @@ namespace code3c
             },
             {
                     1, CODE3C_COLORMODE_WB2C,
+                    "3ccode-wb2c.png",
                     {
                         {30,  50, 24, 3}, /** 60 slices, 24 units, 3 units per data
                                            *  dimension 100x100 (pu²)
@@ -108,6 +111,7 @@ namespace code3c
             },
             {
                     2, CODE3C_COLORMODE_WB6C,
+                    "3ccode-wb6c.png",
                     {
                         {30,  50, 21, 3}, /** 60 slices, 21 units, 3 units per data
                                            *  dimension 100x100 (pu²)

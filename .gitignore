@@ -2,7 +2,8 @@
 /cmake-build-*
 
 # Temporary -- test folder to build Huffman Table File (.htf)
-/resources
+/resources/*.*
+!/resources/*.png
 *.pdf
 
 # CLion IDE settings
