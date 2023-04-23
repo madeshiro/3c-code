@@ -124,8 +124,8 @@ int test_3c_drawer(int argc [[maybe_unused]], char** argv [[maybe_unused]])
 
 int test_create_data()
 {
-    Code3C code3C("bonjour",
-                  CODE3C_MODEL_2);
+    Code3C code3C("https://gitlab.isima.fr/rinbaudelet/uca-l3_graphicalprot",
+                  CODE3C_MODEL_WB2C);
     drawer = code3C.draw();
     drawer->run();
     delete drawer;

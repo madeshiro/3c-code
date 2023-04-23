@@ -21,7 +21,7 @@
  * 3C-CODE Library -=- Colored and Compressed Circular CODE
  *
  * @file 3ccodelib.hh
- * @version 2023/04 0.5.0 (beta)
+ * @version 2023/04 0.5.1 (beta)
  * @author Rin "madeshiro" Baudelet
  *
  * ----- << OS/SPECIFICATION >> -----
@@ -39,11 +39,11 @@
 #   define BLUTILSLIB_DIR __declspec(dllimport)
 #endif
 
-#define CODE3C_LIB  202304050L //>! 2023/04 0.5.0
-#define CODE3C_LIB_VERSION "2023/04 v0.5.0 (3c-code lib)"
+#define CODE3C_LIB  202304051L //>! 2023/04 0.5.1-beta
+#define CODE3C_LIB_VERSION "2023/04 v0.5.1 (3c-code lib)"
 #define CODE3C_LIB_RELEASE 0
 #define CODE3C_LIB_MAJOR   5
-#define CODE3C_LIB_MINOR   0
+#define CODE3C_LIB_MINOR   1
 
 // DEFINE CONSTANTS //
 

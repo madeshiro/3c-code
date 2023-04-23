@@ -5,6 +5,27 @@
 
 namespace code3c
 {
+    char Code3C::header::operator[](uint32_t i) const
+    {
+        char bit(0);
+        if (i < 2)
+            bit = (id>>(1-i));
+        else if (i < 3)
+            bit = err;
+        else if (i < 6)
+        {
+            i -= 3;
+            bit = (huff>>(2-i));
+        }
+        else if (meta_full_bitl-i < sizeof(dlen)*8)
+        {
+            i -= 6;
+            bit = dlen >> (meta_dlen_bitl-i-1);
+        }
+
+        return bit & 1;
+    }
+
     const CODE3C_MODEL_DESC::CODE3C_MODEL_DIMENSION&
         Code3C::Code3CData::getdim(const code3c::CODE3C_MODEL_DESC & desc,
                                    uint32_t size, int err)
@@ -12,14 +33,16 @@ namespace code3c
         uint32_t errSize = (desc.hamming[err]->dim_n()-desc.hamming[err]->dim_k())
                 *(size*8/desc.hamming[err]->dim_k())/8;
         uint32_t totalSize = (errSize + size)*8;
-        
+
         for (const auto& dim : desc.dimensions)
         {
             if (totalSize <= desc.bitl*dim.capacity)
             {
                 // Debug print
-                cDebug("Capacity is: %d bits (%dB) ",
+                cDebug("Capacity is: %d bits (%dB) \n",
                        desc.bitl*dim.capacity, desc.bitl*dim.capacity/8);
+                cDebug("Dimension are: {%d, %d, %d, %d}\n",
+                       dim.rev, dim.absRad, dim.effRad, dim.deltaRad);
                 return dim;
             }
         }
@@ -44,18 +67,20 @@ namespace code3c
         m_hamming->build_pbuffer(&hamming_buf[errOff], nullptr);
 
         // For debugging 
-        cDebug("\nHamming data:\n\t\t- errSeg: %d\n\t\t- dataSeg: %d\n",
-               errSegSize(), dataSegSize());
+        cDebug("\nHamming data:\n\t\t- dataSeg: %d\n\t\t- errSeg: %d\n",
+               dataSegSize(), errSegSize());
 
         // Compute specials sections positions
         int qcal1 = 1*dim.axis_t/4, // q1: rad calibration and begin angle calibration
             qcal2 = 1*dim.axis_t/2, // q2: end angle calibration
             qcal3 = 3*dim.axis_t/4; // q3: rad calibration
         int tcal1 = 3*dim.axis_t/8; // header position
-        
-        uint64_t header(((m_parent->m_desc.model_id-1) << 2) | m_parent->m_errmodel);
-        header <<= ((2*m_dimension.axis_r) - 4);
-        header |= dataSegSize();
+
+        const header& head(parent->m_header);
+        int headi(0);
+        // uint64_t header(((m_parent->m_desc.model_id+1) << 2) | m_parent->m_errmodel);
+        // header <<= ((2*m_dimension.axis_r) - 4);
+        // header |= dataSegSize();
         
         for (int i(0); i < dim.axis_t; i++)
         {
@@ -84,10 +109,9 @@ namespace code3c
                 range[1] = 0;
                 
                 // Set-up header
-                for (int j(0); j < dim.axis_r; j++, header >>= 1)
+                for (int j(0); j < dim.axis_r; j++, headi++)
                 {
-                    this->m_mat[i][j] = static_cast<char>(mask() &
-                                                          ~((header & 0b1) * mask()));
+                    this->m_mat[i][j] = head[headi]*3;
                 }
             }
             else
@@ -134,30 +158,38 @@ namespace code3c
     {
         return m_hamming->xbitl()/8;
     }
-    
+
     uint32_t Code3C::Code3CData::errSegSize() const
     {
         return m_hamming->pbitl()/8+1;
     }
-    
+
     Code3C::Code3C(const char *buffer, size_t bufsize, uint32_t model, int err):
         m_data(strncpy(new char[bufsize], buffer, bufsize)),
-        m_datalen(bufsize), m_desc(code3c_models[model]),
-        m_dataMat(this, Code3CData::getdim(code3c_models[model], bufsize, err)),
+        m_datalen(bufsize),
+        m_desc(code3c_models[model]),
+        m_dim(Code3CData::getdim(code3c_models[model], bufsize, err)),
+        m_header({model+1, static_cast<uint64_t>(err), 0, bufsize,
+                  static_cast<uint32_t>(2*m_dim.axis_r-6), 6}),
+        m_dataMat(this, m_dim),
         m_errmodel(err)
     {
     }
-    
+
     Code3C::Code3C(const char *utf8str, uint32_t model, int err):
         Code3C(utf8str, strlen(utf8str), model, err)
     {
     }
-    
+
     Code3C::Code3C(const char32_t *unistr [[maybe_unused]], uint32_t model, int err):
-        m_data(nullptr), m_desc(code3c_models[model]),
+        m_data(nullptr),
+        m_datalen(/* todo data len */ 0),
+        m_desc(code3c_models[model]),
+        m_dim(Code3CData::getdim(code3c_models[model], m_datalen, err)),
+        m_header({model+1, static_cast<uint64_t>(err), 0, m_datalen,
+                  static_cast<uint32_t>(2*(m_dim.effRad*m_dim.axis_r)-6), 6}),
         m_dataMat(this, Code3CData::getdim(code3c_models[model], 0, err)),
-        m_errmodel(err),
-        m_datalen(/* todo data len */ 0)
+        m_errmodel(err)
     {
         // TODO UTF8
     }
@@ -193,15 +225,17 @@ namespace code3c
             {
                 switch (parent->m_desc.model_id)
                 {
-                    case CODE3C_MODEL_1: // WB
-                        return 0xffffff&~((_byte&0b1)*0xffffff);
-                    case CODE3C_MODEL_2: // WB2C
+                    case CODE3C_MODEL_WB:   // WB -- 1bit
+                    {
+                        return 0xffffff & ~((_byte & 0b1) * 0xffffff);
+                    }
+                    case CODE3C_MODEL_WB2C: // WB2C -- 2bits
                     {
                         int cyan = 0xffff * ((_byte >> 1) & 1);
                         int red  = 0xff   * ((_byte >> 0) & 1);
                         return ~rgb(red, cyan>>8, cyan);
                     }
-                    case CODE3C_MODEL_3: // WB-RGB
+                    case CODE3C_MODEL_WB6C: // WB6C -- 3bits
                     {
                         int red   = 0xff * ((_byte >> 2) & 1);
                         int green = 0xff * ((_byte >> 1) & 1);
@@ -263,7 +297,7 @@ namespace code3c
                 int origY = (height() - logoDiameter) / 2;
                 
                 // Remind to change png filename to default ressource file
-                PixelMap map = PixelMap::loadFromPNG("honteux.png");
+                PixelMap map = PixelMap::loadFromPNG(parent->m_desc.default_logo);
                 PixelMap logo = map.resize(logoDiameter, logoDiameter);
                 
                 int rlogo = logoDiameter / 2;
