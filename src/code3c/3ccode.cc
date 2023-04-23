@@ -111,7 +111,7 @@ namespace code3c
                 // Set-up header
                 for (int j(0); j < dim.axis_r; j++, headi++)
                 {
-                    this->m_mat[i][j] = head[headi]*3;
+                    this->m_mat[i][j] = head[headi]*mask();
                 }
             }
             else
