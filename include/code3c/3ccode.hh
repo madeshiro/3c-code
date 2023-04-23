@@ -213,10 +213,21 @@ namespace code3c
         size_t m_datalen;
 
         int m_errmodel;
-        CODE3C_MODEL_DESC& m_desc;
-        
+        const CODE3C_MODEL_DESC& m_desc;
+        const CODE3C_MODEL_DESC::CODE3C_MODEL_DIMENSION& m_dim;
+
+        struct header final
+        {
+            uint64_t id, err, huff; /*< identifiers */
+            size_t   dlen;          /*< data length */
+
+            uint32_t meta_dlen_bitl;     /*< dlen   length (bit) */
+            uint32_t meta_head_bitl = 6; /*< header length (bit) */
+            uint32_t meta_full_bitl = meta_head_bitl+meta_dlen_bitl;
+            char operator[](uint32_t i) const;
+        } m_header;
+
         Code3CData m_dataMat;
-        
         // HuffmanTable m_huftable;
         // HuffmanTree m_huftree;
     public:

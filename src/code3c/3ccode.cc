@@ -5,6 +5,27 @@
 
 namespace code3c
 {
+    char Code3C::header::operator[](uint32_t i) const
+    {
+        char bit(0);
+        if (i < 2)
+            bit = (id>>(1-i));
+        else if (i < 3)
+            bit = err;
+        else if (i < 6)
+        {
+            i -= 3;
+            bit = (huff>>(2-i));
+        }
+        else if (meta_full_bitl-i < sizeof(dlen)*8)
+        {
+            i -= 6;
+            bit = dlen >> (meta_dlen_bitl-i-1);
+        }
+
+        return bit & 1;
+    }
+
     const CODE3C_MODEL_DESC::CODE3C_MODEL_DIMENSION&
         Code3C::Code3CData::getdim(const code3c::CODE3C_MODEL_DESC & desc,
                                    uint32_t size, int err)
@@ -54,10 +75,12 @@ namespace code3c
             qcal2 = 1*dim.axis_t/2, // q2: end angle calibration
             qcal3 = 3*dim.axis_t/4; // q3: rad calibration
         int tcal1 = 3*dim.axis_t/8; // header position
-        
-        uint64_t header(((m_parent->m_desc.model_id-1) << 2) | m_parent->m_errmodel);
-        header <<= ((2*m_dimension.axis_r) - 4);
-        header |= dataSegSize();
+
+        const header& head(parent->m_header);
+        int headi(0);
+        // uint64_t header(((m_parent->m_desc.model_id+1) << 2) | m_parent->m_errmodel);
+        // header <<= ((2*m_dimension.axis_r) - 4);
+        // header |= dataSegSize();
         
         for (int i(0); i < dim.axis_t; i++)
         {
@@ -86,10 +109,9 @@ namespace code3c
                 range[1] = 0;
                 
                 // Set-up header
-                for (int j(0); j < dim.axis_r; j++, header >>= 1)
+                for (int j(0); j < dim.axis_r; j++, headi++)
                 {
-                    this->m_mat[i][j] = static_cast<char>(mask() &
-                                                          ~((header & 0b1) * mask()));
+                    this->m_mat[i][j] = head[headi]*3;
                 }
             }
             else
@@ -136,30 +158,38 @@ namespace code3c
     {
         return m_hamming->xbitl()/8;
     }
-    
+
     uint32_t Code3C::Code3CData::errSegSize() const
     {
         return m_hamming->pbitl()/8+1;
     }
-    
+
     Code3C::Code3C(const char *buffer, size_t bufsize, uint32_t model, int err):
         m_data(strncpy(new char[bufsize], buffer, bufsize)),
-        m_datalen(bufsize), m_desc(code3c_models[model]),
-        m_dataMat(this, Code3CData::getdim(code3c_models[model], bufsize, err)),
+        m_datalen(bufsize),
+        m_desc(code3c_models[model]),
+        m_dim(Code3CData::getdim(code3c_models[model], bufsize, err)),
+        m_header({model+1, static_cast<uint64_t>(err), 0, bufsize,
+                  static_cast<uint32_t>(2*m_dim.axis_r-6), 6}),
+        m_dataMat(this, m_dim),
         m_errmodel(err)
     {
     }
-    
+
     Code3C::Code3C(const char *utf8str, uint32_t model, int err):
         Code3C(utf8str, strlen(utf8str), model, err)
     {
     }
-    
+
     Code3C::Code3C(const char32_t *unistr [[maybe_unused]], uint32_t model, int err):
-        m_data(nullptr), m_desc(code3c_models[model]),
+        m_data(nullptr),
+        m_datalen(/* todo data len */ 0),
+        m_desc(code3c_models[model]),
+        m_dim(Code3CData::getdim(code3c_models[model], m_datalen, err)),
+        m_header({model+1, static_cast<uint64_t>(err), 0, m_datalen,
+                  static_cast<uint32_t>(2*(m_dim.effRad*m_dim.axis_r)-6), 6}),
         m_dataMat(this, Code3CData::getdim(code3c_models[model], 0, err)),
-        m_errmodel(err),
-        m_datalen(/* todo data len */ 0)
+        m_errmodel(err)
     {
         // TODO UTF8
     }
