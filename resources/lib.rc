@@ -1,8 +1,8 @@
 #include <windows.h>
 
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION 0,1,5,1
-PRODUCTVERSION 0,1,5,1
+FILEVERSION 0,6,0,0
+PRODUCTVERSION 0,6,0,0
 FILEFLAGSMASK 0x3fl
 FILEOS VOS_NT_WINDOWS32
 
@@ -21,12 +21,12 @@ BEGIN
     BEGIN
         VALUE "CompanyName", L"Rin 'madeshiro' Baudelet\0"
         VALUE "FileDescription", "3C-Code Library (C) Rin Baudelet\0"
-        VALUE "FileVersion", "0.1.5.1\0"
+        VALUE "FileVersion", "0.6.0.0\0"
         VALUE "InternalName", "3ccode\0"
         VALUE "LegalCopyright", "Copyright (C) Rin Baudelet, lgpl-v3 licensed\0"
         VALUE "OriginalFilename", RCF_ORIGINALFILENAME ".dll\0"
         VALUE "ProductName", "3C-Code Library\0"
-        VALUE "ProductVersion", "0.1.5.1\0"
+        VALUE "ProductVersion", "0.6.0.0\0"
     END
     END
     BLOCK "VarFileInfo"

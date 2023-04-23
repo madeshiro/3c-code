@@ -135,15 +135,16 @@ set_target_properties(${3CCODE_TARGET}.so PROPERTIES OUTPUT_NAME ${3CCODE_TARGET
 target_link_libraries(${3CCODE_TARGET} ${CODE3C_DEPENDENCIES})
 target_link_libraries(${3CCODE_TARGET}.so ${CODE3C_DEPENDENCIES})
 
-if (WIN32)
-    target_sources(${3CCODE_TARGET} PRIVATE resources/winres.rc)
-    target_sources(${3CCODE_TARGET}.so PRIVATE resources/winres.rc)
-endif ()
-
 message("> add target {'name': '${3CCODE_TARGET}_gen', 'type': 'executable'}")
 add_executable(${3CCODE_TARGET}_gen ${SOURCES} ${HEADERS})
 target_link_libraries(${3CCODE_TARGET}_gen ${3CCODE_TARGET})
 
+# Windows Resources
+if (WIN32)
+    target_sources(${3CCODE_TARGET} PRIVATE resources/lib.rc)
+    target_sources(${3CCODE_TARGET}.so PRIVATE resources/lib.rc)
+    target_sources(${3CCODE_TARGET}_gen PRIVATE resources/exe.rc)
+endif ()
 
 # Instanciate Test Applications
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/test")

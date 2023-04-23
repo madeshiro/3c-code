@@ -1,2 +1,9 @@
+# Ignore everything
+*.*
+
 # Huffman Table File (.htf) (not relevant for now)
 *.htf
+
+# Upload images resources
+!*.png
+!*.ico
