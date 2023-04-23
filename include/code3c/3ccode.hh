@@ -23,9 +23,9 @@
 #include "bitmat.hh"
 #include "hamming743.hh"
 
-#define CODE3C_MODEL_1 0 /*< */
-#define CODE3C_MODEL_2 1 /*< */
-#define CODE3C_MODEL_3 2 /*< */
+#define CODE3C_MODEL_WB 0 /*< */
+#define CODE3C_MODEL_WB2C 1 /*< */
+#define CODE3C_MODEL_WB6C 2 /*< */
 
 #define CODE3C_COLORMODE_WB     1, 1   /*< WHITE AND BLACK: 1bit per pattern  */
 #define CODE3C_COLORMODE_WB2C   2, 3   /*< WHITE, BLACK AND TWO COLORS: 2bits */
@@ -35,7 +35,7 @@
 #define CODE3C_ERRLVL_B    1 // 33%
 
 #ifdef CODE3C_DEBUG
-#define cDebug(x...) printf(x)
+#define cDebug(x...) printf("[debug] " x)
 #else
 #define cDebug(x...)
 #endif
@@ -59,35 +59,71 @@ namespace code3c
             {
                     0,  CODE3C_COLORMODE_WB,
                     {
-                        {30,  50, 20, 4}, //  30 slices, 20 units, 4 units per data
-                        {30,  60, 30, 2}, //  60 slices, 30 units, 2 units per data
-                        {60, 100, 60, 2}, // 120 slices, 60 units, 2 units per data
-                        {90, 140, 80, 2}  // 180 slices, 80 units, 2 units per data
+                        {30,  60, 30, 3}, /** 60 slices, 30 units, 3 units per data
+                                           *  dimension 120x120 (pu²)
+                                           *  542 bits (67 B)
+                                           */
+                        {30,  60, 30, 2}, /** 60 slices, 30 units, 2 units per data
+                                           *  dimension 120x120 (pu²)
+                                           *  827 bits (103 B)
+                                           */
+                        {90, 100, 60, 3}, /** 180 slices, 60 units, 3 units per data
+                                           *  dimension 200x200 (pu²)
+                                           *  3,452 bits (431 B)
+                                           */
+                        {90, 140, 90, 2}  /** 180 slices, 90 units, 2 units per data
+                                           *  dimension 280x280 (pu²)
+                                           *  7,877 bits (984 B)
+                                           */
                     }
             },
             {
                     1, CODE3C_COLORMODE_WB2C,
                     {
-                        {30,  50, 20, 4}, //  30 slices, 20 units, 4 units per data
-                        {30,  60, 30, 2}, //  60 slices, 30 units, 2 units per data
-                        {60, 100, 60, 2}, // 120 slices, 60 units, 2 units per data
-                        {90, 120, 80, 2}  // 180 slices, 80 units, 2 units per data
+                        {30,  50, 24, 3}, /** 60 slices, 24 units, 3 units per data
+                                           *  dimension 100x100 (pu²)
+                                           *  856 bits (107 B)
+                                           */
+                        {30,  60, 30, 2}, /** 60 slices, 20 units, 2 units per data
+                                           *  dimension 120x120 (pu²)
+                                           *  1,654 bits (206 B)
+                                           */
+                        {90, 100, 60, 3}, /** 180 slices, 60 units, 3 units per data
+                                           *  dimension 200x200 (pu²)
+                                           *  6,904 bits (863 B)
+                                           */
+                        {90, 140, 90, 2}  /** 180 slices, 90 units, 2 units per data
+                                           *  dimension 280x280 (pu²)
+                                           *  15,754 bits (1,969 B)
+                                           */
                     }
             },
             {
                     2, CODE3C_COLORMODE_WB6C,
                     {
-                        {30,  50, 20, 4}, //  30 slices, 20 units, 4 units per data
-                        {30,  60, 30, 2}, //  60 slices, 30 units, 2 units per data
-                        {60, 100, 60, 2}, // 120 slices, 60 units, 2 units per data
-                        {90, 120, 80, 2}  // 180 slices, 80 units, 2 units per data
+                        {30,  50, 21, 3}, /** 60 slices, 21 units, 3 units per data
+                                           *  dimension 100x100 (pu²)
+                                           *  1,113 bits (139 B)
+                                           */
+                        {30,  60, 30, 2}, /** 60 slices, 30 units, 2 units per data
+                                           *  dimension 120x120 (pu²)
+                                           *  2,481 bits (310 B)
+                                           */
+                        {90, 100, 60, 3}, /** 180 slices, 60 units, 3 units per data
+                                           *  dimension 200x200 (pu²)
+                                           *  10,356 bits (1,294 B)
+                                           */
+                        {90, 140, 90, 2}  /** 180 slices, 90 units, 2 units per data
+                                           *  dimension 280x280 (pu²)
+                                           *  23,631 bits (2,953 B)
+                                           */
                     }
             }
     };
 
-#define CODE3C_MODEL_DESC_1 code3c::code3c_models[CODE3C_MODEL_1];
-#define CODE3C_MODEL_DESC_2 code3c::code3c_models[CODE3C_MODEL_2];
-#define CODE3C_MODEL_DESC_3 code3c::code3c_models[CODE3C_MODEL_3];
+#define CODE3C_MODEL_DESC_1 code3c::code3c_models[CODE3C_MODEL_WB];
+#define CODE3C_MODEL_DESC_2 code3c::code3c_models[CODE3C_MODEL_WB2C];
+#define CODE3C_MODEL_DESC_3 code3c::code3c_models[CODE3C_MODEL_WB6C];
     
     class Code3C
     {

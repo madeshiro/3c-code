@@ -12,14 +12,16 @@ namespace code3c
         uint32_t errSize = (desc.hamming[err]->dim_n()-desc.hamming[err]->dim_k())
                 *(size*8/desc.hamming[err]->dim_k())/8;
         uint32_t totalSize = (errSize + size)*8;
-        
+
         for (const auto& dim : desc.dimensions)
         {
             if (totalSize <= desc.bitl*dim.capacity)
             {
                 // Debug print
-                cDebug("Capacity is: %d bits (%dB) ",
+                cDebug("Capacity is: %d bits (%dB) \n",
                        desc.bitl*dim.capacity, desc.bitl*dim.capacity/8);
+                cDebug("Dimension are: {%d, %d, %d, %d}\n",
+                       dim.rev, dim.absRad, dim.effRad, dim.deltaRad);
                 return dim;
             }
         }
@@ -44,8 +46,8 @@ namespace code3c
         m_hamming->build_pbuffer(&hamming_buf[errOff], nullptr);
 
         // For debugging 
-        cDebug("\nHamming data:\n\t\t- errSeg: %d\n\t\t- dataSeg: %d\n",
-               errSegSize(), dataSegSize());
+        cDebug("\nHamming data:\n\t\t- dataSeg: %d\n\t\t- errSeg: %d\n",
+               dataSegSize(), errSegSize());
 
         // Compute specials sections positions
         int qcal1 = 1*dim.axis_t/4, // q1: rad calibration and begin angle calibration
@@ -193,15 +195,17 @@ namespace code3c
             {
                 switch (parent->m_desc.model_id)
                 {
-                    case CODE3C_MODEL_1: // WB
-                        return 0xffffff&~((_byte&0b1)*0xffffff);
-                    case CODE3C_MODEL_2: // WB2C
+                    case CODE3C_MODEL_WB:   // WB -- 1bit
+                    {
+                        return 0xffffff & ~((_byte & 0b1) * 0xffffff);
+                    }
+                    case CODE3C_MODEL_WB2C: // WB2C -- 2bits
                     {
                         int cyan = 0xffff * ((_byte >> 1) & 1);
                         int red  = 0xff   * ((_byte >> 0) & 1);
                         return ~rgb(red, cyan>>8, cyan);
                     }
-                    case CODE3C_MODEL_3: // WB-RGB
+                    case CODE3C_MODEL_WB6C: // WB6C -- 3bits
                     {
                         int red   = 0xff * ((_byte >> 2) & 1);
                         int green = 0xff * ((_byte >> 1) & 1);
