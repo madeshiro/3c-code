@@ -40,10 +40,10 @@ namespace code3c
             matbase2 const & m_g;
             matbase2 const & m_h;
         public: // static functions
-            static matbase2 wtom(hword_t w, uint blen);
+            static matbase2 wtom(hword_t w, uint32_t blen);
             static hword_t mtow(const matbase2&);
-            static hword_t xptow(char x, char p, uint n);
-            static lhword_t wtoxp(char w, uint n,
+            static hword_t xptow(char x, char p, uint32_t n);
+            static lhword_t wtoxp(char w, uint32_t n,
                                   char*x = nullptr, char*p = nullptr);
         public: // class functions
             explicit hword(const Hamming& hamm);
@@ -118,16 +118,16 @@ namespace code3c
              * @param pos (pos+1)
              * @return
              */
-            hword invert_bit(uint pos) const;
+            hword invert_bit(uint32_t pos) const;
 
-            inline uint dim_n() const { return m_g.n(); }
-            inline uint dim_k() const { return m_g.m(); }
+            inline uint32_t dim_n() const { return m_g.n(); }
+            inline uint32_t dim_k() const { return m_g.m(); }
 
             /**
-             * Operator calling invert_bit(uint)
+             * Operator calling invert_bit(uint32_t)
              * @return
              */
-            inline hword operator <=>(uint pos) const
+            inline hword operator <=>(uint32_t pos) const
             { return invert_bit(pos);}
 
             explicit inline operator const matbase2&() const
@@ -147,8 +147,8 @@ namespace code3c
         Hamming(const Hamming& hamm);
         virtual ~Hamming();
 
-        virtual inline uint dim_n() const final { return G().n(); }
-        virtual inline uint dim_k() const final { return G().m(); }
+        virtual inline uint32_t dim_n() const final { return G().n(); }
+        virtual inline uint32_t dim_k() const final { return G().m(); }
 
         inline size_t bitl() const
         { return m_hwordsl * dim_n(); }
