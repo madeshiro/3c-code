@@ -159,7 +159,7 @@ int hamm_detect_err_313()
 {
     Hamming313 h313;
     h313.set_buffer("This is a test sample", 21);
-    for (uint i(1); i <= 3; i++)
+    for (uint32_t i(1); i <= 3; i++)
     {
         for (Hamming743::hword *hword: h313)
         {
@@ -175,7 +175,7 @@ int hamm_detect_err_743()
 {
     Hamming743 h743;
     h743.set_buffer("This is a test sample", 21);
-    for (uint i(1); i <= 7; i++)
+    for (uint32_t i(1); i <= 7; i++)
     {
         for (Hamming743::hword *hword: h743)
         {
