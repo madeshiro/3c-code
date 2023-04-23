@@ -61,18 +61,22 @@ namespace code3c
                     {
                         {30,  60, 30, 3}, /** 60 slices, 30 units, 3 units per data
                                            *  dimension 120x120 (pu²)
+                                           *  header 20 bits
                                            *  542 bits (67 B)
                                            */
                         {30,  60, 30, 2}, /** 60 slices, 30 units, 2 units per data
                                            *  dimension 120x120 (pu²)
+                                           *  header 30 bits
                                            *  827 bits (103 B)
                                            */
                         {90, 100, 60, 3}, /** 180 slices, 60 units, 3 units per data
                                            *  dimension 200x200 (pu²)
+                                           *  header 40 bits
                                            *  3,452 bits (431 B)
                                            */
                         {90, 140, 90, 2}  /** 180 slices, 90 units, 2 units per data
                                            *  dimension 280x280 (pu²)
+                                           *  header 90 bits
                                            *  7,877 bits (984 B)
                                            */
                     }
@@ -82,18 +86,22 @@ namespace code3c
                     {
                         {30,  50, 24, 3}, /** 60 slices, 24 units, 3 units per data
                                            *  dimension 100x100 (pu²)
+                                           *  header 16 bits
                                            *  856 bits (107 B)
                                            */
                         {30,  60, 30, 2}, /** 60 slices, 20 units, 2 units per data
                                            *  dimension 120x120 (pu²)
+                                           *  header 30 bits
                                            *  1,654 bits (206 B)
                                            */
                         {90, 100, 60, 3}, /** 180 slices, 60 units, 3 units per data
                                            *  dimension 200x200 (pu²)
+                                           *  header 40 bits
                                            *  6,904 bits (863 B)
                                            */
                         {90, 140, 90, 2}  /** 180 slices, 90 units, 2 units per data
                                            *  dimension 280x280 (pu²)
+                                           *  header 90 bits
                                            *  15,754 bits (1,969 B)
                                            */
                     }
@@ -103,18 +111,22 @@ namespace code3c
                     {
                         {30,  50, 21, 3}, /** 60 slices, 21 units, 3 units per data
                                            *  dimension 100x100 (pu²)
+                                           *  header 14 bits
                                            *  1,113 bits (139 B)
                                            */
                         {30,  60, 30, 2}, /** 60 slices, 30 units, 2 units per data
                                            *  dimension 120x120 (pu²)
+                                           *  header 30 bits
                                            *  2,481 bits (310 B)
                                            */
                         {90, 100, 60, 3}, /** 180 slices, 60 units, 3 units per data
                                            *  dimension 200x200 (pu²)
+                                           *  header 40 bits
                                            *  10,356 bits (1,294 B)
                                            */
                         {90, 140, 90, 2}  /** 180 slices, 90 units, 2 units per data
                                            *  dimension 280x280 (pu²)
+                                           *  header 90 bits
                                            *  23,631 bits (2,953 B)
                                            */
                     }
