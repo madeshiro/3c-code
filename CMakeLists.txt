@@ -93,6 +93,13 @@ set(LIBHEADERS
         include/code3c/pixelmap.hh
         include/code3c/hamming743.hh)
 
+set(RESOURCES
+        resources/3ccode-wb.png
+        resources/3ccode-wb2c.png
+        resources/3ccode-wb6c.png
+        )
+file(COPY ${RESOURCES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/resources)
+
 if(UNIX)
     add_definitions(-DCODE3C_UNIX)
     set(LIBSOURCES ${LIBSOURCES}
