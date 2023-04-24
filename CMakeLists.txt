@@ -105,8 +105,7 @@ endif()
 
 # Add Dependencies
 find_package(PNG REQUIRED)
-# find_package(PkgConfig REQUIRED)
-# pkg_check_modules(GTK REQUIRED gtk4)
+include_directories(${PNG_INCLUDE_DIRS})
 
 set(CODE3C_DEPENDENCIES
         PNG::PNG
@@ -122,9 +121,6 @@ if (WIN32)
             -lMsimg32)
 endif()
 
-include_directories(${PNG_INCLUDE_DIRS})
-# include_directories(${GTK_INCLUDE_DIRS})
-# link_directories(${GTK_LIBRARY_DIR})
 
 # Setup Targets
 message("> add target {'name': '${3CCODE_TARGET}', 'type': 'library'}")
