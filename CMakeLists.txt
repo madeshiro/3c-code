@@ -80,6 +80,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 set(3CCODE_TARGET 3ccode)
+set(CODE3C_TARGET code3c)
 
 set(SOURCES
         src/main.cc
@@ -146,9 +147,9 @@ set_target_properties(${3CCODE_TARGET}.so PROPERTIES OUTPUT_NAME ${3CCODE_TARGET
 target_link_libraries(${3CCODE_TARGET} ${CODE3C_DEPENDENCIES})
 target_link_libraries(${3CCODE_TARGET} ${CODE3C_DEPENDENCIES})
 
-message("> add target {'name': '${3CCODE_TARGET}_gen', 'type': 'executable'}")
-add_executable(${3CCODE_TARGET}_gen ${SOURCES} ${HEADERS})
-target_link_libraries(${3CCODE_TARGET}_gen ${3CCODE_TARGET})
+message("> add target {'name': '${CODE3C_TARGET}', 'type': 'executable'}")
+add_executable(${CODE3C_TARGET} ${SOURCES} ${HEADERS})
+target_link_libraries(${CODE3C_TARGET} ${3CCODE_TARGET})
 
 
 # Instanciate Test Applications
