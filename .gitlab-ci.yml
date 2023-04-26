@@ -25,7 +25,7 @@ build-lib:
     untracked: false
     when: on_success
   only: 
-      - master
+      - main
   script:
     - $cmake -B "${build_dir}" -DCMAKE_BUILD_TYPE=Release -DCMAKE_ENV_GUI=False
     - $cmake --build "${build_dir}" --target all -j 3
@@ -33,7 +33,7 @@ build-lib:
 ctest-test-job:   
   stage: test    
   only:
-    - master
+    - main
   needs:
     -  job: build-lib
        artifacts: true
@@ -45,7 +45,7 @@ ctest-test-job:
 deploy-job:      
   stage: deploy  
   only:
-    - master
+    - main
   needs:
     - job: ctest-test-job
       artifacts: false
@@ -58,4 +58,4 @@ deploy-job:
       - "${build_dir}/*.a"
       - "${build_dir}/*.so"
     when: on_success
-    expire_in: 2 weeks
+    expire_in: 1 week
