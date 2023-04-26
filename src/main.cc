@@ -1,18 +1,18 @@
 /*
- * 3C-CODE program sample, by Rin "madeshiro" Baudelet.
+ * 3C-CODE CLI -- Command Line Interface (software)
+ * Copyright (C) 2023 - Rin "madeshiro" Baudelet
  *
- * Unlicensed file, use for educational purposes to provide an example of how work
- * the 3C-code, its generation and reading processes.
- *
- * You may re-use this file however you want. Thus, quoting the original author,
- * is up to you as you desire.
+ * This program is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation, either
+ * version 3 of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * Remember that the program has been done using the 3C-CODE library, licensed under
- * the LGPL-v3 license, see <https://www.gnu.org/licenses/> for more details.
+ * You should have received a copy of the GNU General Public License along with this
+ * program. If not, see <https://www.gnu.org/licenses/>.
  */
 #include <iostream>
 #include "code3c/3ccode.hh"

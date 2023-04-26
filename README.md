@@ -27,9 +27,9 @@ The project uses some features to improve error coverage and available stocking 
 
 [![pipeline](https://gitlab.isima.fr/rinbaudelet/uca-l3_graphicalprot/badges/master/pipeline.svg)](https://gitlab.isima.fr/rinbaudelet/uca-l3_graphicalprot/-/pipelines?page=1&scope=all&ref=master)
 [![Tests](https://gitlab.isima.fr/rinbaudelet/uca-l3_graphicalprot/-/badges/release.svg)](https://gitlab.isima.fr/rinbaudelet/uca-l3_graphicalprot/-/releases)
-[![lgpl-v3](https://img.shields.io/github/license/madeshiro/3c-code?color=red&logo=license)](https://www.gnu.org/licenses/lgpl-3.0.html)
+[![lgpl-v3](https://img.shields.io/github/license/madeshiro/3c-code?color=darkgreen&logo=license)](https://www.gnu.org/licenses/lgpl-3.0.html)
+[![gpl-v3](https://img.shields.io/badge/license%20(CLI)-GPL--3.0-darkred)](https://www.gnu.org/licenses/gpl-3.0.html)
 
 ---
-[//]: <> (TODO readme.md)
 [![uca](https://www.uca.fr/uas/ksup/LOGO_CLAIR/UCA__Logo_head.png)](https://www.uca.fr)
 [![lgpl-v3](https://www.gnu.org/graphics/lgplv3-with-text-154x68.png)](https://www.gnu.org/licenses/lgpl-3.0.html)
