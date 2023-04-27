@@ -33,3 +33,4 @@ The project uses some features to improve error coverage and available stocking 
 ---
 [![uca](https://www.uca.fr/uas/ksup/LOGO_CLAIR/UCA__Logo_head.png)](https://www.uca.fr)
 [![lgpl-v3](https://www.gnu.org/graphics/lgplv3-with-text-154x68.png)](https://www.gnu.org/licenses/lgpl-3.0.html)
+[![gpl-v3](https://www.gnu.org/graphics/gplv3-with-text-136x68.png)](https://www.gnu.org/licenses/gpl-3.0.html)
