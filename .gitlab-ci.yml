@@ -1,4 +1,4 @@
-image: gcc:latest
+image: gcc:12.2
 
 variables:
   cmake: "cmake-3.26.2-linux-x86_64/bin/cmake"
