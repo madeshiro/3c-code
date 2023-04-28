@@ -162,7 +162,7 @@ target_link_libraries(${CODE3C_TARGET} ${3CCODE_TARGET})
 if (WIN32)
     target_sources(${3CCODE_TARGET} PRIVATE resources/lib.rc)
     target_sources(${3CCODE_TARGET}.so PRIVATE resources/lib.rc)
-    target_sources(${3CCODE_TARGET}_gen PRIVATE resources/exe.rc)
+    target_sources(${CODE3C_TARGET} PRIVATE resources/exe.rc)
 endif ()
 
 # Instanciate Test Applications
