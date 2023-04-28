@@ -224,7 +224,7 @@ int test_key_binding()
             bindKey((DRAWER_KEY_CTRL | 'a'),
                     reinterpret_cast<delegate>(&KeyBindingDrawer::onCtrlAPressed)
                     );
-            bindKey((DRAWER_KEY_ALT | 'f'),
+            bindKey((DRAWER_KEY_ALT | 'f'), // Not working without menu on windows !
                     reinterpret_cast<delegate>(&KeyBindingDrawer::onAltFPressed)
                     );
             bindKey((DRAWER_KEY_CTRL | DRAWER_KEY_ALT | 'a'),

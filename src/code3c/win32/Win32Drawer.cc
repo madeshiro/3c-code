@@ -180,9 +180,13 @@ namespace code3c
             case VK_SHIFT:
                 mask = DRAWER_KEY_SHIFT;
                 break;
+            case VK_ESCAPE:
+                mask = DRAWER_KEY_ESC;
             default:
                 if (keyCode >= 0x41 && keyCode <= 0x5a)
                     mask = 'a' + (keyCode-0x41);
+                if (VK_F1 <= keyCode && VK_F12 >= keyCode)
+                    mask = (keyCode-VK_F1+1) << 12;
                 break;
         }
         
