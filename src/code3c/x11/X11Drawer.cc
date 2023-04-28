@@ -70,10 +70,15 @@ namespace code3c
             case XK_Shift_R:
                 mask = DRAWER_KEY_SHIFT;
                 break;
+            case XK_Escape:
+                mask = DRAWER_KEY_ESC;
+                break;
             default:
             {
-                if (key > 0)
-                    mask = (int) key; // NOLINT(cert-str34-c)
+                if (keySym >= XK_F1 && keySym <= XK_F12)
+                    mask = (keySym-XK_F1+1) << 12;
+                else if (keySym > 0)
+                    mask = (int) keySym; // NOLINT(cert-str34-c)
                 break;
             }
         }
@@ -140,7 +145,8 @@ namespace code3c
                         {
                             keyCode = event.xkey.keycode;
                             XLookupString(&event.xkey, &key, 1, NULL, NULL);
-                            XkbLookupKeySym(m_display, keyCode, 0, &keyMod, &keySym);
+                            // XkbLookupKeySym(m_display, keyCode, 0, &keyMod, &keySym);
+                            keySym = XkbKeycodeToKeysym(m_display, keyCode, 0, 0);
                             if (event.type == KeyPress)
                             {
                                 key_binding(true);

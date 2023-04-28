@@ -200,11 +200,38 @@ int test_key_binding()
             printf("Touch CTRL + A pressed !\n");
             fflush(stdout);
         }
+
+        void onAltFPressed()
+        {
+            printf("Touch Alt + F pressed !\n");
+            fflush(stdout);
+        }
+
+        void onCtrlAltAPressed()
+        {
+            printf("Touch CTRL + Alt + A pressed !\n");
+            fflush(stdout);
+        }
+
+        void onShiftDPressed()
+        {
+            printf("Touch SHIFT + D pressed !\n");
+            fflush(stdout);
+        }
     public:
         KeyBindingDrawer(): Code3CDrawer(400, 400, matb(10))
         {
             bindKey((DRAWER_KEY_CTRL | 'a'),
                     reinterpret_cast<delegate>(&KeyBindingDrawer::onCtrlAPressed)
+                    );
+            bindKey((DRAWER_KEY_ALT | 'f'),
+                    reinterpret_cast<delegate>(&KeyBindingDrawer::onAltFPressed)
+                    );
+            bindKey((DRAWER_KEY_CTRL | DRAWER_KEY_ALT | 'a'),
+                    reinterpret_cast<delegate>(&KeyBindingDrawer::onCtrlAltAPressed)
+                    );
+            bindKey((DRAWER_KEY_SHIFT | 'd'),
+                    reinterpret_cast<delegate>(&KeyBindingDrawer::onShiftDPressed)
                     );
         }
         
