@@ -39,9 +39,71 @@ namespace code3c
     {
     }
     
-    Drawer::Drawer(int width, int height, const code3c::matb &data) :
-            m_data(data), m_width(width), m_height(height)
+    void Drawer::onMouseDragged()
     {
+    }
+    
+    Drawer::Drawer(int width, int height, const code3c::matb &data) :
+            m_data(data), m_width(width), m_height(height),
+            m_keybind(), key(0), keyCode(0), keys_pressed(0)
+    {
+    }
+    
+    Drawer::Drawer(const Drawer & drawer):
+        m_data(drawer.m_data), m_width(drawer.m_width), m_height(drawer.m_height),
+        m_fps(drawer.m_fps),
+        key(0), keyCode(0), keys_pressed(0)
+    {
+    }
+    
+    uint64_t Drawer::hash() const
+    {
+        uint64_t hash(0);
+        hash |= ((uint64_t) m_data.n()) << 32;
+        hash |= ((uint64_t) m_data.m()) << 16;
+        
+        uint64_t strHash(0);
+        for (int x(0); x < m_data.n(); x++)
+        {
+            strHash += ((uint64_t) m_data[x,0]) << x%64;
+            for (int y(1); y < m_data.m(); y++)
+            {
+                strHash += ((uint64_t)m_data[x,y-1]*(y+1)) << x%64;
+            }
+        }
+        return hash | (strHash & 0xffffffff);
+    }
+    
+    bool Drawer::register_key(int mask)
+    {
+        // Invalid mask
+        if ((mask & keys_pressed) != 0)
+            return false;
+        
+        keys_pressed |= mask;
+        if (m_keybind.contains(keys_pressed))
+        {
+            (this->*(m_keybind[keys_pressed]))();
+        }
+        return true;
+    }
+    
+    void Drawer::delete_key(int mask)
+    {
+        if ((keys_pressed & mask) != mask)
+            return;
+        
+        keys_pressed -= mask;
+    }
+    
+    void Drawer::bindKey(int mask, code3c::Drawer::delegate fn)
+    {
+        m_keybind.insert(std::pair<int, delegate>(mask, fn));
+    }
+    
+    void Drawer::unbindKey(int mask)
+    {
+        m_keybind.erase(mask);
     }
     
     unsigned long Drawer::fps() const

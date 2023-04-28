@@ -59,7 +59,7 @@ namespace code3c
     } code3c_models[3] = {
             {
                     0,  CODE3C_COLORMODE_WB,
-                    "3ccode-wb.png",
+                    "resources/3ccode-wb.png",
                     {
                         {30,  60, 30, 3}, /** 60 slices, 30 units, 3 units per data
                                            *  dimension 120x120 (pu²)
@@ -85,7 +85,7 @@ namespace code3c
             },
             {
                     1, CODE3C_COLORMODE_WB2C,
-                    "3ccode-wb2c.png",
+                    "resources/3ccode-wb2c.png",
                     {
                         {30,  50, 24, 3}, /** 60 slices, 24 units, 3 units per data
                                            *  dimension 100x100 (pu²)
@@ -111,7 +111,7 @@ namespace code3c
             },
             {
                     2, CODE3C_COLORMODE_WB6C,
-                    "3ccode-wb6c.png",
+                    "resources/3ccode-wb6c.png",
                     {
                         {30,  50, 21, 3}, /** 60 slices, 21 units, 3 units per data
                                            *  dimension 100x100 (pu²)

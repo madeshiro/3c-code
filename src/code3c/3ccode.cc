@@ -66,7 +66,7 @@ namespace code3c
         m_hamming->build_xbuffer(hamming_buf, &errOff);
         m_hamming->build_pbuffer(&hamming_buf[errOff], nullptr);
 
-        // For debugging 
+        // For debugging
         cDebug("\nHamming data:\n\t\t- dataSeg: %d\n\t\t- errSeg: %d\n",
                dataSegSize(), errSegSize());
 
@@ -210,15 +210,24 @@ namespace code3c
         {
             const Code3C* parent;
             const CODE3C_MODEL_DESC::CODE3C_MODEL_DIMENSION &modelDimension;
+
+            void save_ui()
+            {
+                char fname[256];
+                sprintf(fname, "3ccode-generated-%llx.png", hash());
+                savePNG(fname);
+            }
         public:
             Code3CDrawerSample(const Code3C* parent, const Code3CData& cData):
             parent(parent),
-            X11Drawer(
+            Code3CDrawer(
                 40+2 * cData.getDimension().absRad * CODE3C_PIXEL_UNIT,
                 40+2 * cData.getDimension().absRad * CODE3C_PIXEL_UNIT,
                 cData
                 ), modelDimension(cData.getDimension())
             {
+                bindKey((DRAWER_KEY_CTRL | 's'),
+                        reinterpret_cast<delegate>(&Code3CDrawerSample::save_ui));
             }
             
             unsigned long bit_to_color(char _byte)
@@ -269,22 +278,57 @@ namespace code3c
             {
                 // Setup window
                 setTitle("Code3C Drawing Frame");
+            }
+
+            void draw() override
+            {
                 background(0xffffff);
-                
+                // Draw color calibration
+                {
+                    int offRad(modelDimension.absRad-modelDimension.effRad
+                        +modelDimension.deltaRad);
+                    int currentRad((offRad+(m_data.m()*modelDimension.deltaRad))
+                        *CODE3C_PIXEL_UNIT);
+                    int tcal1 = 3*modelDimension.axis_t/8; // header position
+
+                    // Left part from the header
+                    for (int bit(0), t=tcal1+1;
+                        bit < (1<<parent->m_desc.bitl)/2;
+                        bit++,t++)
+                    {
+                        foreground(bit_to_color(bit));
+                        draw_slice(width()/2, height()/2, currentRad+5,
+                                   180/modelDimension.rev,
+                                   t*180/(modelDimension.rev));
+                    }
+                    // Right part from the header
+                    for (int bit(0b111&parent->m_desc.mask), i(0),t=tcal1;
+                            i < (1<<parent->m_desc.bitl)/2;
+                            bit--,t--, i++)
+                    {
+                        foreground(bit_to_color(bit));
+                        draw_slice(width()/2, height()/2, currentRad+5,
+                                   180/modelDimension.rev,
+                                   t*180/(modelDimension.rev));
+                    }
+                }
+
+#ifdef CODE3C_DEBUG
                 // Draw 3ccode outline
                 foreground(0);
-                fill_circle(width()/2, height()/2, 6+(width()-40)/2);
+                fill_circle(width()/2, height()/2, 2+(width()-40)/2);
                 draw_line(0, height()/2, width(), height()/2);
                 draw_line(width()/2, 0, width()/2, height());
+
+                // Debug : header landmark
+                foreground(0xff0000);
+                draw_line(0, 0, width()/2, height()/2);
+#endif // CODE3C_DEBUG
 
                 // Draw data
                 for (int t(0); t < modelDimension.axis_t; t++)
                     draw_angle(t);
-                
-                // Debug : header landmark
-                foreground(0xff0000);
-                draw_line(0, 0, width()/2, height()/2);
-                
+
                 // Fill logo
                 foreground(0xbe55ab);
                 fill_circle(width()/2, height()/2, (modelDimension
@@ -295,11 +339,10 @@ namespace code3c
                                    CODE3C_PIXEL_UNIT * 2;
                 int origX = (width() - logoDiameter) / 2;
                 int origY = (height() - logoDiameter) / 2;
-                
-                // Remind to change png filename to default ressource file
+                // Todo define var to contain custom file
                 PixelMap map = PixelMap::loadFromPNG(parent->m_desc.default_logo);
                 PixelMap logo = map.resize(logoDiameter, logoDiameter);
-                
+
                 int rlogo = logoDiameter / 2;
                 for (int x = 0, xx=origX; x < logoDiameter; x++, xx++)
                 {
@@ -311,11 +354,6 @@ namespace code3c
                             draw_pixel(logo[x,y].color, xx, yy);
                     }
                 }
-            }
-            
-            void draw() override
-            {
-                // Nothing to do here
             }
         } *cDrawerSample = new Code3CDrawerSample(this, m_dataMat);
         

@@ -1,8 +1,8 @@
 #include "code3c/drawer.hh"
+
 #include <unistd.h>
 #include <ctime>
 #include <cstring>
-#include <X11/Xutil.h>
 #include <stdexcept>
 
 namespace code3c
@@ -18,9 +18,13 @@ namespace code3c
                                        500, 500, width, height, 2,
                                        BlackPixel(m_display, m_screen),
                                        WhitePixel(m_display, m_screen));
-        long mask = ExposureMask | KeyPressMask | ButtonPressMask | StructureNotifyMask |
-                    PointerMotionMask | ButtonReleaseMask;
+        m_keyboard = XkbGetMap(m_display, XkbAllClientInfoMask,
+                               XkbUseCoreKbd);
+        if (!m_keyboard) throw std::runtime_error("Unable to alloc X11 keyboard");
+        long mask = ExposureMask | KeyPressMask | KeyReleaseMask | ButtonPressMask |
+                    StructureNotifyMask |PointerMotionMask | ButtonReleaseMask;
         XSelectInput(m_display, m_window, mask);
+        XAutoRepeatOff(m_display);
         
         m_gcvalues.foreground = BlackPixel(m_display, m_screen);
         m_gcvalues.background = WhitePixel(m_display, m_screen);
@@ -37,11 +41,52 @@ namespace code3c
             throw std::runtime_error("Unable to find \"9x15\" font");
     }
     
+    X11Drawer::X11Drawer(const X11Drawer &x11Drawer):
+            X11Drawer(x11Drawer.m_width, x11Drawer.m_height, x11Drawer.m_data)
+    {
+    }
+    
     X11Drawer::~X11Drawer() noexcept
     {
         XFreeGC(m_display, m_gc);
         XFreeFont(m_display, m_font);
         XCloseDisplay(m_display);
+    }
+    
+    void X11Drawer::key_binding(bool _register)
+    {
+        int mask(0);
+        switch(keySym)
+        {
+            case XK_Control_L:
+            case XK_Control_R:
+                mask = DRAWER_KEY_CTRL;
+                break;
+            case XK_Alt_L:
+            case XK_Alt_R:
+                mask = DRAWER_KEY_ALT;
+                break;
+            case XK_Shift_L:
+            case XK_Shift_R:
+                mask = DRAWER_KEY_SHIFT;
+                break;
+            case XK_Escape:
+                mask = DRAWER_KEY_ESC;
+                break;
+            default:
+            {
+                if (keySym >= XK_F1 && keySym <= XK_F12)
+                    mask = (keySym-XK_F1+1) << 12;
+                else if (keySym > 0)
+                    mask = (int) keySym; // NOLINT(cert-str34-c)
+                break;
+            }
+        }
+        
+        if (_register)
+            register_key(mask);
+        else
+            delete_key(mask);
     }
     
     void X11Drawer::show(bool b)
@@ -98,12 +143,20 @@ namespace code3c
                         case KeyPress:
                         case KeyRelease:
                         {
-                            XLookupString(&event.xkey, &key, 1, NULL, NULL);
                             keyCode = event.xkey.keycode;
+                            XLookupString(&event.xkey, &key, 1, NULL, NULL);
+                            // XkbLookupKeySym(m_display, keyCode, 0, &keyMod, &keySym);
+                            keySym = XkbKeycodeToKeysym(m_display, keyCode, 0, 0);
                             if (event.type == KeyPress)
+                            {
+                                key_binding(true);
                                 onKeyPressed();
+                            }
                             if (event.type == KeyRelease)
+                            {
                                 onKeyReleased();
+                                key_binding(false);
+                            }
                             break;
                         }
                         case MotionNotify:
@@ -113,17 +166,37 @@ namespace code3c
                             mouseEvent.mouseX = event.xbutton.x;
                             mouseEvent.mouseY = event.xbutton.y;
                             onMouseMoved();
+                            if (mouseEvent.button1Pressed)
+                                onMouseDragged();
                             break;
                         }
                         case ButtonRelease:
                         {
                             keyCode = event.xbutton.button;
+                            switch (keyCode)
+                            {
+                                case 1:
+                                    mouseEvent.button1Pressed = false;
+                                    break;
+                                case 2:
+                                    mouseEvent.button2Pressed = false;
+                                    break;
+                            }
                             onMouseReleased();
                             break;
                         }
                         case ButtonPress:
                         {
                             mouseEvent.mouseButton = event.xbutton.button;
+                            switch (keyCode)
+                            {
+                                case 1:
+                                    mouseEvent.button1Pressed = true;
+                                    break;
+                                case 2:
+                                    mouseEvent.button2Pressed = true;
+                                    break;
+                            }
                             if (mouseEvent.mouseButton < 4)
                             {
                                 onMousePressed();
@@ -183,7 +256,26 @@ namespace code3c
     
     void X11Drawer::savePNG(const char *name) const
     {
-    
+        XImage * img = XGetImage(m_display, m_db, 0, 0, m_width, m_height, AllPlanes, XYPixmap);
+        if (img)
+        {
+            PixelMap pixelMap(width(), height());
+            for (int x(0); x < width(); x++)
+            {
+                for (int y(0); y < height(); y++)
+                {
+                    pixelMap[x,y] = {
+                            x, y,
+                            XGetPixel(img, x, y),
+                            0xff
+                    };
+                }
+            }
+            FILE * dest = fopen(name, "wb");
+            if (dest)
+                PixelMap::saveInPng(pixelMap, dest);
+            XFree(img);
+        }
     }
     
     /* draw functions */

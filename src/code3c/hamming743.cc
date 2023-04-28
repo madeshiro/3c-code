@@ -72,10 +72,10 @@ namespace code3c
         return H_();
     }
 
-    matbase2 Hamming::hword::wtom(hword_t w, uint blen)
+    matbase2 Hamming::hword::wtom(hword_t w, uint32_t blen)
     {
         matbase2 _wtom(blen, 1);
-        for (uint i(0); i < blen; i++)
+        for (uint32_t i(0); i < blen; i++)
             _wtom[i, 0] = static_cast<bool>((w>>(blen-1-i)) & 0b1);
         return _wtom;
     }
@@ -88,14 +88,14 @@ namespace code3c
         return _mtow;
     }
 
-    Hamming::hword::hword_t Hamming::hword::xptow(char x, char p, uint n)
+    Hamming::hword::hword_t Hamming::hword::xptow(char x, char p, uint32_t n)
     {
         hword_t _hword(0);
 
-        uint pow2(0);
+        uint32_t pow2(0);
         while (1 << pow2 < n) pow2++;
 
-        for (uint i(0), pos(n); i < n; i++, pos--)
+        for (uint32_t i(0), pos(n); i < n; i++, pos--)
         {
             if (!(pos xor (1 << pow2)))
             {
@@ -113,15 +113,15 @@ namespace code3c
         return _hword;
     }
 
-    Hamming::hword::lhword_t Hamming::hword::wtoxp(char w, uint n, char *x, char *p)
+    Hamming::hword::lhword_t Hamming::hword::wtoxp(char w, uint32_t n, char *x, char *p)
     {
         char _x(0), _p(0);
 
-        uint pow2(0), _pi;
+        uint32_t pow2(0), _pi;
         while (1 << pow2 < n) pow2++;
         _pi = pow2;
 
-        for (uint i(0), pos(n), _xi(0); i < n; i++, pos--, w>>=1)
+        for (uint32_t i(0), pos(n), _xi(0); i < n; i++, pos--, w>>=1)
         {
             if (pos == (1 << (pow2-1)))
             {
@@ -171,9 +171,9 @@ namespace code3c
 
     bool Hamming::hword::parity() const
     {
-        uint _sum(0);
+        uint32_t _sum(0);
         char _p(p());
-        for (uint i(0); i < dim_n()-dim_k(); i++, _p>>=1)
+        for (uint32_t i(0); i < dim_n()-dim_k(); i++, _p>>=1)
             _sum += _p&1;
         return _sum%2 == 0;
     }
@@ -203,7 +203,7 @@ namespace code3c
         return m_matb;
     }
 
-    Hamming::hword Hamming::hword::invert_bit(uint pos) const
+    Hamming::hword Hamming::hword::invert_bit(uint32_t pos) const
     {
         matbase2 _matb(m_matb);
         _matb[pos-1, 0] = !_matb[pos-1, 0];

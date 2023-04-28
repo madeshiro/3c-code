@@ -54,7 +54,7 @@ if (${3CCODE_ARCH} EQUAL 64)
     message("> architecture OK")
 endif()
 message("> detecting ${3CCODE_SYSTEM}...")
-if (UNIX)
+if (UNIX OR WIN32)
     message("> operating system OK")
 else()
     message(FATAL_ERROR "> operating system FAILED")
@@ -109,6 +109,13 @@ set(LIBHEADERS
         include/code3c/pixelmap.hh
         include/code3c/hamming743.hh)
 
+set(RESOURCES
+        resources/3ccode-wb.png
+        resources/3ccode-wb2c.png
+        resources/3ccode-wb6c.png
+        )
+file(COPY ${RESOURCES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/resources)
+
 if(UNIX)
     add_definitions(-DCODE3C_UNIX)
     set(LIBSOURCES ${LIBSOURCES}
@@ -121,8 +128,7 @@ endif()
 
 # Add Dependencies
 find_package(PNG REQUIRED)
-# find_package(PkgConfig REQUIRED)
-# pkg_check_modules(GTK REQUIRED gtk4)
+include_directories(${PNG_INCLUDE_DIRS})
 
 set(CODE3C_DEPENDENCIES
         PNG::PNG
@@ -133,10 +139,11 @@ if(UNIX)
     set(CODE3C_DEPENDENCIES ${CODE3C_DEPENDENCIES}
             X11::X11)
 endif()
+if (WIN32)
+    set(CODE3C_DEPENDENCIES ${CODE3C_DEPENDENCIES}
+            -lMsimg32)
+endif()
 
-include_directories(${PNG_INCLUDE_DIRS})
-# include_directories(${GTK_INCLUDE_DIRS})
-# link_directories(${GTK_LIBRARY_DIR})
 
 # Setup Targets
 message("> add target {'name': '${3CCODE_TARGET}', 'type': 'library'}")
@@ -145,12 +152,18 @@ add_library(${3CCODE_TARGET}.so SHARED ${LIBSOURCES} ${LIBHEADERS})
 set_target_properties(${3CCODE_TARGET}.so PROPERTIES OUTPUT_NAME ${3CCODE_TARGET})
 
 target_link_libraries(${3CCODE_TARGET} ${CODE3C_DEPENDENCIES})
-target_link_libraries(${3CCODE_TARGET} ${CODE3C_DEPENDENCIES})
+target_link_libraries(${3CCODE_TARGET}.so ${CODE3C_DEPENDENCIES})
 
 message("> add target {'name': '${CODE3C_TARGET}', 'type': 'executable'}")
 add_executable(${CODE3C_TARGET} ${SOURCES} ${HEADERS})
 target_link_libraries(${CODE3C_TARGET} ${3CCODE_TARGET})
 
+# Windows Resources
+if (WIN32)
+    target_sources(${3CCODE_TARGET} PRIVATE resources/lib.rc)
+    target_sources(${3CCODE_TARGET}.so PRIVATE resources/lib.rc)
+    target_sources(${3CCODE_TARGET}_gen PRIVATE resources/exe.rc)
+endif ()
 
 # Instanciate Test Applications
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/test")
