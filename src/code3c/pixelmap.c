@@ -1,13 +1,12 @@
 #include <malloc.h>
 #include "code3c/pixelmap.hh"
 
-png_descp open_png(const char* fname)
+png_descp open_png(FILE* filepng)
 {
     png_descp desc = NULL;
-    FILE* png_file = fopen(fname, "rb");
-    if (png_file)
+    if (filepng)
     {
-        desc = read_png(png_file);
+        desc = read_png(filepng);
     }
     return desc;
 }
@@ -136,10 +135,6 @@ void free_png_desc(png_descp desc)
         if (desc->mode == PNG_DESC_MODE_WRITE)
             png_destroy_write_struct(&desc->png, &desc->info);
     }
-    
-    // Close file
-    if (desc->_file)
-        fclose(desc->_file);
     
     free(desc);
 }

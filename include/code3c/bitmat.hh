@@ -162,51 +162,6 @@ namespace code3c
     extern template class vec<char>;
     extern template class vec<int>;
     extern template class vec<long>;
-
-    template < typename T >
-    mat<T> mat2translation(T dx, T dy)
-    {
-        return mat<T>(3, new T*[3]{
-            new T[3]{1, 0, dx},
-            new T[3]{0, 1, dy},
-            new T[3]{0, 0,  1}
-        });
-    }
-    
-    template < typename T >
-    mat<T> mat2dilation(T scale)
-    {
-        return mat<T>(3, new T*[3] {
-            new T[3] {scale, 0, 0},
-            new T[3] {0, scale, 0},
-            new T[3] {0,     0, 1}
-        });
-    }
-    
-    template < typename T >
-    mat<T> mat2dilation(T scaleX, T scaleY)
-    {
-        return mat<T>(3, new T*[3] {
-            new T[3] {scaleX, 0, 0},
-            new T[3] {0, scaleY, 0},
-            new T[3] {0,      0, 1}
-        });
-    }
-    
-    template < typename T >
-    /**
-     *
-     * @tparam T
-     * @param angle (rad)
-     * @return
-     */
-    mat<T> mat2rotate(double angle)
-    {
-        return mat<T>(2, new T*[2] {
-           new T[2] {(T) cos(angle), (T) -sin(angle)},
-           new T[2] {(T) sin(angle), (T)  cos(angle)},
-        });
-    }
 }
 
 #endif //HH_LIB_BITMAT

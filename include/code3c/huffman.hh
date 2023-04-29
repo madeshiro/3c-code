@@ -24,33 +24,21 @@
 #define CODE3C_HUFFMAN_BINARY   0x3 /*< binary compression   */
 #define CODE3C_HUFFMAN_JAPANESE 0x4 /*< corpus japanese text */
 
-extern "C"
-{
-
-};
-
 namespace code3c
 {
     class HuffmanTree;
     
     class HuffmanTable
     {
-        friend class HuffmanTree;
+        const HuffmanTree* m_tree;
     public:
-        
-        HuffmanTree toTree();
+
+
+        static HuffmanTable* fromFile(const char* htfFile);
     };
     
     class HuffmanTree
     {
-        friend class HuffmanTable;
-        HuffmanTable& m_table;
-        
-        HuffmanTree(const HuffmanTable& table);
-    public:
-        HuffmanTree(const HuffmanTree& tree);
-        
-        virtual HuffmanTable& getTable() const noexcept final;
     };
 }
 

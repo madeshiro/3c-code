@@ -43,7 +43,7 @@ extern "C" {
         FILE* _file;
     };
     
-    png_descp open_png(const char* fname);
+    png_descp open_png(FILE* pngfile);
     png_descp read_png(FILE* fin);
     png_descp create_png(FILE* fio, int width, int height);
     void free_png_desc(png_descp desc);
