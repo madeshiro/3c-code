@@ -27,6 +27,7 @@
 namespace code3c
 {
     class HuffmanTree;
+
     
     class HuffmanTable
     {

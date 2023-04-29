@@ -1,16 +1,14 @@
-desk ICON "resources/software_icon.ico"
-
 #include <windows.h>
 
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION 0,1,0,0
-PRODUCTVERSION 0,1,0,0
+FILEVERSION 0,7,0,0
+PRODUCTVERSION 0,7,0,0
 FILEFLAGSMASK 0x3fl
 FILEOS VOS_NT_WINDOWS32
 
 #ifdef CODE3C_64
 #define RCF_BIT "64"
-#define RCF_ORIGINALFILENAME "3ccode_gen"
+#define RCF_ORIGINALFILENAME "3ccode"
 #else
 #define RCF_BIT "32"
 #define RCF_ORIGINALFILENAME "3ccode32"
@@ -22,13 +20,13 @@ BEGIN
     BLOCK "040904E4"
     BEGIN
         VALUE "CompanyName", L"Rin 'madeshiro' Baudelet\0"
-        VALUE "FileDescription", "3C-Code Generator (C) Rin Baudelet\0"
-        VALUE "FileVersion", "0.1.0.0\0"
-        VALUE "InternalName", "3ccode_gen\0"
+        VALUE "FileDescription", "3C-Code Library (C) Rin Baudelet\0"
+        VALUE "FileVersion", "0.7.0.0\0"
+        VALUE "InternalName", "3ccode\0"
         VALUE "LegalCopyright", "Copyright (C) Rin Baudelet, lgpl-v3 licensed\0"
-        VALUE "OriginalFilename", RCF_ORIGINALFILENAME ".exe\0"
-        VALUE "ProductName", "3C-Code Generator\0"
-        VALUE "ProductVersion", "0.1.0.0\0"
+        VALUE "OriginalFilename", RCF_ORIGINALFILENAME ".dll\0"
+        VALUE "ProductName", "3C-Code Library\0"
+        VALUE "ProductVersion", "0.7.0.0\0"
     END
     END
     BLOCK "VarFileInfo"

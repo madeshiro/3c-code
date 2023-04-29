@@ -7,3 +7,6 @@
 # Upload images resources
 !*.png
 !*.ico
+
+# Windows RC
+!*.rc
