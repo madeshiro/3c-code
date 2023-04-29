@@ -1,4 +1,4 @@
-FROM gcc:latest
+FROM gcc:12.2
 
 # Environment
 ENV cmake="/cmake-3.26.2-linux-x86_64/bin/cmake"

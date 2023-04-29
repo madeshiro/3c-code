@@ -147,6 +147,7 @@ int test_png_save()
     {
         PixelMap map(PixelMap::loadFromPNG("gitlab_isima.png"));
         PixelMap::saveInPng(map.resize(2.0f), dest);
+        fclose(dest);
     } else return 1;
     
     return 0;

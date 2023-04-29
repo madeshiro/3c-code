@@ -110,7 +110,7 @@ namespace code3c
     
     PixelMap PixelMap::loadFromPNG(const char *pngfile) noexcept(false)
     {
-        png_descp desc = open_png(pngfile);
+        png_descp desc = open_png(fopen(pngfile, "rb"));
         if (!desc)
             throw std::runtime_error("Unable to load png file");
         
@@ -162,6 +162,5 @@ namespace code3c
             free(buffer_rows);
             free_png_desc(desc);
         }
-        else fclose(dest);
     }
 }

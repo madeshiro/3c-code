@@ -294,7 +294,10 @@ namespace code3c
         }
         FILE * dest = fopen(name, "wb");
         if (dest)
+        {
             PixelMap::saveInPng(pixelMap, dest);
+            fclose(dest);
+        }
     }
     
     void Win32Drawer::background(unsigned long color)
