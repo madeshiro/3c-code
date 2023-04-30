@@ -84,5 +84,5 @@ if (WIN32)
             -lMsimg32)
 endif()
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/code3c)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/exec)
