@@ -17,6 +17,9 @@
 #ifndef HH_LIB_HUFFMAN_3CCODE
 #define HH_LIB_HUFFMAN_3CCODE
 #include "3ccodelib.hh"
+#include <cstdio>
+#include <cstdint>
+#include <map>
 
 #define CODE3C_HUFFMAN_NO       0x0
 #define CODE3C_HUFFMAN_ASCII    0x1 /*< corpus US/UK text    */
@@ -26,20 +29,128 @@
 
 namespace code3c
 {
-    class HuffmanTree;
+    class HuffmanTable;
+    class HTFile;
 
-    
-    class HuffmanTable
-    {
-        const HuffmanTree* m_tree;
-    public:
-
-
-        static HuffmanTable* fromFile(const char* htfFile);
-    };
-    
     class HuffmanTree
     {
+        friend class HuffmanTable;
+    public:
+        struct Node final
+        {
+            friend class HuffmanTable;
+        protected:
+            Node* m_0 = nullptr;  // Left
+            Node* m_1 = nullptr;  // Right
+            uint32_t weight;
+            char     ch;
+        public:
+            ~Node();
+
+            inline const Node* operator[](char _bit) const
+            { return static_cast<const Node*>(_bit & 1 ? m_1 : m_0); }
+
+            /**
+             * @return True if the Node is a leaf, false otherwise
+             */
+            explicit inline operator bool() const
+            { return m_0 == nullptr && m_1 == nullptr; }
+
+            explicit inline operator char() const
+            { return ch; }
+
+            inline uint32_t get_weight() const
+            { return weight; }
+        };
+    private:
+        Node * m_root;
+
+        explicit HuffmanTree(const HuffmanTable &table);
+    public:
+        explicit HuffmanTree(HuffmanTree::Node * root);
+        HuffmanTree(HuffmanTree::Node * leaves, uint32_t len);
+        HuffmanTree(const HuffmanTree& tree);
+        ~HuffmanTree();
+
+        HuffmanTree& truncate(uint32_t floor);
+        HuffmanTree  truncateAt(uint32_t floor) const;
+
+        char operator [](uint32_t bseq) const noexcept(false);
+    };
+
+    class HuffmanTable
+    {
+        friend class HuffmanTree;
+        friend class HTFile;
+
+        class Cell final
+        {
+            uint32_t m_bitl;
+            char* m_bits;
+        public:
+            Cell(char* bits, uint32_t bitl);
+            Cell(const Cell& cell);
+            ~Cell();
+
+            uint32_t bitl() const;
+            char operator[](uint32_t) const;
+
+            bool equal(const char*, uint32_t);
+
+            inline char* begin()
+            { return m_bits; }
+            inline char* end()
+            { return &m_bits[m_bitl]; }
+        };
+
+        HuffmanTree* m_tree;
+        std::map<char, Cell> m_table;
+
+        /**
+         *
+         * @param table
+         */
+        explicit HuffmanTable(const std::map<char, Cell> &table);
+
+        /**
+         *
+         */
+        void _rec_init_from_tree(const HuffmanTree::Node*, const char*, uint32_t);
+    public:
+        explicit HuffmanTable(const HuffmanTree& tree);
+
+        const Cell& operator [](char c) const;
+        char operator [](const char* bits, uint32_t len) const;
+    };
+
+    class HTFile
+    {
+    protected:
+        // Structs
+        struct htf_header
+        {
+            char* title;
+            uint32_t seql, titlel;
+            uint8_t info;
+        } m_header;
+
+        // Fields
+        FILE* m_fin;
+
+        // Constructors
+        HTFile(const char* fname, bool do_write) noexcept(false);
+        ~HTFile();
+
+        // Methods
+
+    public:
+        // Input methods
+        static HuffmanTable* fromFile();
+        static HuffmanTable* fromBuffer(const char* buf);
+
+        // Output methods
+        static bool toFile(const char* dest, const HuffmanTable& table);
+        static char* toBuffer(const HuffmanTable& table);
     };
 }
 
