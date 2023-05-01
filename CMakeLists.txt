@@ -58,12 +58,10 @@ set(HTFGEN_TARGET htfgen)
 
 # Resources
 set(RESOURCES
-        resources/3ccode-wb.png
-        resources/3ccode-wb2c.png
-        resources/3ccode-wb6c.png
+        ${CMAKE_HOME_DIRECTORY}/resources/3ccode-wb.png
+        ${CMAKE_HOME_DIRECTORY}/resources/3ccode-wb2c.png
+        ${CMAKE_HOME_DIRECTORY}/resources/3ccode-wb6c.png
         )
-
-file(COPY ${RESOURCES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/resources)
 
 # Add Dependencies
 find_package(PNG REQUIRED)

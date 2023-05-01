@@ -44,6 +44,8 @@ elseif(WIN32)
             src/win32/Win32Drawer.cc)
 endif()
 
+file(COPY ${RESOURCES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/resources)
+
 # Setup Targets
 message("> add target {'name': '${TARGET}', 'type': 'library'}")
 add_library(${TARGET} STATIC ${SOURCES} ${HEADERS})
