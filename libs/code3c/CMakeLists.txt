@@ -75,6 +75,7 @@ create_test_sourcelist(ctest_testmodule ${TARGET}_testmodule.cxx
         test/mat_operation.cxx
         test/png_in_out.cxx
         test/hamming.cxx
+        test/huffman.cxx
 )
 
 add_executable(${TARGET}_testmodule ${ctest_testmodule})
