@@ -39,14 +39,22 @@ namespace code3c
         struct Node final
         {
             friend class HuffmanTable;
+            friend class HuffmanTree;
         protected:
             Node* m_0 = nullptr;  // Left
             Node* m_1 = nullptr;  // Right
             uint32_t weight;
             char     ch;
         public:
+            Node() = default;
+            Node(const Node&);
             ~Node();
 
+            /**
+             *
+             * @param _bit
+             * @return
+             */
             inline const Node* operator[](char _bit) const
             { return static_cast<const Node*>(_bit & 1 ? m_1 : m_0); }
 
@@ -68,13 +76,18 @@ namespace code3c
         explicit HuffmanTree(const HuffmanTable &table);
     public:
         explicit HuffmanTree(HuffmanTree::Node * root);
-        HuffmanTree(HuffmanTree::Node * leaves, uint32_t len);
+        HuffmanTree(HuffmanTree::Node ** leaves, uint32_t len);
         HuffmanTree(const HuffmanTree& tree);
         ~HuffmanTree();
 
         HuffmanTree& truncate(uint32_t floor);
         HuffmanTree  truncateAt(uint32_t floor) const;
 
+        /**
+         * A 32bit huffman (invert) sequence
+         * @param bseq
+         * @return
+         */
         char operator [](uint32_t bseq) const noexcept(false);
     };
 
@@ -101,6 +114,9 @@ namespace code3c
             { return m_bits; }
             inline char* end()
             { return &m_bits[m_bitl]; }
+
+            inline const char* bits() const
+            { return m_bits; }
         };
 
         HuffmanTree* m_tree;
@@ -111,11 +127,6 @@ namespace code3c
          * @param table
          */
         explicit HuffmanTable(const std::map<char, Cell> &table);
-
-        /**
-         *
-         */
-        void _rec_init_from_tree(const HuffmanTree::Node*, const char*, uint32_t);
     public:
         explicit HuffmanTable(const HuffmanTree& tree);
 
@@ -123,6 +134,7 @@ namespace code3c
         char operator [](const char* bits, uint32_t len) const;
     };
 
+    /* TODO HTFile
     class HTFile
     {
     protected:
@@ -152,6 +164,7 @@ namespace code3c
         static bool toFile(const char* dest, const HuffmanTable& table);
         static char* toBuffer(const HuffmanTable& table);
     };
+     */
 }
 
 #endif //HH_LIB_HUFFMAN_3CCODE
