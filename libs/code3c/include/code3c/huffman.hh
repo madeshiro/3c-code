@@ -17,6 +17,7 @@
 #ifndef HH_LIB_HUFFMAN_3CCODE
 #define HH_LIB_HUFFMAN_3CCODE
 #include "3ccodelib.hh"
+#include <iostream>
 #include <cstdio>
 #include <cstdint>
 #include <map>
@@ -25,26 +26,29 @@
 #define CODE3C_HUFFMAN_ASCII    0x1 /*< corpus US/UK text    */
 #define CODE3C_HUFFMAN_LATIN    0x2 /*< corpus latin text    */
 #define CODE3C_HUFFMAN_BINARY   0x3 /*< binary compression   */
-#define CODE3C_HUFFMAN_JAPANESE 0x4 /*< corpus japanese text */
+#define CODE3C_HUFFMAN_CNJP     0x4 /*< corpus CN/JP text    */
 
 namespace code3c
 {
+    template < typename _CharT >
     class HuffmanTable;
     class HTFile;
 
+
+    template < typename _CharT >
     class HuffmanTree
     {
-        friend class HuffmanTable;
+        friend class HuffmanTable<_CharT>;
     public:
         struct Node final
         {
-            friend class HuffmanTable;
-            friend class HuffmanTree;
+            friend class HuffmanTable<_CharT>;
+            friend class HuffmanTree<_CharT>;
         protected:
             Node* m_0 = nullptr;  // Left
             Node* m_1 = nullptr;  // Right
             uint32_t weight;
-            char     ch;
+            _CharT ch;
         public:
             Node() = default;
             Node(const Node&);
@@ -64,7 +68,7 @@ namespace code3c
             explicit inline operator bool() const
             { return m_0 == nullptr && m_1 == nullptr; }
 
-            explicit inline operator char() const
+            explicit inline operator _CharT() const
             { return ch; }
 
             inline uint32_t get_weight() const
@@ -73,7 +77,7 @@ namespace code3c
     private:
         Node * m_root;
 
-        explicit HuffmanTree(const HuffmanTable &table);
+        explicit HuffmanTree(const HuffmanTable<_CharT> &table);
     public:
         explicit HuffmanTree(HuffmanTree::Node * root);
         HuffmanTree(HuffmanTree::Node ** leaves, uint32_t len);
@@ -88,13 +92,16 @@ namespace code3c
          * @param bseq
          * @return
          */
-        char operator [](uint32_t bseq) const noexcept(false);
+        _CharT operator [](uint32_t bseq) const noexcept(false);
     };
 
+    template < typename _CharT >
     class HuffmanTable
     {
-        friend class HuffmanTree;
+        friend class HuffmanTree<_CharT>;
         friend class HTFile;
+
+        friend std::ostream& operator<<(std::ostream&, const HuffmanTable<char>&);
 
         class Cell final
         {
@@ -119,20 +126,22 @@ namespace code3c
             { return m_bits; }
         };
 
-        HuffmanTree* m_tree;
-        std::map<char, Cell> m_table;
+        HuffmanTree<_CharT>* m_tree;
+        std::map<_CharT, Cell> m_table;
 
         /**
          *
          * @param table
          */
-        explicit HuffmanTable(const std::map<char, Cell> &table);
+        explicit HuffmanTable(const std::map<_CharT, Cell> &table);
     public:
-        explicit HuffmanTable(const HuffmanTree& tree);
+        explicit HuffmanTable(const HuffmanTree<_CharT>& tree);
 
-        const Cell& operator [](char c) const;
-        char operator [](const char* bits, uint32_t len) const;
+        const Cell& operator [](_CharT c) const;
+        _CharT operator [](const char* bits, uint32_t len) const;
     };
+    
+    std::ostream& operator<<(std::ostream& os, const HuffmanTable<char>& table);
 
     /* TODO HTFile
     class HTFile
@@ -165,6 +174,22 @@ namespace code3c
         static char* toBuffer(const HuffmanTable& table);
     };
      */
+
+    extern template class HuffmanTree<char8_t>;
+    extern template class HuffmanTree<char16_t>;
+    extern template class HuffmanTree<char32_t>;
+
+    extern template class HuffmanTable<char8_t>;
+    extern template class HuffmanTable<char16_t>;
+    extern template class HuffmanTable<char32_t>;
+    
+    typedef HuffmanTable<char8_t> HuffmanTable8;
+    typedef HuffmanTable<char16_t> HuffmanTable16;
+    typedef HuffmanTable<char32_t> HuffmanTable32;
+    
+    typedef HuffmanTree<char8_t> HuffmanTree8;
+    typedef HuffmanTree<char16_t> HuffmanTree16;
+    typedef HuffmanTree<char32_t> HuffmanTree32;
 }
 
 #endif //HH_LIB_HUFFMAN_3CCODE
