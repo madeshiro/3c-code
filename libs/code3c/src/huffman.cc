@@ -162,7 +162,8 @@ namespace code3c
 
     template < typename _CharT >
     HuffmanTable<_CharT>::Cell::Cell(const Cell &cell):
-            m_bitl(cell.m_bitl), m_bits(new char[cell.m_bitl])
+            m_bitl(cell.m_bitl),
+            m_bits(strncpy(new char[cell.m_bitl], cell.m_bits, cell.m_bitl))
     {
     }
 
@@ -181,7 +182,7 @@ namespace code3c
     template < typename _CharT >
     char HuffmanTable<_CharT>::Cell::operator[](uint32_t i) const
     {
-        return m_bits[i] & 1;
+        return m_bits[i] == '1';
     }
 
     template < typename _CharT >
@@ -212,17 +213,23 @@ namespace code3c
             init_rec = [&] (const HuffmanTree<_CharT>::Node * node,
                             const char * seq,
                             uint32_t seql) {
-            char *bits = strcpy(new char[seql + 1], seq);
+            char *bits = strncpy(new char[seql + 1], seq, seql);
             if (*node)
             {
-                m_table.insert(std::pair<_CharT, Cell>(node->ch, Cell(bits, seql + 1)));
+                m_table.insert(std::pair<_CharT, Cell>(node->ch, Cell(bits, seql)));
             }
             else
             {
                 if (node->m_0)
+                {
+                    bits[seql] = '0';
                     init_rec(node->m_0, bits, seql + 1);
+                }
                 if (node->m_1)
+                {
+                    bits[seql] = '1';
                     init_rec(node->m_1, bits, seql + 1);
+                }
 
                 delete[] bits;
             }
@@ -249,13 +256,19 @@ namespace code3c
         throw std::runtime_error("Unable to find Cell");
     }
 
+    template < typename _CharT >
+    uint32_t HuffmanTable<_CharT>::size() const
+    {
+            return m_table.size();
+    }
+
     std::ostream& operator<<(std::ostream& os, const HuffmanTable<char8_t>& table)
     {
         for (auto& pair : table.m_table)
         {
-            os << (char)pair.first << " : (" << pair.second.bitl() << " bits) [";
+            os << "'" << (char)pair.first << "' : (" << pair.second.bitl() << " bits) [";
             for (uint32_t i(0); i < pair.second.bitl(); i++)
-                os << (pair.second[i]&1 ? '1' : '0');
+                os << (pair.second[i] ? '1' : '0');
             os << "]\n";
         }
         return os;

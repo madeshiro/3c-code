@@ -140,6 +140,12 @@ namespace code3c
 
         const Cell& operator [](_CharT c) const;
         _CharT operator [](const char* bits, uint32_t len) const;
+
+        /**
+         *
+         * @return the table's row number
+         */
+        uint32_t size() const;
     };
     
     std::ostream& operator<<(std::ostream& os, const HuffmanTable<char8_t>& table);

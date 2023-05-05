@@ -88,8 +88,14 @@ int test_build_table()
 
     HuffmanTree8 tree8(nodes, nlen);
     HuffmanTable8 table8(tree8);
-    std::cout << table8 << std::endl;
-
     delete[] nodes;
+#ifdef CODE3C_DEBUG
+    std::cout << table8 << std::endl;
+#endif
+
+    // Wrong table size
+    if (table8.size() != nlen)
+        return -1;
     return 0;
 }
+
