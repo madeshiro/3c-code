@@ -56,17 +56,40 @@ int test_huffman(int argc [[maybe_unused]], char** argv [[maybe_unused]])
 HuffmanTree8::Node** build_nodes(const char* txt, uint32_t* _out_len)
 {
     uint32_t len(0), slen(strlen(txt));
-    std::map<char, HuffmanTree8::Node*> nodes;
+    std::map<char, uint32_t> map;
 
+    uint32_t i;
+    for (i = 0; i < slen; i++)
+    {
+        if (map.contains(txt[i]))
+            map[txt[i]]++;
+        else {
+            map.insert(std::pair<char, uint32_t>(txt[i], 1));
+            len++;
+        }
+    }
+
+    HuffmanTree8::Node** nodes = new HuffmanTree8::Node *[len];
+
+    i = 0;
+    for (auto p : map)
+        nodes[i++] = new HuffmanTree8::Node(p.first, p.second);
+
+    if (_out_len)
+        *_out_len = len;
+    return nodes;
 }
 
 int test_build_table()
 {
     const char sample[] = "My sample text";
-    for (char c : sample)
-    {
+    uint32_t nlen;
+    HuffmanTree8::Node** nodes = build_nodes(sample, &nlen);
 
-    }
+    HuffmanTree8 tree8(nodes, nlen);
+    HuffmanTable8 table8(tree8);
+    std::cout << table8 << std::endl;
 
+    delete[] nodes;
     return 0;
 }

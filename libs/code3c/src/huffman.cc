@@ -14,6 +14,13 @@ namespace code3c
     template class HuffmanTable<char32_t>;
 
     template < typename _CharT >
+    HuffmanTree<_CharT>::Node::Node(_CharT c, uint32_t w):
+        m_0(nullptr), m_1(nullptr),
+        weight(w), ch(c)
+    {
+    }
+
+    template < typename _CharT >
     HuffmanTree<_CharT>::Node::Node(const code3c::HuffmanTree<_CharT>::Node & node): /* NOLINT */
         m_0(node.m_0 ? new Node(*node.m_0) : nullptr),
         m_1(node.m_1 ? new Node(*node.m_1) : nullptr),
@@ -65,10 +72,10 @@ namespace code3c
     HuffmanTree<_CharT>::HuffmanTree(HuffmanTree<_CharT>::Node **leaves, uint32_t len):
         m_root(new Node)
     {
-        auto sort_ascending = [&]()
+        auto sort_ascending = [&](uint32_t off)
         {
             // Sort by weight (ascending)
-            for (uint32_t i(0); i < len - 1; i++)
+            for (uint32_t i(off); i < len - 1; i++)
             {
                 HuffmanTree<_CharT>::Node *cpy(leaves[i]);
                 HuffmanTree<_CharT>::Node **cur(&leaves[i]);
@@ -87,15 +94,19 @@ namespace code3c
         Node* current;
         for (; i < len-2; i++)
         {
-            sort_ascending();
+            sort_ascending(i);
             current = new Node;
             current->m_0 = leaves[i];
             current->m_1 = leaves[i+1];
+            current->weight = leaves[i]->weight + leaves[i+1]->weight;
+            current->ch = '\0'; // ignore
+
+            leaves[i] = nullptr;
             leaves[i+1] = current;
         }
 
         m_root->m_0 = leaves[i];
-        if (i+1 != len)
+        if (i+1 < len)
             m_root->m_1 = leaves[i+1];
     }
 
@@ -238,13 +249,13 @@ namespace code3c
         throw std::runtime_error("Unable to find Cell");
     }
 
-    std::ostream& operator<<(std::ostream& os, const HuffmanTable<char>& table)
+    std::ostream& operator<<(std::ostream& os, const HuffmanTable<char8_t>& table)
     {
         for (auto& pair : table.m_table)
         {
-            os << pair.first << " : (" << pair.second.bitl() << " bits) [";
+            os << (char)pair.first << " : (" << pair.second.bitl() << " bits) [";
             for (uint32_t i(0); i < pair.second.bitl(); i++)
-                os << pair.second[i];
+                os << (pair.second[i]&1 ? '1' : '0');
             os << "]\n";
         }
         return os;

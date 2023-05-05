@@ -51,6 +51,7 @@ namespace code3c
             _CharT ch;
         public:
             Node() = default;
+            Node(_CharT, uint32_t);
             Node(const Node&);
             ~Node();
 
@@ -101,7 +102,7 @@ namespace code3c
         friend class HuffmanTree<_CharT>;
         friend class HTFile;
 
-        friend std::ostream& operator<<(std::ostream&, const HuffmanTable<char>&);
+        friend std::ostream& operator<<(std::ostream&, const HuffmanTable<char8_t>&);
 
         class Cell final
         {
@@ -141,7 +142,7 @@ namespace code3c
         _CharT operator [](const char* bits, uint32_t len) const;
     };
     
-    std::ostream& operator<<(std::ostream& os, const HuffmanTable<char>& table);
+    std::ostream& operator<<(std::ostream& os, const HuffmanTable<char8_t>& table);
 
     /* TODO HTFile
     class HTFile
