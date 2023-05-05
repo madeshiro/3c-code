@@ -1,5 +1,4 @@
 #include "code3c/huffman.hh"
-#include <cstring>
 #include <stdexcept>
 #include <functional>
 
@@ -238,66 +237,6 @@ namespace code3c
         return m_table.size();
     }
 
-    template < typename _CharT >
-    uint32_t HuffmanTable::lengthOf(const _CharT* str,
-                                    size_t slen,
-                                    uint32_t *_out_bitl) const
-    {
-        uint32_t bitl(0);
-        for (size_t i(0); i < slen; i++)
-            bitl += m_table.at((char32_t)str[i]).bitl();
-
-        if (_out_bitl) *_out_bitl = bitl;
-        return bitl/8 + (bitl%8 ? 1 : 0);
-    }
-
-    template uint32_t HuffmanTable::lengthOf<char>(const char*, size_t,
-            uint32_t*) const;
-    template uint32_t HuffmanTable::lengthOf<char8_t>(const char8_t*, size_t,
-            uint32_t*) const;
-    template uint32_t HuffmanTable::lengthOf<char16_t>(const char16_t*, size_t,
-            uint32_t*) const;
-    template uint32_t HuffmanTable::lengthOf<char32_t>(const char32_t*, size_t,
-            uint32_t*) const;
-
-    template < typename _CharT >
-    char8_t* HuffmanTable::encode(const _CharT * buf,
-                                  uint32_t slen,
-                                  uint32_t *_out_bitl) const
-    {
-        // Huffman Buffer length (byte), length in bit
-        uint32_t bufl, bitl;
-        bufl = lengthOf(buf, slen, &bitl);
-        char8_t * hbuf = new char8_t[bufl+1];
-        std::memset(hbuf, 0, bufl+1);
-
-
-        for (uint32_t i(0), ibit(0); i < slen; i++)
-        {
-            auto cell = m_table.at(static_cast<char32_t>(buf[i]));
-            for (auto& ch : cell)
-            {
-                char8_t* c = &hbuf[ibit/8];
-                ch = (ch=='1')&1;
-                ch <<= (7-ibit%8);
-                *c |= ch;
-                ibit++;
-            }
-        }
-
-        if (_out_bitl) *_out_bitl = bitl;
-        return hbuf;
-    }
-
-    template char8_t* HuffmanTable::encode<char>(const char*, uint32_t, uint32_t *)
-            const;
-    template char8_t* HuffmanTable::encode<char8_t>(const char8_t *, uint32_t, uint32_t *)
-            const;
-    template char8_t* HuffmanTable::encode<char16_t>(const char16_t *, uint32_t, uint32_t *)
-            const;
-    template char8_t* HuffmanTable::encode<char32_t>(const char32_t *, uint32_t, uint32_t *)
-            const;
-
     uint32_t HuffmanTable::countChars(const char8_t * hbuf, size_t bitl) const
     {
         uint32_t count(0), ibit(0);
@@ -321,45 +260,6 @@ namespace code3c
         return count;
     }
 
-    template < typename _CharT >
-    _CharT* HuffmanTable::decode(const char8_t *hbuf, uint32_t bitl,
-                                 uint32_t *_out_len) const
-    {
-        uint32_t bufl = countChars(hbuf, bitl);
-        _CharT* buf = new _CharT[bufl+1];
-        buf[bufl] = '\0';
-
-        uint32_t i(0), ibit(0);
-        char c, b;
-
-        HuffmanTree::Node* node = m_tree->m_root;
-        while (ibit < bitl)
-        {
-            c = hbuf[ibit / 8];
-            b = (c >> (7-(ibit%8)))&1;
-            node = (1 == b ? node->m_1 : node->m_0);
-            ibit++;
-            if (*node)
-            {
-                buf[i] = (_CharT) node->ch.ch32;
-                node = m_tree->m_root;
-                i++;
-            }
-        }
-
-        if (_out_len) *_out_len = i;
-        return buf;
-    }
-    
-    template char * HuffmanTable::decode<char>(const char8_t* hbuf, 
-            uint32_t bitl, uint32_t* _out_len) const;
-    template char8_t * HuffmanTable::decode<char8_t>(const char8_t* hbuf,
-            uint32_t bitl, uint32_t* _out_len) const;
-    template char16_t * HuffmanTable::decode<char16_t>(const char8_t* hbuf,
-            uint32_t bitl, uint32_t* _out_len) const;
-    template char32_t * HuffmanTable::decode<char32_t>(const char8_t* hbuf,
-            uint32_t bitl, uint32_t* _out_len) const;
-
     std::ostream& operator<<(std::ostream& os, const HuffmanTable& table)
     {
         for (auto& pair : table.m_table)
@@ -371,5 +271,127 @@ namespace code3c
             os << "]\n";
         }
         return os;
+    }
+    
+    template uint32_t HuffmanTable::lengthOf<char>(const char*, size_t,
+            uint32_t*) const;
+    template uint32_t HuffmanTable::lengthOf<char8_t>(const char8_t*, size_t,
+            uint32_t*) const;
+    template uint32_t HuffmanTable::lengthOf<char16_t>(const char16_t*, size_t,
+            uint32_t*) const;
+    template uint32_t HuffmanTable::lengthOf<char32_t>(const char32_t*, size_t,
+            uint32_t*) const;
+
+    template char8_t* HuffmanTable::encode<char>(const char*, uint32_t, uint32_t *)
+            const;
+    template char8_t* HuffmanTable::encode<char8_t>(const char8_t *, uint32_t,
+            uint32_t *) const;
+    template char8_t* HuffmanTable::encode<char16_t>(const char16_t *, uint32_t,
+            uint32_t *)const;
+    template char8_t* HuffmanTable::encode<char32_t>(const char32_t *, uint32_t,
+            uint32_t *) const;
+
+    template char * HuffmanTable::decode<char>(const char8_t* hbuf,
+            uint32_t bitl, uint32_t* _out_len) const;
+    template char8_t * HuffmanTable::decode<char8_t>(const char8_t* hbuf,
+            uint32_t bitl, uint32_t* _out_len) const;
+    template char16_t * HuffmanTable::decode<char16_t>(const char8_t* hbuf,
+            uint32_t bitl, uint32_t* _out_len) const;
+    template char32_t * HuffmanTable::decode<char32_t>(const char8_t* hbuf,
+            uint32_t bitl, uint32_t* _out_len) const;
+
+    uint8_t HTFile::htf_info::to_byte() const
+    {
+        uint8_t _byte(0);
+        _byte |= (char_type&0b11)  << 7;
+        _byte |= (entry_bit&0b1)   << 5;
+        _byte |= (length_max&0x1f);
+
+        return _byte;
+    }
+
+    HTFile::HTFile(const char *fname, bool do_write) noexcept(false):
+        m_header(), m_file(nullptr)
+    {
+        m_file = fopen(fname, do_write ? "wb" : "rb");
+        if (!m_file)
+            throw std::runtime_error("Unable to open file");
+
+        if (do_write)
+        {
+
+        }
+        else
+        {
+            char header[9];
+            if (std::fread(header, 1, 9, m_file) == 9)
+            {
+
+            }
+            else throw std::runtime_error("Error while reading HTF header");
+        }
+    }
+
+    HTFile::~HTFile()
+    {
+        fclose(m_file);
+    }
+
+    bool HTFile::write(const HuffmanTable & table)
+    {
+        size_t fbuflen;
+        char* fbuffer = toBuffer(table, &fbuflen);
+
+        bool status = fwrite(fbuffer, sizeof(char), fbuflen/sizeof(char), m_file)
+            == fbuflen/sizeof(char);
+
+        delete[] fbuffer;
+        return status;
+    }
+
+    HuffmanTable* HTFile::read()
+    {
+        size_t fbuflen;
+        char* fbuf = toString(&fbuflen);
+
+        HuffmanTable* table = fromBuffer(fbuf, fbuflen);
+
+        delete[] fbuf;
+        return table;
+    }
+
+    char* HTFile::toString(size_t *_out_len)
+    {
+        fseek(m_file, 0L, SEEK_END);
+        long fsize = ftell(m_file);
+        fseek(m_file, 0L, SEEK_SET);
+
+        char* fbuffer = new char[fsize];
+        fread(fbuffer, sizeof(char), fsize/sizeof(char), m_file);
+
+        if (_out_len) *_out_len = fsize;
+        return fbuffer;
+    }
+
+    HuffmanTable* HTFile::fromFile(const char *fname)
+    {
+        return HTFile(fname, false).read();
+    }
+
+    HuffmanTable* HTFile::fromBuffer(const char *buf, uint32_t buflen)
+    {
+        // TODO fromBuffer
+        return nullptr;
+    }
+
+    bool HTFile::toFile(const char *dest, const HuffmanTable &table)
+    {
+        return HTFile(dest, true).write(table);
+    }
+
+    char* HTFile::toBuffer(const HuffmanTable &table, size_t * _out_len)
+    {
+        // TODO toBuffer
+        return nullptr;
     }
 }

@@ -8,6 +8,7 @@ using code3c::HTFile;
 
 int test_build_table();
 int test_huff_encode();
+int test_huff_file();
 
 typedef int (*TestFunction)(void); /* NOLINT */
 typedef struct /* NOLINT */
@@ -28,6 +29,11 @@ static testFunctionMapEntry registeredFunctionEntries[] = {
             "huffman_encode/decode",
             test_huff_encode,
             1, 0
+        },
+        {
+            "huffman_file_generation",
+            test_huff_file,
+            2, 0
         }
 };
 
@@ -162,5 +168,55 @@ int test_huff_encode()
         delete[] hbuf;
     }
 
+    return 0;
+}
+
+int test_huff_file()
+{
+    const char* htf_file = "test_huff_file.htf";
+    const char* samples[] = {
+            "My sample text",
+            "a8zd974531het8/.;:;afekf^^^\\983=(",
+            "012345678989756423120",
+            "d"
+    };
+
+    for (auto sample : samples)
+    {
+        char8_t *hbuf;
+        uint32_t hblen, slen;
+
+        /* encode and save table */
+        {
+            uint32_t nlen;
+
+            // Huffman classes
+            HuffmanTree::Node **leaves = build_nodes(sample, &nlen);
+            HuffmanTree  tree(leaves, nlen);
+            HuffmanTable table(tree);
+
+            // Encode buffers
+            hbuf = table.encode(sample, strlen(sample), &hblen);
+
+            // Save file
+            if (!HTFile::toFile(htf_file, table))
+                return 10;
+        }
+
+        /* load table and decode */
+        try {
+            HuffmanTable * table = HTFile::fromFile(htf_file);
+            char* sbuf = table->decode<char>(hbuf, hblen, &slen);
+            if (slen != strlen(sample))
+                return 1;
+            if (strcmp(sbuf, sample))
+                return 2;
+        } catch (std::exception e) {
+            std::cerr << e.what() << std::endl;
+            return 11;
+        }
+    }
+
+    std::remove(htf_file);
     return 0;
 }
