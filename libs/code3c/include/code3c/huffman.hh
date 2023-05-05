@@ -30,28 +30,32 @@
 
 namespace code3c
 {
-    template < typename _CharT >
+    union huff_char_t
+    {
+        char8_t ch8;
+        char16_t ch16;
+        char32_t ch32;
+    };
+
     class HuffmanTable;
     class HTFile;
 
-
-    template < typename _CharT >
     class HuffmanTree
     {
-        friend class HuffmanTable<_CharT>;
+        friend class HuffmanTable;
     public:
         struct Node final
         {
-            friend class HuffmanTable<_CharT>;
-            friend class HuffmanTree<_CharT>;
+            friend class HuffmanTable;
+            friend class HuffmanTree;
         protected:
             Node* m_0 = nullptr;  // Left
             Node* m_1 = nullptr;  // Right
             uint32_t weight;
-            _CharT ch;
+            huff_char_t ch;
         public:
             Node() = default;
-            Node(_CharT, uint32_t);
+            Node(huff_char_t, uint32_t);
             Node(const Node&);
             ~Node();
 
@@ -69,8 +73,17 @@ namespace code3c
             explicit inline operator bool() const
             { return m_0 == nullptr && m_1 == nullptr; }
 
-            explicit inline operator _CharT() const
+            explicit inline operator huff_char_t() const
             { return ch; }
+
+            explicit inline operator char8_t () const
+            { return ch.ch8; }
+
+            explicit inline operator char16_t () const
+            { return ch.ch16; }
+
+            explicit inline operator char32_t () const
+            { return ch.ch32; }
 
             inline uint32_t get_weight() const
             { return weight; }
@@ -78,7 +91,7 @@ namespace code3c
     private:
         Node * m_root;
 
-        explicit HuffmanTree(const HuffmanTable<_CharT> &table);
+        explicit HuffmanTree(const HuffmanTable &table);
     public:
         explicit HuffmanTree(HuffmanTree::Node * root);
         HuffmanTree(HuffmanTree::Node ** leaves, uint32_t len);
@@ -93,16 +106,16 @@ namespace code3c
          * @param bseq
          * @return
          */
-        _CharT operator [](uint32_t bseq) const noexcept(false);
+        huff_char_t operator [](uint32_t bseq) const noexcept(false);
     };
 
-    template < typename _CharT >
     class HuffmanTable
     {
-        friend class HuffmanTree<_CharT>;
+        friend class HuffmanTree;
         friend class HTFile;
 
-        friend std::ostream& operator<<(std::ostream&, const HuffmanTable<char8_t>&);
+        // 8bit char print
+        friend std::ostream& operator<<(std::ostream&, const HuffmanTable&);
 
         class Cell final
         {
@@ -127,19 +140,20 @@ namespace code3c
             { return m_bits; }
         };
 
-        HuffmanTree<_CharT>* m_tree;
-        std::map<_CharT, Cell> m_table;
+        HuffmanTree* m_tree;
+        // use per default max capacity char
+        std::map<char32_t, Cell> m_table;
 
         /**
          *
          * @param table
          */
-        explicit HuffmanTable(const std::map<_CharT, Cell> &table);
+        explicit HuffmanTable(const std::map<char32_t, Cell> &table);
     public:
-        explicit HuffmanTable(const HuffmanTree<_CharT>& tree);
+        explicit HuffmanTable(const HuffmanTree& tree);
 
-        const Cell& operator [](_CharT c) const;
-        _CharT operator [](const char* bits, uint32_t len) const;
+        const Cell& operator [](huff_char_t c) const;
+        huff_char_t operator [](const char* bits, uint32_t len) const;
 
         /**
          *
@@ -147,8 +161,9 @@ namespace code3c
          */
         uint32_t size() const;
     };
-    
-    std::ostream& operator<<(std::ostream& os, const HuffmanTable<char8_t>& table);
+
+    // 8 bit char table print
+    std::ostream& operator<<(std::ostream& os, const HuffmanTable& table);
 
     /* TODO HTFile
     class HTFile
@@ -180,23 +195,7 @@ namespace code3c
         static bool toFile(const char* dest, const HuffmanTable& table);
         static char* toBuffer(const HuffmanTable& table);
     };
-     */
-
-    extern template class HuffmanTree<char8_t>;
-    extern template class HuffmanTree<char16_t>;
-    extern template class HuffmanTree<char32_t>;
-
-    extern template class HuffmanTable<char8_t>;
-    extern template class HuffmanTable<char16_t>;
-    extern template class HuffmanTable<char32_t>;
-    
-    typedef HuffmanTable<char8_t> HuffmanTable8;
-    typedef HuffmanTable<char16_t> HuffmanTable16;
-    typedef HuffmanTable<char32_t> HuffmanTable32;
-    
-    typedef HuffmanTree<char8_t> HuffmanTree8;
-    typedef HuffmanTree<char16_t> HuffmanTree16;
-    typedef HuffmanTree<char32_t> HuffmanTree32;
+    */
 }
 
 #endif //HH_LIB_HUFFMAN_3CCODE
