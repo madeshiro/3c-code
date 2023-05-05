@@ -1,9 +1,12 @@
 #include <iostream>
 #include <code3c/huffman.hh>
+#include <cstring>
 
-using code3c::HuffmanTree;
-using code3c::HuffmanTable;
+using code3c::HuffmanTree8;
+using code3c::HuffmanTable8;
 using code3c::HTFile;
+
+int test_build_table();
 
 typedef int (*TestFunction)(void); /* NOLINT */
 typedef struct /* NOLINT */
@@ -15,7 +18,11 @@ typedef struct /* NOLINT */
 } testFunctionMapEntry;
 
 static testFunctionMapEntry registeredFunctionEntries[] = {
-
+        {
+            "build_table",
+            test_build_table,
+            0, 0
+        }
 };
 
 int test_huffman(int argc [[maybe_unused]], char** argv [[maybe_unused]])
@@ -44,4 +51,22 @@ int test_huffman(int argc [[maybe_unused]], char** argv [[maybe_unused]])
 
     std::cout << pass << "/" << found << " test(s) passed" << std::endl;
     return (int) status;
+}
+
+HuffmanTree8::Node** build_nodes(const char* txt, uint32_t* _out_len)
+{
+    uint32_t len(0), slen(strlen(txt));
+    std::map<char, HuffmanTree8::Node*> nodes;
+
+}
+
+int test_build_table()
+{
+    const char sample[] = "My sample text";
+    for (char c : sample)
+    {
+
+    }
+
+    return 0;
 }
