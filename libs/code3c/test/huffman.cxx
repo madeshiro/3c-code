@@ -7,6 +7,7 @@ using code3c::HuffmanTable;
 using code3c::HTFile;
 
 int test_build_table();
+int test_huff_encode();
 
 typedef int (*TestFunction)(void); /* NOLINT */
 typedef struct /* NOLINT */
@@ -22,6 +23,11 @@ static testFunctionMapEntry registeredFunctionEntries[] = {
             "build_table",
             test_build_table,
             0, 0
+        },
+        {
+            "huffman_encode/decode",
+            test_huff_encode,
+            1, 0
         }
 };
 
@@ -51,6 +57,16 @@ int test_huffman(int argc [[maybe_unused]], char** argv [[maybe_unused]])
 
     std::cout << pass << "/" << found << " test(s) passed" << std::endl;
     return (int) status;
+}
+
+void print_hbuf(const char8_t * hbuf, uint32_t bitl)
+{
+    for (uint32_t ibit(0); ibit<bitl;)
+    {
+        char8_t _bit = hbuf[ibit/8];
+        for (uint32_t off(0); off < 8 && ibit < bitl; ibit++, off++)
+            std::cout << (char) (((_bit >> (7-off))&1)+'0');
+    }
 }
 
 HuffmanTree::Node** build_nodes(const char* txt, uint32_t* _out_len)
@@ -100,3 +116,51 @@ int test_build_table()
     return 0;
 }
 
+int test_huff_encode()
+{
+    const char* samples[] = {
+            "My sample text",
+            "a8zd974531het8/.;:;afekf^^^\\983=(",
+            "012345678989756423120",
+            "d"
+    };
+
+    for (auto sample : samples)
+    {
+        uint32_t nlen, sblen, hblen;
+
+        // Huffman classes
+        HuffmanTree::Node** leaves = build_nodes(sample, &nlen);
+        HuffmanTree tree(leaves, nlen);
+        HuffmanTable table(tree);
+
+        // Encode/Decode buffers
+        char8_t *hbuf;
+        char* sbuf;
+
+        hbuf = table.encode(sample, strlen(sample), &hblen);
+        sbuf = table.decode<char>(hbuf, hblen, &sblen);
+
+#ifdef CODE3C_DEBUG
+        printf("\nsample:\n\twitness: \n\t\tstr: %s\n\t\tlength: %lu\n",
+               sample, strlen(sample));
+        printf("\tencode:\n\t\tbits: ");
+        print_hbuf(hbuf, hblen);
+        printf("\n\t\tlength: %d\n", hblen);
+        printf("\tdecode:\n\t\tstr: %s\n\t\tlength: %d\n", sbuf, sblen);
+        std::cout << "Table: \n" << table;
+#endif
+
+        if (sblen != strlen(sample))
+            return 1;
+        if (strcmp(sbuf, sample))
+            return 2;
+
+        // Release memory
+        delete[] leaves;
+        delete[] sbuf;
+        delete[] hbuf;
+    }
+
+    return 0;
+}

@@ -131,9 +131,9 @@ namespace code3c
 
             bool equal(const char*, uint32_t);
 
-            inline char* begin()
+            inline char* begin() const
             { return m_bits; }
-            inline char* end()
+            inline char* end() const
             { return &m_bits[m_bitl]; }
 
             inline const char* bits() const
@@ -160,7 +160,53 @@ namespace code3c
          * @return the table's row number
          */
         uint32_t size() const;
+
+        template < typename _CharT >
+        uint32_t lengthOf(const _CharT* str,
+                          size_t slen,
+                          uint32_t *_out_bitl=nullptr) const;
+
+        template < typename _CharT >
+        char8_t* encode(const _CharT* buf, uint32_t slen, uint32_t* _out_bitl) const;
+
+        /**
+         * Count the number of chars that were coded in the Huffman compressed sequence.
+         * @param hbuf the encode data
+         * @param bitl the number of bits in the buffer
+         * @return The number of encoded chars
+         */
+        uint32_t countChars(const char8_t * hbuf, size_t bitl) const;
+
+        template < typename _CharT >
+        _CharT* decode(const char8_t* hbuf, uint32_t bitl, uint32_t* _out_len) const;
     };
+
+    extern template uint32_t HuffmanTable::lengthOf<char>(const char*, size_t,
+            uint32_t*) const;
+    extern template uint32_t HuffmanTable::lengthOf<char8_t>(const char8_t*, size_t,
+            uint32_t*) const;
+    extern template uint32_t HuffmanTable::lengthOf<char16_t>(const char16_t*, size_t,
+            uint32_t*) const;
+    extern template uint32_t HuffmanTable::lengthOf<char32_t>(const char32_t*, size_t,
+            uint32_t*) const;
+
+    extern template char8_t* HuffmanTable::encode<char>(const char*, uint32_t, uint32_t *)
+            const;
+    extern template char8_t* HuffmanTable::encode<char8_t>(const char8_t *, uint32_t,
+            uint32_t *) const;
+    extern template char8_t* HuffmanTable::encode<char16_t>(const char16_t *, uint32_t,
+            uint32_t *)const;
+    extern template char8_t* HuffmanTable::encode<char32_t>(const char32_t *, uint32_t,
+            uint32_t *) const;
+
+    extern template char * HuffmanTable::decode<char>(const char8_t* hbuf,
+            uint32_t bitl, uint32_t* _out_len) const;
+    extern template char8_t * HuffmanTable::decode<char8_t>(const char8_t* hbuf,
+            uint32_t bitl, uint32_t* _out_len) const;
+    extern template char16_t * HuffmanTable::decode<char16_t>(const char8_t* hbuf,
+            uint32_t bitl, uint32_t* _out_len) const;
+    extern template char32_t * HuffmanTable::decode<char32_t>(const char8_t* hbuf,
+            uint32_t bitl, uint32_t* _out_len) const;
 
     // 8 bit char table print
     std::ostream& operator<<(std::ostream& os, const HuffmanTable& table);
