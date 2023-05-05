@@ -98,9 +98,6 @@ namespace code3c
         HuffmanTree(const HuffmanTree& tree);
         ~HuffmanTree();
 
-        HuffmanTree& truncate(uint32_t floor);
-        HuffmanTree  truncateAt(uint32_t floor) const;
-
         /**
          * A 32bit huffman (invert) sequence
          * @param bseq

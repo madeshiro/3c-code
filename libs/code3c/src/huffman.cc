@@ -112,19 +112,6 @@ namespace code3c
     }
 
     
-    HuffmanTree& HuffmanTree::truncate(uint32_t floor)
-    {
-        // TODO truncate
-        return *this;
-    }
-
-    
-    HuffmanTree HuffmanTree::truncateAt(uint32_t floor) const
-    {
-        return HuffmanTree(*this).truncate(floor);
-    }
-
-    
     huff_char_t HuffmanTree::operator[](uint32_t bseq) const noexcept(false)
     {
         const Node* cur(m_root);
