@@ -2,8 +2,8 @@
 #include <code3c/huffman.hh>
 #include <cstring>
 
-using code3c::HuffmanTree8;
-using code3c::HuffmanTable8;
+using code3c::HuffmanTree;
+using code3c::HuffmanTable;
 using code3c::HTFile;
 
 int test_build_table();
@@ -53,7 +53,7 @@ int test_huffman(int argc [[maybe_unused]], char** argv [[maybe_unused]])
     return (int) status;
 }
 
-HuffmanTree8::Node** build_nodes(const char* txt, uint32_t* _out_len)
+HuffmanTree::Node** build_nodes(const char* txt, uint32_t* _out_len)
 {
     uint32_t len(0), slen(strlen(txt));
     std::map<char, uint32_t> map;
@@ -69,11 +69,12 @@ HuffmanTree8::Node** build_nodes(const char* txt, uint32_t* _out_len)
         }
     }
 
-    HuffmanTree8::Node** nodes = new HuffmanTree8::Node *[len];
+    HuffmanTree::Node** nodes = new HuffmanTree::Node *[len];
 
     i = 0;
     for (auto p : map)
-        nodes[i++] = new HuffmanTree8::Node(p.first, p.second);
+        nodes[i++] = new HuffmanTree::Node(code3c::huff_char_t{(char8_t)p.first},
+                                           p.second);
 
     if (_out_len)
         *_out_len = len;
@@ -84,10 +85,10 @@ int test_build_table()
 {
     const char sample[] = "My sample text";
     uint32_t nlen;
-    HuffmanTree8::Node** nodes = build_nodes(sample, &nlen);
+    HuffmanTree::Node** nodes = build_nodes(sample, &nlen);
 
-    HuffmanTree8 tree8(nodes, nlen);
-    HuffmanTable8 table8(tree8);
+    HuffmanTree tree8(nodes, nlen);
+    HuffmanTable table8(tree8);
     delete[] nodes;
 #ifdef CODE3C_DEBUG
     std::cout << table8 << std::endl;

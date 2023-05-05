@@ -5,14 +5,6 @@
 
 namespace code3c
 {
-    template class HuffmanTree<char8_t>;
-    template class HuffmanTree<char16_t>;
-    template class HuffmanTree<char32_t>;
-
-    template class HuffmanTable<char8_t>;
-    template class HuffmanTable<char16_t>;
-    template class HuffmanTable<char32_t>;
-
     template < typename _CharT >
     HuffmanTree<_CharT>::Node::Node(_CharT c, uint32_t w):
         m_0(nullptr), m_1(nullptr),
