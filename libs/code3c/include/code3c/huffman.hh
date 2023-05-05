@@ -143,7 +143,6 @@ namespace code3c
         HuffmanTree* m_tree;
         // use per default max capacity char
         std::map<char32_t, Cell> m_table;
-        uint8_t m_chsizeof;
 
         /**
          *
@@ -161,8 +160,6 @@ namespace code3c
          * @return the table's row number
          */
         uint32_t size() const;
-
-        uint8_t chSizeof() const;
     };
 
     // 8 bit char table print

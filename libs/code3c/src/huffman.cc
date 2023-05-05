@@ -5,35 +5,32 @@
 
 namespace code3c
 {
-    template < typename _CharT >
-    HuffmanTree<_CharT>::Node::Node(_CharT c, uint32_t w):
+    HuffmanTree::Node::Node(huff_char_t c, uint32_t w):
         m_0(nullptr), m_1(nullptr),
         weight(w), ch(c)
     {
     }
-
-    template < typename _CharT >
-    HuffmanTree<_CharT>::Node::Node(const code3c::HuffmanTree<_CharT>::Node & node): /* NOLINT */
+    
+    HuffmanTree::Node::Node(const code3c::HuffmanTree::Node & node): /* NOLINT */
         m_0(node.m_0 ? new Node(*node.m_0) : nullptr),
         m_1(node.m_1 ? new Node(*node.m_1) : nullptr),
         weight(node.weight), ch(node.ch)
     {
     }
-
-    template < typename _CharT >
-    HuffmanTree<_CharT>::Node::~Node()
+    
+    HuffmanTree::Node::~Node()
     {
         delete m_0;
         delete m_1;
     }
 
-    template < typename _CharT >
-    HuffmanTree<_CharT>::HuffmanTree(const HuffmanTable<_CharT> &table):
+    
+    HuffmanTree::HuffmanTree(const HuffmanTable &table):
         m_root(new Node)
     {
         // Recursive function to init Tree
-        std::function<void(Node *, _CharT, const char* bits, uint32_t bitl)>
-                rec_init = [&](Node *node, _CharT ch, const char* bits, uint32_t bitl)
+        std::function<void(Node *, huff_char_t, const char* bits, uint32_t bitl)>
+                rec_init = [&](Node *node, huff_char_t ch, const char* bits, uint32_t bitl)
         {
             if (!bitl)
             {
@@ -50,18 +47,18 @@ namespace code3c
         // Init tree from each table's cell
         for (const auto &pair : table.m_table)
         {
-            rec_init(m_root, pair.first, pair.second.bits(), pair.second.bitl());
+            rec_init(m_root, {.ch32=pair.first}, pair.second.bits(), pair.second.bitl());
         }
     }
 
-    template < typename _CharT >
-    HuffmanTree<_CharT>::HuffmanTree(HuffmanTree<_CharT>::Node *root):
+    
+    HuffmanTree::HuffmanTree(HuffmanTree::Node *root):
         m_root(root)
     {
     }
 
-    template < typename _CharT >
-    HuffmanTree<_CharT>::HuffmanTree(HuffmanTree<_CharT>::Node **leaves, uint32_t len):
+    
+    HuffmanTree::HuffmanTree(HuffmanTree::Node **leaves, uint32_t len):
         m_root(new Node)
     {
         auto sort_ascending = [&](uint32_t off)
@@ -69,8 +66,8 @@ namespace code3c
             // Sort by weight (ascending)
             for (uint32_t i(off); i < len - 1; i++)
             {
-                HuffmanTree<_CharT>::Node *cpy(leaves[i]);
-                HuffmanTree<_CharT>::Node **cur(&leaves[i]);
+                HuffmanTree::Node *cpy(leaves[i]);
+                HuffmanTree::Node **cur(&leaves[i]);
                 for (uint32_t j(i + 1); j < len; j++)
                 {
                     if ((*cur)->get_weight() > leaves[j]->get_weight())
@@ -91,7 +88,7 @@ namespace code3c
             current->m_0 = leaves[i];
             current->m_1 = leaves[i+1];
             current->weight = leaves[i]->weight + leaves[i+1]->weight;
-            current->ch = '\0'; // ignore
+            current->ch = {.ch32 = 0}; // ignore
 
             leaves[i] = nullptr;
             leaves[i+1] = current;
@@ -102,33 +99,33 @@ namespace code3c
             m_root->m_1 = leaves[i+1];
     }
 
-    template < typename _CharT >
-    HuffmanTree<_CharT>::HuffmanTree(const code3c::HuffmanTree<_CharT> &tree):
+    
+    HuffmanTree::HuffmanTree(const code3c::HuffmanTree &tree):
         m_root(new Node(*tree.m_root))
     {
     }
 
-    template < typename _CharT >
-    HuffmanTree<_CharT>::~HuffmanTree()
+    
+    HuffmanTree::~HuffmanTree()
     {
         delete m_root;
     }
 
-    template < typename _CharT >
-    HuffmanTree<_CharT>& HuffmanTree<_CharT>::truncate(uint32_t floor)
+    
+    HuffmanTree& HuffmanTree::truncate(uint32_t floor)
     {
         // TODO truncate
         return *this;
     }
 
-    template < typename _CharT >
-    HuffmanTree<_CharT> HuffmanTree<_CharT>::truncateAt(uint32_t floor) const
+    
+    HuffmanTree HuffmanTree::truncateAt(uint32_t floor) const
     {
-        return HuffmanTree<_CharT>(*this).truncate(floor);
+        return HuffmanTree(*this).truncate(floor);
     }
 
-    template < typename _CharT >
-    _CharT HuffmanTree<_CharT>::operator[](uint32_t bseq) const noexcept(false)
+    
+    huff_char_t HuffmanTree::operator[](uint32_t bseq) const noexcept(false)
     {
         const Node* cur(m_root);
         for (uint32_t _(0); _<32; _++)
@@ -146,39 +143,39 @@ namespace code3c
                                  "tree");
     }
 
-    template < typename _CharT >
-    HuffmanTable<_CharT>::Cell::Cell(char *bits, uint32_t bitl) :
+    
+    HuffmanTable::Cell::Cell(char *bits, uint32_t bitl) :
             m_bitl(bitl), m_bits(bits)
     {
     }
 
-    template < typename _CharT >
-    HuffmanTable<_CharT>::Cell::Cell(const Cell &cell):
+    
+    HuffmanTable::Cell::Cell(const Cell &cell):
             m_bitl(cell.m_bitl),
             m_bits(strncpy(new char[cell.m_bitl], cell.m_bits, cell.m_bitl))
     {
     }
 
-    template < typename _CharT >
-    HuffmanTable<_CharT>::Cell::~Cell()
+    
+    HuffmanTable::Cell::~Cell()
     {
         delete[] m_bits;
     }
 
-    template < typename _CharT >
-    uint32_t HuffmanTable<_CharT>::Cell::bitl() const
+    
+    uint32_t HuffmanTable::Cell::bitl() const
     {
         return m_bitl;
     }
 
-    template < typename _CharT >
-    char HuffmanTable<_CharT>::Cell::operator[](uint32_t i) const
+    
+    char HuffmanTable::Cell::operator[](uint32_t i) const
     {
         return m_bits[i] == '1';
     }
 
-    template < typename _CharT >
-    bool HuffmanTable<_CharT>::Cell::equal(const char * bits, uint32_t bitl)
+    
+    bool HuffmanTable::Cell::equal(const char * bits, uint32_t bitl)
     {
         if (bitl == m_bitl)
         {
@@ -190,25 +187,25 @@ namespace code3c
         return false;
     }
 
-    template < typename _CharT >
-    HuffmanTable<_CharT>::HuffmanTable(const std::map<_CharT, Cell> &table):
+    
+    HuffmanTable::HuffmanTable(const std::map<char32_t, Cell> &table):
             m_tree(nullptr), m_table(table)
     {
-        m_tree = new HuffmanTree<_CharT>(*this);
+        m_tree = new HuffmanTree(*this);
     }
 
-    template < typename _CharT >
-    HuffmanTable<_CharT>::HuffmanTable(const HuffmanTree<_CharT> &tree):
-            m_tree(new HuffmanTree<_CharT>(tree)), m_table()
+    
+    HuffmanTable::HuffmanTable(const HuffmanTree &tree):
+            m_tree(new HuffmanTree(tree)), m_table()
     {
-        std::function<void(const typename HuffmanTree<_CharT>::Node*, const char*, uint32_t)>
-            init_rec = [&] (const HuffmanTree<_CharT>::Node * node,
+        std::function<void(const typename HuffmanTree::Node*, const char*, uint32_t)>
+            init_rec = [&] (const HuffmanTree::Node * node,
                             const char * seq,
                             uint32_t seql) {
             char *bits = strncpy(new char[seql + 1], seq, seql);
             if (*node)
             {
-                m_table.insert(std::pair<_CharT, Cell>(node->ch, Cell(bits, seql)));
+                m_table.insert(std::pair<char32_t, Cell>(node->ch.ch32, Cell(bits, seql)));
             }
             else
             {
@@ -230,35 +227,36 @@ namespace code3c
         init_rec(m_tree->m_root, "", 0);
     }
 
-    template < typename _CharT >
-    const HuffmanTable<_CharT>::Cell& HuffmanTable<_CharT>::operator[](_CharT c) const
+    
+    const HuffmanTable::Cell& HuffmanTable::operator[](huff_char_t c) const
     {
-        return m_table.at(c);
+        return m_table.at(c.ch32);
     }
 
-    template < typename _CharT >
-    _CharT HuffmanTable<_CharT>::operator[](const char *bits, uint32_t len) const
+    
+    huff_char_t HuffmanTable::operator[](const char *bits, uint32_t len) const
     {
         for (auto pair : m_table)
         {
             if (pair.second.equal(bits, len))
-                return pair.first;
+                return huff_char_t {.ch32=pair.first};
         }
 
         throw std::runtime_error("Unable to find Cell");
     }
 
-    template < typename _CharT >
-    uint32_t HuffmanTable<_CharT>::size() const
+    
+    uint32_t HuffmanTable::size() const
     {
-            return m_table.size();
+        return m_table.size();
     }
 
-    std::ostream& operator<<(std::ostream& os, const HuffmanTable<char8_t>& table)
+    std::ostream& operator<<(std::ostream& os, const HuffmanTable& table)
     {
         for (auto& pair : table.m_table)
         {
-            os << "'" << (char)pair.first << "' : (" << pair.second.bitl() << " bits) [";
+            os << "'" << (char)pair.first << "' : (" << pair.second.bitl()
+               << " bits) [";
             for (uint32_t i(0); i < pair.second.bitl(); i++)
                 os << (pair.second[i] ? '1' : '0');
             os << "]\n";

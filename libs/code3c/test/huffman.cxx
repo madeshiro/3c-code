@@ -91,7 +91,7 @@ int test_build_table()
     HuffmanTable table8(tree8);
     delete[] nodes;
 #ifdef CODE3C_DEBUG
-    std::cout << table8 << std::endl;
+    std::cout << std::endl << table8 << std::endl;
 #endif
 
     // Wrong table size
