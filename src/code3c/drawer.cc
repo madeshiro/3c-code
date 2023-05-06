@@ -136,4 +136,16 @@ namespace code3c
         this->setHeigh(height);
         this->setWidth(width);
     }
+
+    void Drawer::draw_pixelmap(const PixelMap &pixelMap, int x, int y)
+    {
+        for (int px(0); px < pixelMap.width(); px++)
+        {
+            int xx(px+x);
+            for (int py(0); py < pixelMap.height(); py++)
+            {
+                draw_pixel(pixelMap[px, py].color, xx, py+y);
+            }
+        }
+    }
 }

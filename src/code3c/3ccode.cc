@@ -282,7 +282,16 @@ namespace code3c
 
             void draw() override
             {
+                // white background
                 background(0xffffff);
+
+                // Draw marker
+                {
+                    PixelMap map = PixelMap::loadFromPNG("resources/code3c-marker.png");
+                    PixelMap logo = map.resize(width(), height());
+                    draw_pixelmap(logo, 0, 0);
+                }
+
                 // Draw color calibration
                 {
                     int offRad(modelDimension.absRad-modelDimension.effRad
