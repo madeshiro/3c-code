@@ -164,6 +164,11 @@ namespace code3c
         virtual void draw_slice(int origin_x, int origin_y, int radius, int degree,
                                 int rotation) = 0;
 
+        virtual void fill_circle(int x, int y, int radius) = 0;
+        virtual void draw_line(int x1, int y1, int x2, int y2) = 0;
+
+        virtual void draw_pixelmap(const PixelMap& pixelMap, int x, int y);
+
         virtual uint64_t hash() const;
     };
 
@@ -223,8 +228,8 @@ namespace code3c
                 int origin_x, int origin_y, int radius, int degree,
                 int rotation
         ) override;
-        virtual void fill_circle(int x, int y, int radius);
-        virtual void draw_line(int x1, int y1, int x2, int y2);
+        void fill_circle(int x, int y, int radius) override;
+        void draw_line(int x1, int y1, int x2, int y2) override;
     };
 
     typedef X11Drawer Code3CDrawer;
@@ -284,8 +289,8 @@ namespace code3c
         void draw_text(const char* str, int x, int y) override;
         void draw_slice(int origin_x, int origin_y, int radius, int degree,
                         int rotation) override;
-        virtual void fill_circle(int x, int y, int radius);
-        virtual void draw_line(int x1, int y1, int x2, int y2);
+        void fill_circle(int x, int y, int radius) override;
+        void draw_line(int x1, int y1, int x2, int y2) override;
     };
     typedef Win32Drawer Code3CDrawer;
 #endif //CODE3C_WIN32

@@ -113,6 +113,7 @@ set(RESOURCES
         resources/3ccode-wb.png
         resources/3ccode-wb2c.png
         resources/3ccode-wb6c.png
+        resources/code3c-marker.png
         )
 file(COPY ${RESOURCES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/resources)
 
