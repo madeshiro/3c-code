@@ -61,6 +61,7 @@ set(RESOURCES
         ${CMAKE_HOME_DIRECTORY}/resources/3ccode-wb.png
         ${CMAKE_HOME_DIRECTORY}/resources/3ccode-wb2c.png
         ${CMAKE_HOME_DIRECTORY}/resources/3ccode-wb6c.png
+        ${CMAKE_HOME_DIRECTORY}/resources/code3c-marker.png
         )
 
 # Add Dependencies

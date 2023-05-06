@@ -211,6 +211,8 @@ namespace code3c
             const Code3C* parent;
             const CODE3C_MODEL_DESC::CODE3C_MODEL_DIMENSION &modelDimension;
 
+            PixelMap *logo, *marker;
+
             void save_ui()
             {
                 char fname[256];
@@ -219,7 +221,7 @@ namespace code3c
             }
         public:
             Code3CDrawerSample(const Code3C* parent, const Code3CData& cData):
-            parent(parent),
+            parent(parent), logo(nullptr), marker(nullptr),
             Code3CDrawer(
                 40+2 * cData.getDimension().absRad * CODE3C_PIXEL_UNIT,
                 40+2 * cData.getDimension().absRad * CODE3C_PIXEL_UNIT,
@@ -228,6 +230,12 @@ namespace code3c
             {
                 bindKey((DRAWER_KEY_CTRL | 's'),
                         reinterpret_cast<delegate>(&Code3CDrawerSample::save_ui));
+            }
+
+            ~Code3CDrawerSample()
+            {
+                delete logo;
+                delete marker;
             }
             
             unsigned long bit_to_color(char _byte)
@@ -278,11 +286,31 @@ namespace code3c
             {
                 // Setup window
                 setTitle("Code3C Drawing Frame");
+
+                // Load marker
+                {
+                    PixelMap map = PixelMap::loadFromPNG("resources/code3c-marker.png");
+                    marker = new PixelMap(map.resize(width(), height()));
+                }
+
+                // Load logo
+                {
+                    int logoDiameter = (modelDimension.absRad - modelDimension.effRad) *
+                                   CODE3C_PIXEL_UNIT * 2;
+                    // Todo define var to contain custom file
+                    PixelMap map = PixelMap::loadFromPNG(parent->m_desc.default_logo);
+                    logo = new PixelMap(map.resize(logoDiameter, logoDiameter));
+                }
             }
 
             void draw() override
             {
+                // white background
                 background(0xffffff);
+
+                // Draw marker
+                draw_pixelmap(*marker, 0, 0);
+
                 // Draw color calibration
                 {
                     int offRad(modelDimension.absRad-modelDimension.effRad
@@ -339,9 +367,6 @@ namespace code3c
                                    CODE3C_PIXEL_UNIT * 2;
                 int origX = (width() - logoDiameter) / 2;
                 int origY = (height() - logoDiameter) / 2;
-                // Todo define var to contain custom file
-                PixelMap map = PixelMap::loadFromPNG(parent->m_desc.default_logo);
-                PixelMap logo = map.resize(logoDiameter, logoDiameter);
 
                 int rlogo = logoDiameter / 2;
                 for (int x = 0, xx=origX; x < logoDiameter; x++, xx++)
@@ -351,7 +376,7 @@ namespace code3c
                     {
                         int ry = abs(rlogo-y);
                         if (((rx*rx)+(ry*ry)) < (rlogo*rlogo))
-                            draw_pixel(logo[x,y].color, xx, yy);
+                            draw_pixel((*logo)[x,y].color, xx, yy);
                     }
                 }
             }
