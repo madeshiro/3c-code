@@ -233,26 +233,57 @@ namespace code3c
             huff_char_t ch;
             uint8_t len;
             char seq[4];
-        };
+
+            /**
+             * Get amount of bits used to encode the char using Huffman Code
+             * @return
+             */
+            inline uint8_t bitl() const
+            { return len; }
+
+            /**
+             *
+             * @return a sequence of bits represented by '0' and '1' chars
+             */
+            char* toBits() const;
+        } *m_segments;
 
         // Fields
-        FILE* m_file;
+        uint32_t m_segCount;
+        char*    m_buf;
+        size_t   m_lbuf;
+
+        /**
+         *
+         * @param buffer
+         * @param len
+         */
+        void init_from_buffer(const char* buffer, size_t len);
 
         // Constructors
-        HTFile(const char* fname, bool do_write) noexcept(false);
+        explicit HTFile(FILE* infile);               // In
+        HTFile(const char* buffer, size_t len);      // In
+        explicit HTFile(const HuffmanTable& table);  // Out
         ~HTFile();
 
         // Methods
-        bool write(const HuffmanTable&);
-        HuffmanTable* read();
+        char* write(size_t *_out_len)  const;
+        bool  write(FILE* outfile) const;
+        HuffmanTable* read() const;
 
-        char* toString(size_t* _out_len = nullptr);
+        uint8_t charSize() const;
+        uint8_t entryBit() const;
+        uint8_t seqMaxLength() const;
+        uint32_t countSegments() const;
 
+        const segment& operator[](size_t) const noexcept(false);
 
+        const segment* begin() const;
+        const segment* end() const;
     public:
         // Input methods
         static HuffmanTable* fromFile(const char* fname);
-        static HuffmanTable* fromBuffer(const char* buf, uint32_t buflen);
+        static HuffmanTable* fromBuffer(const char* buf, size_t buflen);
 
         // Output methods
         static bool toFile(const char* dest, const HuffmanTable& table);

@@ -9,21 +9,21 @@ namespace code3c
         weight(w), ch(c)
     {
     }
-    
+
     HuffmanTree::Node::Node(const code3c::HuffmanTree::Node & node): /* NOLINT */
         m_0(node.m_0 ? new Node(*node.m_0) : nullptr),
         m_1(node.m_1 ? new Node(*node.m_1) : nullptr),
         weight(node.weight), ch(node.ch)
     {
     }
-    
+
     HuffmanTree::Node::~Node()
     {
         delete m_0;
         delete m_1;
     }
 
-    
+
     HuffmanTree::HuffmanTree(const HuffmanTable &table):
         m_root(new Node)
     {
@@ -50,13 +50,13 @@ namespace code3c
         }
     }
 
-    
+
     HuffmanTree::HuffmanTree(HuffmanTree::Node *root):
         m_root(root)
     {
     }
 
-    
+
     HuffmanTree::HuffmanTree(HuffmanTree::Node **leaves, uint32_t len):
         m_root(new Node)
     {
@@ -98,19 +98,19 @@ namespace code3c
             m_root->m_1 = leaves[i+1];
     }
 
-    
+
     HuffmanTree::HuffmanTree(const code3c::HuffmanTree &tree):
         m_root(new Node(*tree.m_root))
     {
     }
 
-    
+
     HuffmanTree::~HuffmanTree()
     {
         delete m_root;
     }
 
-    
+
     huff_char_t HuffmanTree::operator[](uint32_t bseq) const noexcept(false)
     {
         const Node* cur(m_root);
@@ -129,38 +129,38 @@ namespace code3c
                                  "tree");
     }
 
-    
+
     HuffmanTable::Cell::Cell(char *bits, uint32_t bitl) :
             m_bitl(bitl), m_bits(bits)
     {
     }
 
-    
+
     HuffmanTable::Cell::Cell(const Cell &cell):
             m_bitl(cell.m_bitl),
             m_bits(strncpy(new char[cell.m_bitl], cell.m_bits, cell.m_bitl))
     {
     }
 
-    
+
     HuffmanTable::Cell::~Cell()
     {
         delete[] m_bits;
     }
 
-    
+
     uint32_t HuffmanTable::Cell::bitl() const
     {
         return m_bitl;
     }
 
-    
+
     char HuffmanTable::Cell::operator[](uint32_t i) const
     {
         return m_bits[i] == '1';
     }
 
-    
+
     bool HuffmanTable::Cell::equal(const char * bits, uint32_t bitl)
     {
         if (bitl == m_bitl)
@@ -173,14 +173,14 @@ namespace code3c
         return false;
     }
 
-    
+
     HuffmanTable::HuffmanTable(const std::map<char32_t, Cell> &table):
             m_tree(nullptr), m_table(table)
     {
         m_tree = new HuffmanTree(*this);
     }
 
-    
+
     HuffmanTable::HuffmanTable(const HuffmanTree &tree):
             m_tree(new HuffmanTree(tree)), m_table()
     {
@@ -213,13 +213,13 @@ namespace code3c
         init_rec(m_tree->m_root, "", 0);
     }
 
-    
+
     const HuffmanTable::Cell& HuffmanTable::operator[](huff_char_t c) const
     {
         return m_table.at(c.ch32);
     }
 
-    
+
     huff_char_t HuffmanTable::operator[](const char *bits, uint32_t len) const
     {
         for (auto pair : m_table)
@@ -231,7 +231,7 @@ namespace code3c
         throw std::runtime_error("Unable to find Cell");
     }
 
-    
+
     uint32_t HuffmanTable::size() const
     {
         return m_table.size();
@@ -272,7 +272,7 @@ namespace code3c
         }
         return os;
     }
-    
+
     template uint32_t HuffmanTable::lengthOf<char>(const char*, size_t,
             uint32_t*) const;
     template uint32_t HuffmanTable::lengthOf<char8_t>(const char8_t*, size_t,
@@ -310,88 +310,154 @@ namespace code3c
         return _byte;
     }
 
-    HTFile::HTFile(const char *fname, bool do_write) noexcept(false):
-        m_header(), m_file(nullptr)
+    char* HTFile::segment::toBits() const
     {
-        m_file = fopen(fname, do_write ? "wb" : "rb");
-        if (!m_file)
-            throw std::runtime_error("Unable to open file");
-
-        if (do_write)
+        char* bits = new char[len];
+        for (uint8_t ibit(0); ibit < len; )
         {
-
-        }
-        else
-        {
-            char header[9];
-            if (std::fread(header, 1, 9, m_file) == 9)
+            char _byte = seq[ibit/8];
+            for (uint8_t i(0); i < 8 && ibit < len; ibit++, i++)
             {
-
+                bits[ibit] = '0' + ((_byte >> (7 - i)) & 1);
             }
-            else throw std::runtime_error("Error while reading HTF header");
         }
+
+        return bits;
+    }
+
+    void HTFile::init_from_buffer(const char *buffer, size_t len)
+    {
+        // TODO init
+    }
+
+    HTFile::HTFile(FILE *infile):
+            m_segments(nullptr), m_segCount(0),
+            m_buf(nullptr), m_lbuf(0)
+    {
+        fseek(infile, 0L, SEEK_END);
+        size_t fsize = ftell(infile);
+        fseek(infile, 0L, SEEK_SET);
+
+        char* fbuffer = new char[fsize];
+        fread(fbuffer, sizeof(char), fsize/sizeof(char), infile);
+
+        init_from_buffer(fbuffer, fsize);
+    }
+
+    HTFile::HTFile(const char *buffer, size_t len):
+            m_segments(nullptr), m_segCount(0),
+            m_buf(nullptr), m_lbuf(0)
+    {
+        init_from_buffer(buffer, len);
+    }
+
+    HTFile::HTFile(const HuffmanTable &table):
+            m_segments(nullptr), m_segCount(0),
+            m_buf(nullptr), m_lbuf(0)
+    {
+        // TODO
     }
 
     HTFile::~HTFile()
     {
-        fclose(m_file);
+        delete[] m_buf;
     }
 
-    bool HTFile::write(const HuffmanTable & table)
+    char* HTFile::write(size_t* _out_len) const
     {
-        size_t fbuflen;
-        char* fbuffer = toBuffer(table, &fbuflen);
-
-        bool status = fwrite(fbuffer, sizeof(char), fbuflen/sizeof(char), m_file)
-            == fbuflen/sizeof(char);
-
-        delete[] fbuffer;
-        return status;
+        if (_out_len)
+            *_out_len = m_lbuf;
+        return strncpy(new char[m_lbuf+1], m_buf, m_lbuf+1);
     }
 
-    HuffmanTable* HTFile::read()
+    bool HTFile::write(FILE* outfile) const
     {
-        size_t fbuflen;
-        char* fbuf = toString(&fbuflen);
-
-        HuffmanTable* table = fromBuffer(fbuf, fbuflen);
-
-        delete[] fbuf;
-        return table;
+        return std::fwrite(m_buf, sizeof(char), m_lbuf/sizeof(char), outfile)
+            == m_lbuf/sizeof(char);
     }
 
-    char* HTFile::toString(size_t *_out_len)
+    HuffmanTable* HTFile::read() const
     {
-        fseek(m_file, 0L, SEEK_END);
-        long fsize = ftell(m_file);
-        fseek(m_file, 0L, SEEK_SET);
+        std::map<char32_t, HuffmanTable::Cell> cells;
+        for (auto &seg : *this)
+        {
+            cells.insert(std::pair<char32_t, HuffmanTable::Cell>{
+                seg.ch.ch32,
+                { seg.toBits(), seg.bitl() }
+            });
+        }
+        return new HuffmanTable(cells);
+    }
 
-        char* fbuffer = new char[fsize];
-        fread(fbuffer, sizeof(char), fsize/sizeof(char), m_file);
+    uint8_t HTFile::charSize() const
+    {
+        return m_header.info.char_type;
+    }
 
-        if (_out_len) *_out_len = fsize;
-        return fbuffer;
+    uint8_t HTFile::entryBit() const
+    {
+        return m_header.info.entry_bit;
+    }
+
+    uint8_t HTFile::seqMaxLength() const
+    {
+        return m_header.info.length_max;
+    }
+
+    uint32_t HTFile::countSegments() const
+    {
+        return m_segCount;
+    }
+
+    const HTFile::segment& HTFile::operator[](size_t index) const noexcept(false)
+    {
+        if (m_segments)
+            return m_segments[index];
+        else
+            throw std::runtime_error("invalid use of operator[] in HTFile");
+    }
+
+    const HTFile::segment* HTFile::begin() const
+    {
+        return m_segments;
+    }
+
+    const HTFile::segment* HTFile::end() const
+    {
+        return &m_segments[m_segCount];
     }
 
     HuffmanTable* HTFile::fromFile(const char *fname)
     {
-        return HTFile(fname, false).read();
+        std::FILE* file = std::fopen(fname, "rb");
+        if (file)
+        {
+            HuffmanTable * table = HTFile(file).read();
+            std::fclose(file);
+            return table;
+        }
+        return nullptr;
     }
 
-    HuffmanTable* HTFile::fromBuffer(const char *buf, uint32_t buflen)
+    HuffmanTable* HTFile::fromBuffer(const char *buf, size_t buflen)
     {
-        // TODO fromBuffer
-        return nullptr;
+        return HTFile(buf, buflen).read();
     }
 
     bool HTFile::toFile(const char *dest, const HuffmanTable &table)
     {
-        return HTFile(dest, true).write(table);
+        std::FILE* file = fopen(dest, "wb");
+        if (file)
+        {
+            bool status(HTFile(table).write(file));
+            std::fclose(file);
+            return status;
+        }
+        return false;
     }
 
     char* HTFile::toBuffer(const HuffmanTable &table, size_t * _out_len)
     {
-        // TODO toBuffer
-        return nullptr;
+        return HTFile(table).write(_out_len);
     }
 }
