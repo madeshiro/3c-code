@@ -325,8 +325,9 @@ namespace code3c
     
     void Win32Drawer::draw_pixel(unsigned long color, int x, int y)
     {
-        uint32_t index = (width()*height()) - (width()*y+(width()-x));
-        ((UINT*)m_bitmapBits)[index] = (UINT) (0xff<<24) | color;
+        SetPixel(m_hdc, x, y, RGB((color>>16)&0xff, (color>>8)&0xff, color&0xff));
+        // uint32_t index = (width()*height()) - (width()*y+(width()-x));
+        // ((UINT*)m_bitmapBits)[index] = (UINT) color;
     }
     
     void Win32Drawer::draw_text(const char *str, int x, int y)
