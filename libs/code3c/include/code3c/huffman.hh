@@ -220,6 +220,7 @@ namespace code3c
             uint8_t length_max; // 5 bits
 
             uint8_t to_byte() const;
+            static htf_info from_byte(uint8_t);
         };
 
         struct htf_header

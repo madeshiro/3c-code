@@ -310,6 +310,15 @@ namespace code3c
         return _byte;
     }
 
+    HTFile::htf_info HTFile::htf_info::from_byte(uint8_t _byte)
+    {
+        return htf_info {
+            .char_type  = static_cast<uint8_t>((_byte >> 6) & 2),
+            .entry_bit  = static_cast<uint8_t>((_byte >> 5) & 1),
+            .length_max = static_cast<uint8_t>(_byte & 0x1f)
+        };
+    }
+
     char* HTFile::segment::toBits() const
     {
         char* bits = new char[len];
@@ -327,7 +336,62 @@ namespace code3c
 
     void HTFile::init_from_buffer(const char *buffer, size_t len)
     {
-        // TODO init
+        /**
+         * magic_number: identifier of a HT file 0x7f + "HTF"
+         */
+        const char magic_number[4] = {0x7f, 'H', 'T', 'F'};
+
+        if (std::strncmp(buffer, magic_number, 4) == 0)
+        {
+            uint32_t nseq = *((uint32_t*) &buffer[4]);
+            htf_header header = {
+                    nseq,
+                    htf_info::from_byte(buffer[5])
+            };
+
+            m_segments = new segment[nseq];
+            uint32_t iseq, ibuf;
+            for (iseq=0, ibuf=0; ibuf < len && iseq < nseq; iseq++)
+            {
+                // Useful variables
+                const char* buf = &buffer[ibuf];
+                segment seg {};
+
+                // Init char
+                switch (header.info.char_type)
+                {
+                    case 1: // char8_t
+                        seg.ch.ch8 = (char8_t) *buf;
+                        break;
+                    case 2: // char16_t
+                        seg.ch.ch16 = *((char16_t*)buf);
+                        break;
+                    case 4: // char32_t
+                        seg.ch.ch32 = *((char32_t*)buf);
+                        break;
+                    default:
+                        throw std::runtime_error("corrupted header: invalid char type");
+                }
+                ibuf += header.info.char_type;
+                buf += header.info.char_type;
+
+                // Set bits' length
+                seg.len = static_cast<uint8_t>(*buf);
+                ibuf++;
+                buf++;
+
+                // Set sequence bits
+                for (uint8_t ibit(0); ibit < seg.len; ibit+=8, ibuf++, buf++)
+                {
+                    seg.seq[ibit/8] = *buf;
+                    ibuf++;
+                    buf++;
+                }
+            }
+
+            if (nseq != iseq)
+                throw std::runtime_error("corrupted buffer");
+        }
     }
 
     HTFile::HTFile(FILE *infile):
@@ -352,10 +416,33 @@ namespace code3c
     }
 
     HTFile::HTFile(const HuffmanTable &table):
-            m_segments(nullptr), m_segCount(0),
+            m_segments(new segment[table.size()]), m_segCount(table.size()),
             m_buf(nullptr), m_lbuf(0)
     {
-        // TODO
+        uint32_t i(0);
+        for (auto cell : table.m_table)
+        {
+            m_segments[i] = segment {
+                    .ch  = {.ch32 = cell.first},
+                    .len = static_cast<uint8_t>(cell.second.bitl()),
+                    .seq = {0,0,0,0}
+            };
+
+            char* bits = m_segments[i].seq;
+            for (uint32_t ibit(0), ibyte(0); ibit < cell.second.bitl(); ibyte++)
+            {
+                char &c = bits[i];
+                for (uint32_t j(0); j < 8 && ibit < cell.second.bitl(); j++, ibit++)
+                {
+                    char _bit = (cell.second[ibit] == '1');
+                    c |= (_bit << (7-j)) & 1;
+                }
+            }
+
+            i++;
+        }
+
+        // TODO writing
     }
 
     HTFile::~HTFile()
