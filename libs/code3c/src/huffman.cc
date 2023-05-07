@@ -381,11 +381,9 @@ namespace code3c
                 buf++;
 
                 // Set sequence bits
-                for (uint8_t ibit(0); ibit < seg.len; ibit+=8, ibuf++, buf++)
+                for (uint8_t i(0); i*8 < seg.len; i++, ibuf++, buf++)
                 {
-                    seg.seq[ibit/8] = *buf;
-                    ibuf++;
-                    buf++;
+                    seg.seq[i] = *buf;
                 }
             }
 
