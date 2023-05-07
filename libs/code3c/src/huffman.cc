@@ -37,7 +37,7 @@ namespace code3c
             }
             else
             {
-                Node** dest = *bits ? &node->m_1 : &node->m_0;
+                Node** dest = (*bits == '1') ? &(node->m_1) : &(node->m_0);
                 if (!*dest) *dest = new Node;
                 rec_init(*dest, ch, bits+1, bitl-1);
             }
@@ -303,7 +303,7 @@ namespace code3c
     uint8_t HTFile::htf_info::to_byte() const
     {
         uint8_t _byte(0);
-        _byte |= (char_type&0b11)  << 7;
+        _byte |= (char_type&0b11)  << 6;
         _byte |= (entry_bit&0b1)   << 5;
         _byte |= (length_max&0x1f);
 
@@ -313,8 +313,8 @@ namespace code3c
     HTFile::htf_info HTFile::htf_info::from_byte(uint8_t _byte)
     {
         return htf_info {
-            .char_type  = static_cast<uint8_t>((_byte >> 6) & 2),
-            .entry_bit  = static_cast<uint8_t>((_byte >> 5) & 1),
+            .char_type  = static_cast<uint8_t>((_byte >> 6) & 0b11),
+            .entry_bit  = static_cast<uint8_t>((_byte >> 5) & 0b1),
             .length_max = static_cast<uint8_t>(_byte & 0x1f)
         };
     }
@@ -336,29 +336,25 @@ namespace code3c
 
     void HTFile::init_from_buffer(const char *buffer, size_t len)
     {
-        /**
-         * magic_number: identifier of a HT file 0x7f + "HTF"
-         */
-        const char magic_number[4] = {0x7f, 'H', 'T', 'F'};
-
         if (std::strncmp(buffer, magic_number, 4) == 0)
         {
             uint32_t nseq = *((uint32_t*) &buffer[4]);
-            htf_header header = {
+            m_header = {
                     nseq,
-                    htf_info::from_byte(buffer[5])
+                    htf_info::from_byte(buffer[8])
             };
 
+            m_segCount = nseq;
             m_segments = new segment[nseq];
             uint32_t iseq, ibuf;
-            for (iseq=0, ibuf=0; ibuf < len && iseq < nseq; iseq++)
+            for (iseq=0, ibuf=9; ibuf < len && iseq < nseq; iseq++)
             {
                 // Useful variables
                 const char* buf = &buffer[ibuf];
                 segment seg {};
 
                 // Init char
-                switch (header.info.char_type)
+                switch (m_header.info.char_type)
                 {
                     case 1: // char8_t
                         seg.ch.ch8 = (char8_t) *buf;
@@ -372,8 +368,8 @@ namespace code3c
                     default:
                         throw std::runtime_error("corrupted header: invalid char type");
                 }
-                ibuf += header.info.char_type;
-                buf += header.info.char_type;
+                ibuf += m_header.info.char_type;
+                buf += m_header.info.char_type;
 
                 // Set bits' length
                 seg.len = static_cast<uint8_t>(*buf);
@@ -385,11 +381,14 @@ namespace code3c
                 {
                     seg.seq[i] = *buf;
                 }
+
+                m_segments[iseq] = seg;
             }
 
             if (nseq != iseq)
                 throw std::runtime_error("corrupted buffer");
-        }
+        } else
+            throw std::runtime_error("magin number not found");
     }
 
     HTFile::HTFile(FILE *infile):
@@ -415,32 +414,68 @@ namespace code3c
 
     HTFile::HTFile(const HuffmanTable &table):
             m_segments(new segment[table.size()]), m_segCount(table.size()),
-            m_buf(nullptr), m_lbuf(0)
+            m_buf(nullptr), m_lbuf(9)
     {
-        uint32_t i(0);
+        m_header = {0, { sizeof(char), 0b1, 3 }};
+
         for (auto cell : table.m_table)
         {
-            m_segments[i] = segment {
+            m_segments[m_header.seql] = segment {
                     .ch  = {.ch32 = cell.first},
                     .len = static_cast<uint8_t>(cell.second.bitl()),
                     .seq = {0,0,0,0}
             };
 
-            char* bits = m_segments[i].seq;
+            m_header.info.length_max = std::max<uint8_t>(cell.second.bitl(),
+                                                         m_header.info.length_max);
+            m_header.info.char_type = [cell]() -> uint8_t {
+                if (cell.first < 0x100)
+                    return sizeof(char);
+                if (cell.first < 0x10000)
+                    return sizeof(char16_t);
+
+                return sizeof(char32_t);
+            }();
+
             for (uint32_t ibit(0), ibyte(0); ibit < cell.second.bitl(); ibyte++)
             {
-                char &c = bits[i];
+                char *c = &m_segments[m_header.seql].seq[ibyte];
                 for (uint32_t j(0); j < 8 && ibit < cell.second.bitl(); j++, ibit++)
                 {
-                    char _bit = (cell.second[ibit] == '1');
-                    c |= (_bit << (7-j)) & 1;
+                    *c |= (cell.second[ibit] << (7-j));
                 }
             }
 
-            i++;
+            m_header.seql++;
         }
 
-        // TODO writing
+        // Determine buffer size
+        for (auto& seg: *this)
+        {
+            m_lbuf += m_header.info.char_type + 1 /* bitl byte */;
+            m_lbuf += seg.bitl() / 8 + (seg.bitl() % 8 > 0);
+        }
+
+        // Initialize buffer
+        m_buf = new char[m_lbuf+1];
+        m_buf[m_lbuf] = '\0';
+
+        // Write header
+        strncpy(m_buf, magic_number, 4);
+        strncpy(&m_buf[4], ((char*)&m_header.seql), 4);
+        m_buf[8] = (char) m_header.info.to_byte();
+
+        // Write sequences
+        char* buf = &m_buf[9];
+        for (auto& seg : *this)
+        {
+            strncpy(buf, ((char*)&seg.ch.ch32), m_header.info.char_type);
+            buf += m_header.info.char_type;
+            *buf = (char) seg.len;
+            buf++;
+            for (uint8_t i(0); i*8 < seg.len; i++, buf++)
+                *buf = seg.seq[i];
+        }
     }
 
     HTFile::~HTFile()

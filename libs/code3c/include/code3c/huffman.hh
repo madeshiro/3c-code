@@ -282,6 +282,11 @@ namespace code3c
         const segment* begin() const;
         const segment* end() const;
     public:
+        /**
+         * magic_number: identifier of a HT file 0x7f + "HTF"
+         */
+        static constexpr const char magic_number[4] = {0x3f, 'H', 'T', 'F'};
+
         // Input methods
         static HuffmanTable* fromFile(const char* fname);
         static HuffmanTable* fromBuffer(const char* buf, size_t buflen);

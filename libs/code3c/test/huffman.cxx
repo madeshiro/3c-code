@@ -204,16 +204,20 @@ int test_huff_file()
         }
 
         /* load table and decode */
-        try {
+        {
             HuffmanTable * table = HTFile::fromFile(htf_file);
-            char* sbuf = table->decode<char>(hbuf, hblen, &slen);
-            if (slen != strlen(sample))
-                return 1;
-            if (strcmp(sbuf, sample))
-                return 2;
-        } catch (std::exception e) {
-            std::cerr << e.what() << std::endl;
-            return 11;
+            if (table)
+            {
+#ifdef CODE3C_DEBUG
+                std::cout << std::endl << *table << std::endl;
+#endif
+                char *sbuf = table->decode<char>(hbuf, hblen, &slen);
+                if (slen != strlen(sample))
+                    return 1;
+                if (strcmp(sbuf, sample))
+                    return 2;
+            }
+            else return 11;
         }
     }
 
