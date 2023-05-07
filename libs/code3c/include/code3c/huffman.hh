@@ -212,7 +212,7 @@ namespace code3c
         struct htf_info
         {
             uint8_t char_type;  // 2 bits
-            uint8_t entry_bit;  // 1 bit
+            uint8_t entry_bit;  // 1 bit/experimental
             uint8_t length_max; // 5 bits
 
             uint8_t to_byte() const;
