@@ -1,5 +1,4 @@
-<br/>
-<div style="text-align: center">
+<div align="center">
     <img alt="3ccode logo" src="resources/code3c.png" style="transform: scale(90%)" />
 </div>
 
@@ -37,7 +36,7 @@ The project uses some features to improve error coverage and available stocking 
 [![gpl-v3](https://img.shields.io/badge/license%20(CLI)-GPL--3.0-darkred)](https://www.gnu.org/licenses/gpl-3.0.html)
 
 ---
-<div style="text-align: center">
+<div align="center">
 
 [![uca](https://www.uca.fr/uas/ksup/LOGO_CLAIR/UCA__Logo_head.png)](https://www.uca.fr)
 [![lgpl-v3](https://www.gnu.org/graphics/lgplv3-with-text-154x68.png)](https://www.gnu.org/licenses/lgpl-3.0.html)
