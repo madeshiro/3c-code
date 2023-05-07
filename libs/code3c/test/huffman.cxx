@@ -266,8 +266,18 @@ int test_htf_full_generation()
                     return 1;
 
 
-                delete[] table.encode(fbuf, fsize, &hlen);
+                auto hbuf = table.encode(fbuf, fsize, &hlen);
                 printf("[encode vs raw]: %d / %lu\n", hlen / 8, fsize);
+                char* sbuf = table.decode<char>(hbuf, hlen, &hlen);
+
+                if (hlen != fsize)
+                    return 2;
+                if (strcmp(sbuf, fbuf))
+                    return 3;
+
+                delete[] hbuf;
+                delete[] sbuf;
+                delete[] fbuf;
             }
             else return -2;
         }
