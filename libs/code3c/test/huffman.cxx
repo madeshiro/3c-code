@@ -233,36 +233,46 @@ int test_huff_file()
 
 int test_htf_full_generation()
 {
-    FILE* en_EN = fopen("resources/training_set.en_EN.txt", "rb");
-    if (en_EN)
-    {
-        fseek(en_EN, 0L, SEEK_END);
-        size_t fsize = ftell(en_EN);
-        fseek(en_EN, 0L, SEEK_SET);
-        char* fbuf = new char[fsize];
-        if (fread(fbuf, sizeof(char), fsize, en_EN) == fsize)
-        {
-            uint32_t nlen, hlen;
+    struct {
+        const char* htf, *src;
+    } files[] {
+            {"en_EN.htf", "resources/training_set.en_EN.txt"},
+            {"fr_FR.htf", "resources/training_set.fr_FR.txt"}
+    };
 
-            // Huffman classes
-            HuffmanTree::Node **leaves = build_nodes(fbuf, &nlen);
-            HuffmanTree tree(leaves, nlen);
-            HuffmanTable table(tree);
+    for (auto fdesc : files)
+    {
+        FILE *pFile = fopen(fdesc.src, "rb");
+        if (pFile)
+        {
+            fseek(pFile, 0L, SEEK_END);
+            size_t fsize = ftell(pFile);
+            fseek(pFile, 0L, SEEK_SET);
+            char *fbuf = new char[fsize];
+            if (fread(fbuf, sizeof(char), fsize, pFile) == fsize)
+            {
+                uint32_t nlen, hlen;
+
+                // Huffman classes
+                HuffmanTree::Node **leaves = build_nodes(fbuf, &nlen);
+                HuffmanTree tree(leaves, nlen);
+                HuffmanTable table(tree);
 #ifdef CODE3C_DEBUG
-            std::cout << std::endl << "'en_EN' Huffman Table" <<
-            std::endl << table << std::endl;
+                std::cout << std::endl << '"' << fdesc.htf << "\" Huffman Table" <<
+                std::endl << table << std::endl;
 #endif
 
-            if (!HTFile::toFile("en_EN.htf", table))
-                return 1;
+                if (!HTFile::toFile(fdesc.htf, table))
+                    return 1;
 
 
-            delete[] table.encode(fbuf, fsize, &hlen);
-            printf("[encode vs raw]: %d / %lu\n", hlen/8, fsize);
+                delete[] table.encode(fbuf, fsize, &hlen);
+                printf("[encode vs raw]: %d / %lu\n", hlen / 8, fsize);
+            }
+            else return -2;
         }
-        else return -2;
+        else return -1;
     }
-    else return -1;
 
     // EXIT_SUCCESS
     return 0;
