@@ -4,6 +4,9 @@
 # Huffman Table File (.htf) (not relevant for now)
 *.htf
 
+# Training sets
+!training_set.*.txt
+
 # Upload images resources
 !*.png
 !*.ico

@@ -179,8 +179,6 @@ namespace code3c
         _CharT* decode(const char8_t* hbuf, uint32_t bitl, uint32_t* _out_len) const;
     };
 
-    extern template uint32_t HuffmanTable::lengthOf<char>(const char*, size_t,
-            uint32_t*) const;
     extern template uint32_t HuffmanTable::lengthOf<char8_t>(const char8_t*, size_t,
             uint32_t*) const;
     extern template uint32_t HuffmanTable::lengthOf<char16_t>(const char16_t*, size_t,
@@ -188,8 +186,6 @@ namespace code3c
     extern template uint32_t HuffmanTable::lengthOf<char32_t>(const char32_t*, size_t,
             uint32_t*) const;
 
-    extern template char8_t* HuffmanTable::encode<char>(const char*, uint32_t, uint32_t *)
-            const;
     extern template char8_t* HuffmanTable::encode<char8_t>(const char8_t *, uint32_t,
             uint32_t *) const;
     extern template char8_t* HuffmanTable::encode<char16_t>(const char16_t *, uint32_t,

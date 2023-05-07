@@ -273,8 +273,6 @@ namespace code3c
         return os;
     }
 
-    template uint32_t HuffmanTable::lengthOf<char>(const char*, size_t,
-            uint32_t*) const;
     template uint32_t HuffmanTable::lengthOf<char8_t>(const char8_t*, size_t,
             uint32_t*) const;
     template uint32_t HuffmanTable::lengthOf<char16_t>(const char16_t*, size_t,
@@ -282,8 +280,6 @@ namespace code3c
     template uint32_t HuffmanTable::lengthOf<char32_t>(const char32_t*, size_t,
             uint32_t*) const;
 
-    template char8_t* HuffmanTable::encode<char>(const char*, uint32_t, uint32_t *)
-            const;
     template char8_t* HuffmanTable::encode<char8_t>(const char8_t *, uint32_t,
             uint32_t *) const;
     template char8_t* HuffmanTable::encode<char16_t>(const char16_t *, uint32_t,
@@ -299,6 +295,48 @@ namespace code3c
             uint32_t bitl, uint32_t* _out_len) const;
     template char32_t * HuffmanTable::decode<char32_t>(const char8_t* hbuf,
             uint32_t bitl, uint32_t* _out_len) const;
+
+    template <>
+    uint32_t HuffmanTable::lengthOf<char>(const char* str,
+                                    size_t slen,
+                                    uint32_t *_out_bitl) const
+    {
+        uint32_t bitl(0);
+        for (size_t i(0); i < slen; i++)
+            bitl += m_table.at((char32_t)static_cast<unsigned char>(str[i])).bitl();
+
+        if (_out_bitl) *_out_bitl = bitl;
+        return bitl/8 + (bitl%8 ? 1 : 0);
+    }
+
+    template <>
+    char8_t* HuffmanTable::encode<char>(const char * buf,
+                                  uint32_t slen,
+                                  uint32_t *_out_bitl) const
+    {
+        // Huffman Buffer length (byte), length in bit
+        uint32_t bufl, bitl;
+        bufl = lengthOf(buf, slen, &bitl);
+        char8_t * hbuf = new char8_t[bufl+1];
+        std::memset(hbuf, 0, bufl+1);
+
+
+        for (uint32_t i(0), ibit(0); i < slen; i++)
+        {
+            auto cell = m_table.at(static_cast<unsigned char>(buf[i]));
+            for (auto& ch : cell)
+            {
+                char8_t* c = &hbuf[ibit/8];
+                ch = (ch=='1')&1;
+                ch <<= (7-ibit%8);
+                *c |= ch;
+                ibit++;
+            }
+        }
+
+        if (_out_bitl) *_out_bitl = bitl;
+        return hbuf;
+    }
 
     uint8_t HTFile::htf_info::to_byte() const
     {

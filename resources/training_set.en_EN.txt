@@ -1,0 +1,76 @@
+PODCAST N°1
+
+Title: The Turing test: Can a computer pass for a human?
+Source: Alex Gendler (25 April 2016). “The Turing test: Can a computer pass for a human?”. In: Youtube.com / Ted-Ed. URL: https://www.youtube.com/watch?v=3wLqsRLvV-c (last accessed: 27/09/2022).
+
+Summary
+The video “The Turing test: Can a computer pass for a human?” presented by Alex Gendler explains the concept of the Turing test through the perspective of conversation and consciousness. They describe the history of the Turing test and its evolution through the ages, from the 1950 to nowadays. Beforehand, they show us the first statement of Turing concerning the evaluation of Artificial Intelligence (AI) consisting of ignoring all complicated statements about some philosophical questions (mind, consciousness, neurons…) and simplifying by focusing on whether a computer can talk like a human. Nevertheless, regarding several AI that passed the Turing test by now, there aren’t that many. It mainly consists in fooling judges caused by some bias humans have about intelligence. To sum up, even if computer science and AI made huge progress since 1950, the reality comes to reveal that it isn’t simple to have a bot that would be able to imitate a human conversation (and question the reality of consciousness for Artificial Intelligence).
+Opinion
+Regarding the evolution of AI nowadays and how it’s used (including the wrong usage of the term), the first statement of Turing made me ask about many productions happening, like the AI which won an art contest recently. For instance, the difference between inspiration and imitation. Furthermore, Turing decided to ignore some philosophical questions that many of us have about AI to simplify it while at the end, from my point of view, there definitely had an influence on the test results because humans are (and always will be) involved in the evaluation. Like it was said in the video, humans have their own concept of intelligence, going through philosophical and scientific questions and facts. Regarding how AI is built, I’m not sure that it will be able to develop consciousness. They could at least imitate humans, but they will lack some precious features like intuition.
+Keywords
+Turing test : a test established by Turing around the 1950s to determine whether an artificial intelligence could be considered “intelligent” by using a game using language that could mislead humans to think it isn’t a computer.
+“ELIZA”, “PARRY” : two AI that successfully passed the Turing test which inspired many others AI’s conception to pass the test.
+Chatbots : “AI” used to chat with.
+Parse : Analyze sentences, words… human talks to determine the sense and being able to analyze it correctly and respond to it as intended.
+Questions
+Is an AI able to develop a conscience by itself regarding the Turing test requirement ?
+What could be the difference between inspiration and imitation to you ?
+What is the full purpose and functioning of the Turing test ?
+What do you think about AI and the Turing test ?
+
+PODCAST N°2
+
+Title: Would Mind Upload allow us to live forever?
+Source: Hashem Al-Ghaili (Feb. 2022). “Would Mind Upload allow us to live forever?”. In: Youtube.com.URL: https://www.youtube.com/watch?v=gVfxChWj9_s
+
+Summary
+In “Would Mind Upload allow us to live forever?” Al-Ghaili explores the idea of “immortality” through transferring the mind into a computer or technology-like to preserve the brain and consciousness of a human-being. Treating death as a disease, some researchers consider that it should be cured thanks to that technology. Thus, uploading the mind into a technological receptacle would make humans able to pursue their career. Nevertheless, he raises the philosophical question about the true continuity of yourself: “is it you or just a copy of yourself”, relating to the complexity of the human brain. Despite that, some companies as well as a Russian businessman (Dmitry Itskov) launched many projects to pursue this objective with different approaches. To sum up, some researchers are going through the challenge of immortality using technologies to preserve the mind instead of the full body to treat death as if it was a disease.
+Opinion
+In my opinion, the development of this kind of technology raises an ethical problem that comes with knowing if the technology is developed for the humankind purpose: is it progress for progress or does the intention serve humanity well? Like what Elon Musk did, it looks like just some kind of stuff for rich people without the intent to help humanity reach another step in the evolution. While we currently face many critical situations with global warming, this kind of technology looks like a childish wish. Moreover, treating death as a disease is to me a complete disillusionment and a severe loss of humanity. Death is a part of the human cycle as any living being does. Moreover, it won’t be cheap to be able to benefit from this technology, increasing the gap between the rich and poor people as a privilege would be created again for a useless purpose.
+Keywords
+Brain-computer interface: likely called in computer science “API” (Application Programming Interface) made to translate brain signals into treatable signals for electronics compounds.
+Human brain mapping: the way to locate any features of the brain to get for what stands for any part of the brain.
+Computer simulation: a program which would run in a heavy computer to emulate the functionality of something (such as emulating the human brain)
+Questions
+According to you, does mind uploading would be a copy of yourself or the continuity of your existence?
+Do you think this kind of technology would benefit humanity?
+How long would it take for this technology to be developed ?
+
+PODCAST N°3
+
+Title: These laws that sex workers really want
+Source: Juno Mac, TED (June. 2016). “These laws that sex workers really want”. In: Youtube.com.URL: https://www.youtube.com/watch?v=vc-n852sv3E
+
+Summary
+The TEDx talk “These laws that sex workers really want” presented by Juno Mac explores the different countries laws about criminalizing sexwork to inform about the different effects that it has on sexworkers and third-parties. By exploring the differents ways legislation make somehow “prostitution” illegal (i.e. Full, partial and End-Demand criminalization), she exposes the fact that in the end, prostitution rate increase, and so insecurity do too. Even with legalization, it's difficult to get a balance situation due to the way states done this: it's called by sex-workers “backdoor criminalization”. At the end, J. Mac proposed that what SW really want is legal protection and support, meaning decriminalization and social rights to face their situation. To sum up, Prohibition by different levels of functioning is in place today in a large part of the world, making SW precarious (Judicially and Economically) while they’re currently fighting to get social rights and protection.
+Opinion
+To keep it simple, I’m totally for a full-decriminalization of sex-work, following the demands of differents association (like in France, Amnesty International and the STRASS syndicate). In my opinion, sex-work criminalization is a way to keep power under sex-workers by pressuring them because what they do is illegal. A large consequence of patriarchy and at the end, a SWERF branch in feminism (Sex-Worker Exclusionary Radical Feminist). The approach is somehow similar to what is happening currently with trans people, i.e. put forward a threat to women's rights by designating a “villain”, advancing  misleading arguments to get people’s support. And yet, at the end, sex-workers are discriminate and won’t be able to get basic social rights like access to health (AIDS discrimination, etc.), dwelling… making their situation get worse and worse. It’s a vicious cycle system to keep under power poor people that don’t get other ways than that to survive.
+Keywords
+Sex-workers, (do not say prostitution, respect the way people want to be talked about), Sex-work
+Criminalization, Prohibition
+Full, Partial, ‘End-Demand’ and ‘backdoor’ criminalization, ie. (in order) criminalize everyone involved; buying or selling sex; buying sex; difficult regulation to comply with.
+
+
+Questions
+Do you support sex-work legalization ?
+Why did you choose this subject ? What’s your approach to this question?
+Don’t you think that sex-work/prostitution is a matter of humans (women) abuse ?
+
+PODCAST N°4
+
+Title: Transgender Rights II: Last Week Tonight with John Oliver
+Source: LastWeekTonight (Oct. 2022). “Transgender Rights II: Last Week Tonight with John Oliver”. In: Youtube.com.URL: https://www.youtube.com/watch?v=Ns8NvPPHX5Y
+
+Summary
+In the TV show “Transgender Right II: Last Week Tonight with John Oliver”, John Oliver discusses the recent attacks on trans rights by politician (Republican) all over the USA. To begin with, he focuses on some rights like for trans girl to just be able to go to girl’s bathroom for instance, going to put bodyguards to keep trans people out of it (The fuck…). After that, John talks about the legislation that makes trans girls unable to do sport in school in order to “save the US female sport”, taking as example the campaign of Kristi Noem. Furthermore, he describes the way people shift the debate of gender identity to a sexualized threat by using other words to describe things instead of the usual ones. To sum up, John Oliver continues in this TV show its discussion about transgender rights, underlying the attacks of some politicians on people who just want to be themselves.
+Opinion
+As a transgender woman, I was already informed on many attacks on the LGBTQ+ community by the Republicans. The most shocking one was about trans girls not able to do sport, more precisely in Ohio where they’re decided to do some (excuse my language) FUCKING gynecological control on girls “in order to protect them” and “making sure that there won’t be any trans girls”. By inserting some fingers in a 9 years old girl vagina to be sure that it’s a girl ?! A good way to protect them, for sure ! At the end, all of these laws isn’t to protect girls, they just use the “feminist excuse” to justify there actions, however, it’s just to ensure there patriarchy dominance over womens. Trans people were the last barrier to “somehow” keep safe women's rights and now, Roe. V. Wade has fallen. There's so much more to say about it however there is so little space to say it.
+Keywords
+Transgender: When someone’s gender identity do not correspond to the one assigned at birth.
+Republicans: Political family in the US, right side of the political chest, conservative.
+Kristi Noem: Governor of the South Dakota since 2019
+Questions
+What’s your position about trans girls in women's sports ?
+How do you feel about legislation on trans people in France (and other countries in Europe) ?
+Don’t you think that hormone therapy and sex reassignation surgery can’t be a threat to people, leading to regretful decision ?
+

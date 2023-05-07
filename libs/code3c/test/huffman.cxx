@@ -9,6 +9,7 @@ using code3c::HTFile;
 int test_build_table();
 int test_huff_encode();
 int test_huff_file();
+int test_htf_full_generation();
 
 typedef int (*TestFunction)(void); /* NOLINT */
 typedef struct /* NOLINT */
@@ -34,6 +35,11 @@ static testFunctionMapEntry registeredFunctionEntries[] = {
             "huffman_file_generation",
             test_huff_file,
             2, 0
+        },
+        {
+            "huffman_full_generation",
+            test_htf_full_generation,
+            3, 0
         }
 };
 
@@ -222,5 +228,42 @@ int test_huff_file()
     }
 
     std::remove(htf_file);
+    return 0;
+}
+
+int test_htf_full_generation()
+{
+    FILE* en_EN = fopen("resources/training_set.en_EN.txt", "rb");
+    if (en_EN)
+    {
+        fseek(en_EN, 0L, SEEK_END);
+        size_t fsize = ftell(en_EN);
+        fseek(en_EN, 0L, SEEK_SET);
+        char* fbuf = new char[fsize];
+        if (fread(fbuf, sizeof(char), fsize, en_EN) == fsize)
+        {
+            uint32_t nlen, hlen;
+
+            // Huffman classes
+            HuffmanTree::Node **leaves = build_nodes(fbuf, &nlen);
+            HuffmanTree tree(leaves, nlen);
+            HuffmanTable table(tree);
+#ifdef CODE3C_DEBUG
+            std::cout << std::endl << "'en_EN' Huffman Table" <<
+            std::endl << table << std::endl;
+#endif
+
+            if (!HTFile::toFile("en_EN.htf", table))
+                return 1;
+
+
+            delete[] table.encode(fbuf, fsize, &hlen);
+            printf("[encode vs raw]: %d / %lu\n", hlen/8, fsize);
+        }
+        else return -2;
+    }
+    else return -1;
+
+    // EXIT_SUCCESS
     return 0;
 }
