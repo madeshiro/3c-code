@@ -101,6 +101,7 @@ namespace code3c
             wc.lpfnWndProc = code3c::WndProc;
             wc.hInstance = m_instance;
             wc.lpszClassName = "Win32Drawer";
+            wc.hIcon = LoadIcon(m_instance, "desk");
             
             RegisterClass(&wc);
         }
