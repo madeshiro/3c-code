@@ -237,29 +237,6 @@ namespace code3c
         return m_table.size();
     }
 
-    uint32_t HuffmanTable::countChars(const char8_t * hbuf, size_t bitl) const
-    {
-        uint32_t count(0), ibit(0);
-        char c, b;
-
-        HuffmanTree::Node* node = m_tree->m_root;
-        while (ibit < bitl)
-        {
-            c = hbuf[ibit / 8];
-            b = (c >> (7-(ibit%8)))&1;
-            node = (1 == b ? node->m_1 : node->m_0);
-            ibit++;
-
-            if (*node)
-            {
-                node = m_tree->m_root;
-                count++;
-            }
-        }
-
-        return count;
-    }
-
     std::ostream& operator<<(std::ostream& os, const HuffmanTable& table)
     {
         for (auto& pair : table.m_table)
@@ -273,6 +250,15 @@ namespace code3c
         return os;
     }
 
+    template uint32_t HuffmanTable::countChars<char>(const char8_t *hbuf,
+                                                      size_t bitl) const;
+    template uint32_t HuffmanTable::countChars<char8_t>(const char8_t *hbuf,
+                                                      size_t bitl) const;
+    template uint32_t HuffmanTable::countChars<char16_t>(const char8_t *hbuf,
+                                                      size_t bitl) const;
+    template uint32_t HuffmanTable::countChars<char32_t>(const char8_t *hbuf,
+                                                      size_t bitl) const;
+    
     template uint32_t HuffmanTable::lengthOf<char8_t>(const char8_t*, size_t,
             uint32_t*) const;
     template uint32_t HuffmanTable::lengthOf<char16_t>(const char16_t*, size_t,
@@ -303,7 +289,16 @@ namespace code3c
     {
         uint32_t bitl(0);
         for (size_t i(0); i < slen; i++)
-            bitl += m_table.at((char32_t)static_cast<unsigned char>(str[i])).bitl();
+        {
+            if (m_table.contains((char32_t) static_cast<unsigned char>(str[i])))
+            {
+                bitl += hasEntryBit() +
+                        m_table.at((char32_t) static_cast<unsigned char>(str[i])).bitl();
+            }
+            else if (hasEntryBit())
+                bitl += 9;
+            else throw std::runtime_error("entry bit is disabled");
+        }
 
         if (_out_bitl) *_out_bitl = bitl;
         return bitl/8 + (bitl%8 ? 1 : 0);
@@ -320,18 +315,38 @@ namespace code3c
         char8_t * hbuf = new char8_t[bufl+1];
         std::memset(hbuf, 0, bufl+1);
 
-
         for (uint32_t i(0), ibit(0); i < slen; i++)
         {
-            auto cell = m_table.at(static_cast<unsigned char>(buf[i]));
-            for (auto& ch : cell)
+            if (m_table.contains(static_cast<unsigned char>(buf[i])))
             {
-                char8_t* c = &hbuf[ibit/8];
-                ch = (ch=='1')&1;
-                ch <<= (7-ibit%8);
-                *c |= ch;
-                ibit++;
+                if (hasEntryBit())
+                {
+                    hbuf[ibit/8] |= (entry_bit << (7 - ibit % 8));
+                    ibit++;
+                }
+                auto cell = m_table.at(static_cast<unsigned char>(buf[i]));
+                for (auto &ch: cell)
+                {
+                    char8_t *c = &hbuf[ibit / 8];
+                    ch = (ch == '1') & 1;
+                    ch <<= (7 - ibit % 8);
+                    *c |= ch;
+                    ibit++;
+                }
             }
+            else if (hasEntryBit())
+            {
+                char8_t ch;
+                hbuf[ibit/8] |= (ignoreBit() << (7 - ibit % 8));
+                ibit++;
+
+                for (uint8_t ich(0); ich < sizeof(char); ich++, ibit++)
+                {
+                    ch = (hbuf[i] >> (7 - ich % 8)) & 1;
+                    hbuf[ibit/8] |= (ch << (7 - ibit % 8));
+                }
+            }
+            else throw std::runtime_error("entry bit is disabled");
         }
 
         if (_out_bitl) *_out_bitl = bitl;

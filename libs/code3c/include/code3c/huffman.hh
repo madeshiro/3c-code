@@ -141,6 +141,8 @@ namespace code3c
         HuffmanTree* m_tree;
         // use per default max capacity char
         std::map<char32_t, Cell> m_table;
+        // 0 or 1, else, feature is disable
+        uint8_t entry_bit = 0;
 
         /**
          *
@@ -173,11 +175,39 @@ namespace code3c
          * @param bitl the number of bits in the buffer
          * @return The number of encoded chars
          */
+        template < typename _CharT >
         uint32_t countChars(const char8_t * hbuf, size_t bitl) const;
 
         template < typename _CharT >
         _CharT* decode(const char8_t* hbuf, uint32_t bitl, uint32_t* _out_len) const;
+
+        /**
+         * Set the entry bit. If <code>0 &le; ebit &le; 1</code>, the entry bit
+         * feature is enabled. Any other value will be considered as disabling
+         * the entry_bit feature.
+         * @param ebit the entry bit
+         */
+        inline void setEntryBit(uint8_t ebit)
+        { entry_bit = ebit; }
+
+        inline uint8_t entryBit() const
+        { return entry_bit; }
+
+        inline uint8_t ignoreBit() const
+        { return (entry_bit + 1) % 2; }
+
+        inline bool hasEntryBit() const
+        { return 1 >= entry_bit; }
     };
+
+    extern template uint32_t HuffmanTable::countChars<char>(const char8_t *hbuf,
+                                                      size_t bitl) const;
+    extern template uint32_t HuffmanTable::countChars<char8_t>(const char8_t *hbuf,
+                                                      size_t bitl) const;
+    extern template uint32_t HuffmanTable::countChars<char16_t>(const char8_t *hbuf,
+                                                      size_t bitl) const;
+    extern template uint32_t HuffmanTable::countChars<char32_t>(const char8_t *hbuf,
+                                                      size_t bitl) const;
 
     extern template uint32_t HuffmanTable::lengthOf<char8_t>(const char8_t*, size_t,
             uint32_t*) const;
@@ -212,7 +242,7 @@ namespace code3c
         struct htf_info
         {
             uint8_t char_type;  // 2 bits
-            uint8_t entry_bit;  // 1 bit/experimental
+            uint8_t entry_bit;  // 1 bit
             uint8_t length_max; // 5 bits
 
             uint8_t to_byte() const;
@@ -293,13 +323,59 @@ namespace code3c
     };
 
     template < typename _CharT >
+    uint32_t HuffmanTable::countChars(const char8_t * hbuf, size_t bitl) const
+    {
+        uint32_t count(0), ibit(0);
+        char c, b, e = 2;
+
+        HuffmanTree::Node* node = m_tree->m_root;
+        while (ibit < bitl)
+        {
+            if (!hasEntryBit() || e == entry_bit)
+            {
+                c = hbuf[ibit / 8];
+                b = (c >> (7 - (ibit % 8))) & 1;
+                node = (1 == b ? node->m_1 : node->m_0);
+                ibit++;
+
+                if (*node)
+                {
+                    node = m_tree->m_root;
+                    count++;
+                    e = 2;
+                }
+            }
+            else if (hasEntryBit())
+            {
+                // get entry_bit
+                e = (hbuf[ibit/8] >> (7-(ibit%8)))&1;
+                ibit++;
+
+                if (e != entry_bit)
+                {
+                    ibit += sizeof(_CharT) * 8;
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+
+    template < typename _CharT >
     uint32_t HuffmanTable::lengthOf(const _CharT* str,
                                     size_t slen,
                                     uint32_t *_out_bitl) const
     {
         uint32_t bitl(0);
         for (size_t i(0); i < slen; i++)
-            bitl += m_table.at((char32_t)str[i]).bitl();
+        {
+            if (m_table.contains((char32_t) str[i]))
+                bitl += hasEntryBit() + m_table.at((char32_t) str[i]).bitl();
+            else if (hasEntryBit())
+                bitl += 1 + sizeof(_CharT)*8;
+            else throw std::runtime_error("entry bit is disabled");
+        }
 
         if (_out_bitl) *_out_bitl = bitl;
         return bitl/8 + (bitl%8 ? 1 : 0);
@@ -319,15 +395,37 @@ namespace code3c
 
         for (uint32_t i(0), ibit(0); i < slen; i++)
         {
-            auto cell = m_table.at(static_cast<char32_t>(buf[i]));
-            for (auto& ch : cell)
+            if (m_table.contains(static_cast<char32_t>(buf[i])))
             {
-                char8_t* c = &hbuf[ibit/8];
-                ch = (ch=='1')&1;
-                ch <<= (7-ibit%8);
-                *c |= ch;
-                ibit++;
+                if (hasEntryBit())
+                {
+                    hbuf[ibit/8] |= (entry_bit << (7 - ibit % 8));
+                    ibit++;
+                }
+                auto cell = m_table.at(static_cast<char32_t>(buf[i]));
+                for (auto &ch: cell)
+                {
+                    char8_t *c = &hbuf[ibit / 8];
+                    ch = (ch == '1') & 1;
+                    ch <<= (7 - ibit % 8);
+                    *c |= ch;
+                    ibit++;
+                }
             }
+            else if (hasEntryBit())
+            {
+                _CharT ch;
+                hbuf[ibit/8] |= (ignoreBit() << (7 - ibit % 8));
+                ibit++;
+
+                for (uint8_t ich(0), bitSizeof(sizeof(_CharT)*8);
+                     ich < sizeof(_CharT); ich++, ibit++)
+                {
+                    ch = (hbuf[i] >> ((bitSizeof-1) - ich % bitSizeof));
+                    hbuf[ibit/8] |= (ch << ((bitSizeof-1) - ibit % bitSizeof));
+                }
+            }
+            else throw std::runtime_error("entry bit is disabled");
         }
 
         if (_out_bitl) *_out_bitl = bitl;
@@ -338,25 +436,46 @@ namespace code3c
     _CharT* HuffmanTable::decode(const char8_t *hbuf, uint32_t bitl,
                                  uint32_t *_out_len) const
     {
-        uint32_t bufl = countChars(hbuf, bitl);
+        uint32_t bufl = countChars<_CharT>(hbuf, bitl);
         _CharT* buf = new _CharT[bufl+1];
         buf[bufl] = '\0';
 
         uint32_t i(0), ibit(0);
-        char c, b;
+        char c, b, e = 2;
 
         HuffmanTree::Node* node = m_tree->m_root;
         while (ibit < bitl)
         {
-            c = hbuf[ibit / 8];
-            b = (c >> (7-(ibit%8)))&1;
-            node = (1 == b ? node->m_1 : node->m_0);
-            ibit++;
-            if (*node)
+            if (!hasEntryBit() || e == entry_bit)
             {
-                buf[i] = (_CharT) node->ch.ch32;
-                node = m_tree->m_root;
-                i++;
+                c = hbuf[ibit / 8];
+                b = (c >> (7 - (ibit % 8))) & 1;
+                node = (1 == b ? node->m_1 : node->m_0);
+                ibit++;
+
+                if (*node)
+                {
+                    buf[i] = (_CharT) node->ch.ch32;
+                    node = m_tree->m_root;
+                    e = 2;
+                    i++;
+                }
+            }
+            else if (hasEntryBit())
+            {
+                e = (hbuf[ibit / 8] >> (7 - (ibit % 8))) & 1;
+                ibit++;
+
+                if (e != entry_bit)
+                {
+                    _CharT ch(0);
+                    for (uint32_t j(0); j < sizeof(_CharT)*8; j++, ibit++)
+                    {
+                        ch |= hbuf[ibit / 8] >> (7 - ibit % 8) & 1;
+                        ch <<= 1;
+                    }
+                    buf[i++] = ch;
+                }
             }
         }
 

@@ -257,6 +257,7 @@ int test_htf_full_generation()
                 HuffmanTree::Node **leaves = build_nodes(fbuf, &nlen);
                 HuffmanTree tree(leaves, nlen);
                 HuffmanTable table(tree);
+                table.setEntryBit(2); // disable entry_bit
 #ifdef CODE3C_DEBUG
                 std::cout << std::endl << '"' << fdesc.htf << "\" Huffman Table" <<
                 std::endl << table << std::endl;
@@ -267,7 +268,9 @@ int test_htf_full_generation()
 
 
                 auto hbuf = table.encode(fbuf, fsize, &hlen);
+#ifdef CODE3C_DEBUG
                 printf("[encode vs raw]: %d / %lu\n", hlen / 8, fsize);
+#endif
                 char* sbuf = table.decode<char>(hbuf, hlen, &hlen);
 
                 if (hlen != fsize)
