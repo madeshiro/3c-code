@@ -356,9 +356,9 @@ namespace code3c
     uint8_t HTFile::htf_info::to_byte() const
     {
         uint8_t _byte(0);
-        _byte |= (char_type&0b11)  << 6;
-        _byte |= (entry_bit&0b1)   << 5;
-        _byte |= (length_max&0x1f);
+        _byte |= (char_type & 0b11)  << 6;
+        _byte |= (entry_bit & 0b11)  << 4;
+        _byte |= (reserved & 0xf);
 
         return _byte;
     }
@@ -366,9 +366,9 @@ namespace code3c
     HTFile::htf_info HTFile::htf_info::from_byte(uint8_t _byte)
     {
         return htf_info {
-            .char_type  = static_cast<uint8_t>((_byte >> 6) & 0b11),
-            .entry_bit  = static_cast<uint8_t>((_byte >> 5) & 0b1),
-            .length_max = static_cast<uint8_t>(_byte & 0x1f)
+            .char_type = static_cast<uint8_t>((_byte >> 6) & 0b11),
+            .entry_bit = static_cast<uint8_t>((_byte >> 4) & 0b11),
+            .reserved      = static_cast<uint8_t>(_byte & 0xf)
         };
     }
 
@@ -469,7 +469,7 @@ namespace code3c
             m_segments(new segment[table.size()]), m_segCount(table.size()),
             m_buf(nullptr), m_lbuf(9)
     {
-        m_header = {0, { sizeof(char), 0b1, 3 }};
+        m_header = {0, { sizeof(char), table.entry_bit, 0 }};
 
         for (auto cell : table.m_table)
         {
@@ -479,8 +479,6 @@ namespace code3c
                     .seq = {0,0,0,0}
             };
 
-            m_header.info.length_max = std::max<uint8_t>(cell.second.bitl(),
-                                                         m_header.info.length_max);
             m_header.info.char_type = [cell]() -> uint8_t {
                 if (cell.first < 0x100)
                     return sizeof(char);
@@ -559,7 +557,9 @@ namespace code3c
                 { seg.toBits(), seg.bitl() }
             });
         }
-        return new HuffmanTable(cells);
+        HuffmanTable *table = new HuffmanTable(cells);
+        table->setEntryBit(m_header.info.entry_bit);
+        return table;
     }
 
     uint8_t HTFile::charSize() const
@@ -570,11 +570,6 @@ namespace code3c
     uint8_t HTFile::entryBit() const
     {
         return m_header.info.entry_bit;
-    }
-
-    uint8_t HTFile::seqMaxLength() const
-    {
-        return m_header.info.length_max;
     }
 
     uint32_t HTFile::countSegments() const

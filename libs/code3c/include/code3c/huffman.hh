@@ -188,7 +188,7 @@ namespace code3c
          * @param ebit the entry bit
          */
         inline void setEntryBit(uint8_t ebit)
-        { entry_bit = ebit; }
+        { entry_bit = ebit > 1 ? 2 : ebit; }
 
         inline uint8_t entryBit() const
         { return entry_bit; }
@@ -242,8 +242,8 @@ namespace code3c
         struct htf_info
         {
             uint8_t char_type;  // 2 bits
-            uint8_t entry_bit;  // 1 bit
-            uint8_t length_max; // 5 bits
+            uint8_t entry_bit;  // 2 bit
+            uint8_t reserved;   // 4 bits
 
             uint8_t to_byte() const;
             static htf_info from_byte(uint8_t);
@@ -300,7 +300,6 @@ namespace code3c
 
         uint8_t charSize() const;
         uint8_t entryBit() const;
-        uint8_t seqMaxLength() const;
         uint32_t countSegments() const;
 
         const segment& operator[](size_t) const noexcept(false);
