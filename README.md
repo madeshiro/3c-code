@@ -1,4 +1,9 @@
-# 3C-Code: Graphical Communication Protocol 
+<div align="center">
+    <img alt="3ccode logo" src="resources/code3c.png" style="transform: scale(90%)" />
+</div>
+
+---
+# 3C-Code: Graphical Communication Protocol
 > **3C-CODE** - _Colored and Compressed Circular Code_
 
 The 3C-Code library and `code3c generator` CLI software are part of the 
@@ -8,7 +13,7 @@ due for my 6th bachelor semester.
 ## Inspiration and Conception
 
 Inspired by the QR Code, the 3C-Code is intended to produce a graphical way to communicate
-information through a <i>circular</i> matrix and using colors to increase <b>pixel unit</b> 
+information through a <i>circular</i> matrix and using colours to increase <b>pixel unit</b> 
 capacity:
 
 <ul>
@@ -31,6 +36,10 @@ The project uses some features to improve error coverage and available stocking 
 [![gpl-v3](https://img.shields.io/badge/license%20(CLI)-GPL--3.0-darkred)](https://www.gnu.org/licenses/gpl-3.0.html)
 
 ---
+<div align="center">
+
 [![uca](https://www.uca.fr/uas/ksup/LOGO_CLAIR/UCA__Logo_head.png)](https://www.uca.fr)
 [![lgpl-v3](https://www.gnu.org/graphics/lgplv3-with-text-154x68.png)](https://www.gnu.org/licenses/lgpl-3.0.html)
 [![gpl-v3](https://www.gnu.org/graphics/gplv3-with-text-136x68.png)](https://www.gnu.org/licenses/gpl-3.0.html)
+
+</div>

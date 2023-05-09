@@ -1,4 +1,4 @@
-#include "include/code3c/bitmat.hh"
+#include "code3c/bitmat.hh"
 #include <stdexcept>
 
 namespace code3c

@@ -67,7 +67,7 @@ int test_png_in_out(int argc [[maybe_unused]], char** argv [[maybe_unused]])
 
 int test_png_read()
 {
-    PixelMap map(PixelMap::loadFromPNG("gitlab_isima.png"));
+    PixelMap map(PixelMap::loadFromPNG("resources/3ccode-wb2c.png"));
     class PNGDrawer : public Code3CDrawer
     {
         PixelMap &map;
@@ -104,7 +104,7 @@ int test_png_read()
 
 int test_png_resize()
 {
-    PixelMap map(PixelMap::loadFromPNG("gitlab_isima.png"));
+    PixelMap map(PixelMap::loadFromPNG("resources/3ccode-wb2c.png"));
     PixelMap scaled(map.resize(169*2,0));
     class PNGDrawer : public Code3CDrawer
     {
@@ -145,7 +145,7 @@ int test_png_save()
     FILE* dest = fopen("isima_resize.png", "wb");
     if (dest)
     {
-        PixelMap map(PixelMap::loadFromPNG("gitlab_isima.png"));
+        PixelMap map(PixelMap::loadFromPNG("resources/3ccode-wb2c.png"));
         PixelMap::saveInPng(map.resize(2.0f), dest);
         fclose(dest);
     } else return 1;

@@ -1,4 +1,4 @@
-desk ICON "resources/software_icon.ico"
+desk ICON "resources/code3c.ico"
 
 #include <windows.h>
 
@@ -10,7 +10,7 @@ FILEOS VOS_NT_WINDOWS32
 
 #ifdef CODE3C_64
 #define RCF_BIT "64"
-#define RCF_ORIGINALFILENAME "3ccode_gen"
+#define RCF_ORIGINALFILENAME "code3c"
 #else
 #define RCF_BIT "32"
 #define RCF_ORIGINALFILENAME "3ccode32"
@@ -24,8 +24,8 @@ BEGIN
         VALUE "CompanyName", L"Rin 'madeshiro' Baudelet\0"
         VALUE "FileDescription", "3C-Code Generator (C) Rin Baudelet\0"
         VALUE "FileVersion", "0.1.0.0\0"
-        VALUE "InternalName", "3ccode_gen\0"
-        VALUE "LegalCopyright", "Copyright (C) Rin Baudelet, lgpl-v3 licensed\0"
+        VALUE "InternalName", "code3c\0"
+        VALUE "LegalCopyright", "Copyright (C) Rin Baudelet, gpl-v3 licensed\0"
         VALUE "OriginalFilename", RCF_ORIGINALFILENAME ".exe\0"
         VALUE "ProductName", "3C-Code Generator\0"
         VALUE "ProductVersion", "0.1.0.0\0"

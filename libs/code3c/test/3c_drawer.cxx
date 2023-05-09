@@ -60,6 +60,7 @@ int test_create_window();
 int test_create_data();
 int test_draw_pixel();
 int test_key_binding();
+int test_create_data_with_huffman();
 
 
 typedef int (*TestFunction)(void); /* NOLINT */
@@ -84,14 +85,19 @@ static testFunctionMapEntry registeredFunctionEntries[] = {
             1, 0
         },
         {
+            "create_data_huffman",
+            test_create_data_with_huffman,
+            2, 0
+        },
+        {
             "draw_pixel",
             test_draw_pixel,
-            2, 0
+            3, 0
         },
         {
             "key_binding",
             test_key_binding,
-            3, 0
+            4, 0
         }
 #endif
 };
@@ -128,6 +134,16 @@ int test_create_data()
 {
     Code3C code3C("https://gitlab.isima.fr/rinbaudelet/uca-l3_graphicalprot",
                   CODE3C_MODEL_WB2C);
+    drawer = code3C.draw();
+    drawer->run();
+    delete drawer;
+    return 0;
+}
+
+int test_create_data_with_huffman()
+{
+    Code3C code3C("https://gitlab.isima.fr/rinbaudelet/uca-l3_graphicalprot",
+                  CODE3C_MODEL_WB2C, CODE3C_ERRLVL_A, CODE3C_HUFFMAN_ASCII);
     drawer = code3C.draw();
     drawer->run();
     delete drawer;

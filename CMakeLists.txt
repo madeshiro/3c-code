@@ -1,34 +1,5 @@
-# 3C-CODE -- Colored and Compressed Circular CODE
-# Copyright (C) 2023 - Rin "madeshiro" Baudelet
-#
-# This program is free software: you can redistribute it and/or
-# modify it under the terms of the GNU Lesser General Public
-# License as published by the Free Software Foundation, either
-# version 3 of the License, or (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-# PARTICULAR PURPOSE. See the GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along with this
-# program. If not, see <https://www.gnu.org/licenses/>.
-# --------------------------------------------------------------------------------------
-# 3C-CODE CLI -- Command Line Interface (software)
-# Copyright (C) 2023 - Rin "madeshiro" Baudelet
-#
-# This program is free software: you can redistribute it and/or
-# modify it under the terms of the GNU General Public
-# License as published by the Free Software Foundation, either
-# version 3 of the License, or (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-# PARTICULAR PURPOSE. See the GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along with this
-# program. If not, see <https://www.gnu.org/licenses/>.
 cmake_minimum_required(VERSION 3.23)
-project(3c-code C CXX)
+project(code3c C CXX)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 23)
 
@@ -76,56 +47,26 @@ add_definitions(
         -DCODE3C_${3CCODE_ARCH}
 )
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
+# Headers directories
+include_directories("${CMAKE_HOME_DIRECTORY}")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/libs/code3c/include")
 
+# Targets
 set(3CCODE_TARGET 3ccode)
 set(CODE3C_TARGET code3c)
+set(HTFGEN_TARGET htfgen)
 
-set(SOURCES
-        src/main.cc
-        )
-
-set(HEADERS
-        )
-
-set(LIBSOURCES
-        src/code3c/3ccode.cc
-        src/code3c/drawer.cc
-        src/code3c/huffman.cc
-        src/code3c/bitmat.cc
-        src/code3c/in3ccode.cc
-        src/code3c/pixelmap.cc
-        src/code3c/pixelmap.c
-        src/code3c/hamming743.cc)
-
-set(LIBHEADERS
-        include/code3c/3ccode.hh
-        include/code3c/drawer.hh
-        include/code3c/huffman.hh
-        include/code3c/3ccodelib.hh
-        include/code3c/bitmat.hh
-        include/code3c/in3ccode.hh
-        include/code3c/pixelmap.hh
-        include/code3c/hamming743.hh)
-
+# Resources
 set(RESOURCES
-        resources/3ccode-wb.png
-        resources/3ccode-wb2c.png
-        resources/3ccode-wb6c.png
-        resources/code3c-marker.png
+        ${CMAKE_HOME_DIRECTORY}/resources/3ccode-wb.png
+        ${CMAKE_HOME_DIRECTORY}/resources/3ccode-wb2c.png
+        ${CMAKE_HOME_DIRECTORY}/resources/3ccode-wb6c.png
+        ${CMAKE_HOME_DIRECTORY}/resources/code3c-marker.png
+        ${CMAKE_HOME_DIRECTORY}/resources/training_set.en_EN.txt
+        ${CMAKE_HOME_DIRECTORY}/resources/training_set.fr_FR.txt
+        ${CMAKE_HOME_DIRECTORY}/resources/en_EN.htf
+        ${CMAKE_HOME_DIRECTORY}/resources/fr_FR.htf
         )
-file(COPY ${RESOURCES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/resources)
-
-if(UNIX)
-    add_definitions(-DCODE3C_UNIX)
-    set(LIBSOURCES ${LIBSOURCES}
-            src/code3c/x11/X11Drawer.cc)
-elseif(WIN32)
-    add_definitions(-DCODE3C_WIN32)
-    set(LIBSOURCES ${LIBSOURCES}
-            src/code3c/win32/Win32Drawer.cc)
-endif()
 
 # Add Dependencies
 find_package(PNG REQUIRED)
@@ -135,6 +76,7 @@ set(CODE3C_DEPENDENCIES
         PNG::PNG
         -lm
         )
+
 if(UNIX)
     find_package(X11 REQUIRED)
     set(CODE3C_DEPENDENCIES ${CODE3C_DEPENDENCIES}
@@ -145,53 +87,5 @@ if (WIN32)
             -lMsimg32)
 endif()
 
-
-# Setup Targets
-message("> add target {'name': '${3CCODE_TARGET}', 'type': 'library'}")
-add_library(${3CCODE_TARGET} STATIC ${LIBSOURCES} ${LIBHEADERS})
-add_library(${3CCODE_TARGET}.so SHARED ${LIBSOURCES} ${LIBHEADERS})
-set_target_properties(${3CCODE_TARGET}.so PROPERTIES OUTPUT_NAME ${3CCODE_TARGET})
-
-target_link_libraries(${3CCODE_TARGET} ${CODE3C_DEPENDENCIES})
-target_link_libraries(${3CCODE_TARGET}.so ${CODE3C_DEPENDENCIES})
-
-message("> add target {'name': '${CODE3C_TARGET}', 'type': 'executable'}")
-add_executable(${CODE3C_TARGET} ${SOURCES} ${HEADERS})
-target_link_libraries(${CODE3C_TARGET} ${3CCODE_TARGET})
-
-# Windows Resources
-if (WIN32)
-    target_sources(${3CCODE_TARGET} PRIVATE resources/lib.rc)
-    target_sources(${3CCODE_TARGET}.so PRIVATE resources/lib.rc)
-    target_sources(${CODE3C_TARGET} PRIVATE resources/exe.rc)
-endif ()
-
-# Instanciate Test Applications
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/test")
-if(${CMAKE_ENV_GUI} MATCHES False)
-    add_definitions(
-        -DCMAKE_CTEST_ENV_NOGUI
-    )
-endif ()
-create_test_sourcelist(ctest_testmodule ${3CCODE_TARGET}_testmodule.cxx
-        test/3c_generation.cxx
-        test/3c_drawer.cxx
-        test/mat_operation.cxx
-        test/png_in_out.cxx
-        test/hamming.cxx
-)
-
-add_executable(${3CCODE_TARGET}_testmodule ${ctest_testmodule})
-target_link_libraries(${3CCODE_TARGET}_testmodule ${3CCODE_TARGET})
-
-set(ctest_runtest
-        ${ctest_testmodule}
-        )
-list(REMOVE_ITEM ctest_runtest ${3CCODE_TARGET}_testmodule.cxx)
-
-foreach(test ${ctest_runtest})
-    get_filename_component(test_name ${test} NAME_WE)
-    add_test(NAME ${3CCODE_TARGET}.${test_name} COMMAND ${3CCODE_TARGET}_testmodule test/${test_name})
-    set_property(TEST ${3CCODE_TARGET}.${test_name} PROPERTY LABELS ${3CCODE_TARGET})
-    message("> add test ${3CCODE_TARGET}.${test_name}")
-endforeach()
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/exec)

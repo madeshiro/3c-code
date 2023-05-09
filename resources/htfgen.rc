@@ -1,0 +1,38 @@
+desk ICON "resources/code3c.ico"
+
+#include <windows.h>
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION 0,1,0,0
+PRODUCTVERSION 0,1,0,0
+FILEFLAGSMASK 0x3fl
+FILEOS VOS_NT_WINDOWS32
+
+#ifdef CODE3C_64
+#define RCF_BIT "64"
+#define RCF_ORIGINALFILENAME "htfgen"
+#else
+#define RCF_BIT "32"
+#define RCF_ORIGINALFILENAME "3ccode32"
+#endif
+
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+    BLOCK "040904E4"
+    BEGIN
+        VALUE "CompanyName", L"Rin 'madeshiro' Baudelet\0"
+        VALUE "FileDescription", "HTF File Generator (C) Rin Baudelet\0"
+        VALUE "FileVersion", "0.1.0.0\0"
+        VALUE "InternalName", "htfgen\0"
+        VALUE "LegalCopyright", "Copyright (C) Rin Baudelet, gpl-v3 licensed\0"
+        VALUE "OriginalFilename", RCF_ORIGINALFILENAME ".exe\0"
+        VALUE "ProductName", "Huffman Table File Generator\0"
+        VALUE "ProductVersion", "0.1.0.0\0"
+    END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+    VALUE "Translation", 0x409, 1252
+    END
+END
