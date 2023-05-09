@@ -3,6 +3,8 @@
 
 # Huffman Table File (.htf) (not relevant for now)
 *.htf
+!en_EN.htf
+!fr_FR.htf
 
 # Training sets
 !training_set.*.txt
