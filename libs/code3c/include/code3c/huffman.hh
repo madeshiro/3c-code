@@ -209,6 +209,9 @@ namespace code3c
     extern template uint32_t HuffmanTable::countChars<char32_t>(const char8_t *hbuf,
                                                       size_t bitl) const;
 
+    template <>
+    uint32_t HuffmanTable::lengthOf<char>(const char*, size_t,
+            uint32_t*) const;
     extern template uint32_t HuffmanTable::lengthOf<char8_t>(const char8_t*, size_t,
             uint32_t*) const;
     extern template uint32_t HuffmanTable::lengthOf<char16_t>(const char16_t*, size_t,
@@ -216,6 +219,9 @@ namespace code3c
     extern template uint32_t HuffmanTable::lengthOf<char32_t>(const char32_t*, size_t,
             uint32_t*) const;
 
+    template <>
+    char8_t* HuffmanTable::encode<char>(const char * buf, uint32_t slen,
+                                        uint32_t *_out_bitl) const;
     extern template char8_t* HuffmanTable::encode<char8_t>(const char8_t *, uint32_t,
             uint32_t *) const;
     extern template char8_t* HuffmanTable::encode<char16_t>(const char16_t *, uint32_t,
@@ -481,6 +487,14 @@ namespace code3c
         if (_out_len) *_out_len = i;
         return buf;
     }
+
+    static HuffmanTable* CODE3C_DEFAULT_HTF[5] {
+        nullptr,
+        HTFile::fromFile("resources/en_EN.htf"),
+        HTFile::fromFile("resources/fr_FR.htf"),
+        nullptr,
+        nullptr
+    };
 }
 
 #endif //HH_LIB_HUFFMAN_3CCODE

@@ -257,7 +257,7 @@ int test_htf_full_generation()
                 HuffmanTree::Node **leaves = build_nodes(fbuf, &nlen);
                 HuffmanTree tree(leaves, nlen);
                 HuffmanTable table(tree);
-                table.setEntryBit(2); // disable entry_bit
+                table.setEntryBit(0);
 #ifdef CODE3C_DEBUG
                 std::cout << std::endl << '"' << fdesc.htf << "\" Huffman Table" <<
                 std::endl << table << std::endl;

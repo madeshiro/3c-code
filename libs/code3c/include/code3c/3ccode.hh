@@ -152,6 +152,10 @@ namespace code3c
             Code3C* m_parent;
 
             Hamming* m_hamming;
+            const HuffmanTable* m_huffman;
+
+            char* m_huffdata;
+            uint32_t m_hufflen;
         public:
             static const CODE3C_MODEL_DESC::CODE3C_MODEL_DIMENSION&
                 getdim(const CODE3C_MODEL_DESC&, uint32_t, int err);
@@ -159,7 +163,7 @@ namespace code3c
             Code3CData(Code3C* parent, const CODE3C_MODEL_DESC::CODE3C_MODEL_DIMENSION&)
                 noexcept(false);
             Code3CData(const Code3CData& mat);
-            ~Code3CData() override = default;
+            ~Code3CData() override;
             
             /**
              * Get the byte at the specified cursor pos.
@@ -213,6 +217,7 @@ namespace code3c
         size_t m_datalen;
 
         int m_errmodel;
+        int m_huffmodel;
         const CODE3C_MODEL_DESC& m_desc;
         const CODE3C_MODEL_DESC::CODE3C_MODEL_DIMENSION& m_dim;
 
@@ -228,13 +233,13 @@ namespace code3c
         } m_header;
 
         Code3CData m_dataMat;
-        // HuffmanTable m_huftable;
-        // HuffmanTree m_huftree;
     public:
         Code3C(const char* buffer, size_t bufsize, uint32_t model,
-               int err = CODE3C_ERRLVL_A);
-        Code3C(const char* utf8str, uint32_t model, int err = CODE3C_ERRLVL_A);
-        Code3C(const char32_t* unistr, uint32_t model, int err = CODE3C_ERRLVL_A);
+               int err = CODE3C_ERRLVL_A, int huff = CODE3C_HUFFMAN_NO);
+        Code3C(const char* utf8str, uint32_t model,
+               int err = CODE3C_ERRLVL_A, int huff = CODE3C_HUFFMAN_NO);
+        Code3C(const char32_t* unistr, uint32_t model,
+               int err = CODE3C_ERRLVL_A, int huff = CODE3C_HUFFMAN_NO);
         Code3C(const Code3C& c3c);
         virtual ~Code3C();
         

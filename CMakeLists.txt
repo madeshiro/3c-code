@@ -64,6 +64,8 @@ set(RESOURCES
         ${CMAKE_HOME_DIRECTORY}/resources/code3c-marker.png
         ${CMAKE_HOME_DIRECTORY}/resources/training_set.en_EN.txt
         ${CMAKE_HOME_DIRECTORY}/resources/training_set.fr_FR.txt
+        ${CMAKE_HOME_DIRECTORY}/resources/en_EN.htf
+        ${CMAKE_HOME_DIRECTORY}/resources/fr_FR.htf
         )
 
 # Add Dependencies
