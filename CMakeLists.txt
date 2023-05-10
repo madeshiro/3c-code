@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.23)
-project(code3c C CXX)
+project(code3c LANGUAGES C CXX VERSION 1.0.0)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 23)
 
@@ -47,6 +47,13 @@ add_definitions(
         -DCODE3C_${3CCODE_ARCH}
 )
 
+if(UNIX)
+    add_definitions(-DCODE3C_UNIX)
+elseif(WIN32)
+    add_definitions(-DCODE3C_WIN32)
+endif()
+
+
 # Headers directories
 include_directories("${CMAKE_HOME_DIRECTORY}")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/libs/code3c/include")
@@ -68,6 +75,8 @@ set(RESOURCES
         ${CMAKE_HOME_DIRECTORY}/resources/fr_FR.htf
         )
 
+# file(COPY ${RESOURCES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/resources)
+
 # Add Dependencies
 find_package(PNG REQUIRED)
 include_directories(${PNG_INCLUDE_DIRS})
@@ -87,5 +96,31 @@ if (WIN32)
             -lMsimg32)
 endif()
 
+# Set-up CPack
+set(CPACK_GENERATOR "DEB")
+set(CPACK_PACKAGE_NAME "code3c")
+set(CPACK_VENDOR_NAME "Rin Baudelet")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY)
+set(CPACK_PACKAGE_FILE_NAME code3c-1.0.0rc-Linux-amd64)
+set(CPACK_PACKAGE_CONTACT rin.baudelet@etu.uca.fr)
+
+set(CPACK_PROJECT_NAME ${PROJECT_NAME})
+set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
+
+set(CPACK_PACKAGE_VERSION_MAJOR 1)
+set(CPACK_PACKAGE_VERSION_MINOR 0)
+set(CPACK_PACKAGE_VERSION_PATCH 0)
+set(CPACK_SYSTEM_NAME Linux-AMD64)
+
+# Setup CPack
+include(CPack)
+
+# Resources
+foreach (rfile ${RESOURCES})
+    install(FILES "${rfile}" DESTINATION share/${PROJECT_NAME})
+endforeach()
+
+# Add sub-projects
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/exec)
+

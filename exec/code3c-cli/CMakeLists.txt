@@ -31,3 +31,7 @@ target_link_libraries(${TARGET} ${3CCODE_TARGET})
 if (WIN32)
     target_sources(${TARGET} PRIVATE ${CMAKE_HOME_DIRECTORY}/resources/code3c.rc)
 endif ()
+
+# Install
+install(TARGETS ${TARGET} RUNTIME DESTINATION bin)
+

@@ -490,8 +490,8 @@ namespace code3c
 
     static HuffmanTable* CODE3C_DEFAULT_HTF[5] {
         nullptr,
-        HTFile::fromFile("resources/en_EN.htf"),
-        HTFile::fromFile("resources/fr_FR.htf"),
+        HTFile::fromFile(C3CRC("en_EN.htf")),
+        HTFile::fromFile(C3CRC("fr_FR.htf")),
         nullptr,
         nullptr
     };

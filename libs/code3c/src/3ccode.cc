@@ -320,7 +320,7 @@ namespace code3c
 
                 // Load marker
                 {
-                    PixelMap map = PixelMap::loadFromPNG("resources/code3c-marker.png");
+                    PixelMap map = PixelMap::loadFromPNG(C3CRC("code3c-marker.png"));
                     marker = new PixelMap(map.resize(width(), height()));
                 }
 

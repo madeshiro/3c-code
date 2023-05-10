@@ -45,8 +45,29 @@
 #define CODE3C_LIB_MAJOR   7
 #define CODE3C_LIB_MINOR   0
 
+#ifdef CODE3C_UNIX
+#include "signal.h"
+#include "unistd.h"
+#define C3CRC(fname) []() -> const char* {      \
+        if (access("/usr/local/share/code3c/" fname, F_OK) == 0)   \
+            return "/usr/local/share/code3c/" fname;               \
+        else if (access("resources/" fname, F_OK) == 0)     \
+            return "resources/" fname;                      \
+        else                                                \
+            return fname;                                   \
+    }()
+#endif // CODE3C_UNIX
+
+#ifdef CODE3C_WIN32
+// #include <io.h>
+// #define F_OK 0
+// #define access _access
+#define C3CRC(fname) "resources/" fname
+#endif // CODE3C_WIN32
+
 // DEFINE CONSTANTS //
 
 #define CODE3C_PIXEL_UNIT 3 // Amount of pixel for each data unit
+
 
 #endif //HH_LIB_3CCODELIB

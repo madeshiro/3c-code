@@ -59,7 +59,7 @@ namespace code3c
     } code3c_models[3] = {
             {
                     0,  CODE3C_COLORMODE_WB,
-                    "resources/3ccode-wb.png",
+                    C3CRC("3ccode-wb.png"),
                     {
                         {30,  60, 30, 3}, /** 60 slices, 30 units, 3 units per data
                                            *  dimension 120x120 (pu²)
@@ -85,7 +85,7 @@ namespace code3c
             },
             {
                     1, CODE3C_COLORMODE_WB2C,
-                    "resources/3ccode-wb2c.png",
+                    C3CRC("3ccode-wb2c.png"),
                     {
                         {30,  50, 24, 3}, /** 60 slices, 24 units, 3 units per data
                                            *  dimension 100x100 (pu²)
@@ -111,7 +111,7 @@ namespace code3c
             },
             {
                     2, CODE3C_COLORMODE_WB6C,
-                    "resources/3ccode-wb6c.png",
+                    C3CRC("3ccode-wb6c.png"),
                     {
                         {30,  50, 21, 3}, /** 60 slices, 21 units, 3 units per data
                                            *  dimension 100x100 (pu²)
@@ -136,15 +136,9 @@ namespace code3c
                     }
             }
     };
-
-#define CODE3C_MODEL_DESC_1 code3c::code3c_models[CODE3C_MODEL_WB];
-#define CODE3C_MODEL_DESC_2 code3c::code3c_models[CODE3C_MODEL_WB2C];
-#define CODE3C_MODEL_DESC_3 code3c::code3c_models[CODE3C_MODEL_WB6C];
     
     class Code3C
     {
-        // TODO Code3CReader x Code3C (not prior)
-        // friend class Code3CReader;
     public:
         class Code3CData : public matb
         {

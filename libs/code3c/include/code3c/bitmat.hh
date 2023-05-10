@@ -156,12 +156,14 @@ namespace code3c
     extern template class mat<char>;
     extern template class mat<int>;
     extern template class mat<long>;
+    extern template class mat<char8_t>;
 
     extern template class vec<float>;
     extern template class vec<double>;
     extern template class vec<char>;
     extern template class vec<int>;
     extern template class vec<long>;
+    extern template class vec<char8_t>;
 }
 
 #endif //HH_LIB_BITMAT

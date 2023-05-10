@@ -6,6 +6,7 @@ namespace code3c
     template class mat<float>;
     template class mat<double>;
     template class mat<char>;
+    template class mat<char8_t>;
     template class mat<int>;
     template class mat<long>;
     template class mat<bool>;
@@ -13,6 +14,7 @@ namespace code3c
     template class vec<float>;
     template class vec<double>;
     template class vec<char>;
+    template class vec<char8_t>;
     template class vec<int>;
     template class vec<long>;
     template class vec<bool>;
