@@ -34,12 +34,6 @@
 #define CODE3C_ERRLVL_A    0 // 14%
 #define CODE3C_ERRLVL_B    1 // 33%
 
-#ifdef CODE3C_DEBUG
-#define cDebug(x...) printf("[debug] " x)
-#else
-#define cDebug(x...)
-#endif
-
 namespace code3c
 {
     static struct CODE3C_MODEL_DESC { /* NOLINT */
