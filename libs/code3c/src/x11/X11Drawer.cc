@@ -7,7 +7,7 @@
 
 namespace code3c
 {
-    X11Drawer::X11Drawer(int width, int height, const code3c::matb &data):
+    X11Drawer::X11Drawer(int width, int height, const code3c::mat<char8_t> &data):
             Drawer(width, height, data), m_frameRate(fps()),
             m_gcvalues(), m_attributes()
     {

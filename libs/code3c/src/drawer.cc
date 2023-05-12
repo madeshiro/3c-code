@@ -43,7 +43,7 @@ namespace code3c
     {
     }
     
-    Drawer::Drawer(int width, int height, const code3c::matb &data) :
+    Drawer::Drawer(int width, int height, const mat<char8_t> &data) :
             m_data(data), m_width(width), m_height(height),
             m_keybind(), key(0), keyCode(0), keys_pressed(0)
     {
@@ -121,7 +121,7 @@ namespace code3c
         return m_width;
     }
     
-    const matb &Drawer::getData() const
+    const mat<char8_t> &Drawer::getData() const
     {
         return m_data;
     }

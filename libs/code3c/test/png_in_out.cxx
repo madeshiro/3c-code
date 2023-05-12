@@ -73,7 +73,7 @@ int test_png_read()
         PixelMap &map;
     public:
         explicit PNGDrawer(PixelMap &map):
-            Code3CDrawer(map.width(), map.height(), matb(20)),
+            Code3CDrawer(map.width(), map.height(), mat<char8_t>(20)),
             map(map)
         {
         }
@@ -111,7 +111,7 @@ int test_png_resize()
         PixelMap &map;
     public:
         explicit PNGDrawer(PixelMap &map):
-            Code3CDrawer(map.width(), map.height(), matb(20)),
+            Code3CDrawer(map.width(), map.height(), mat<char8_t>(20)),
             map(map)
         {
         }

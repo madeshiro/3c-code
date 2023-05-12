@@ -12,7 +12,7 @@ class TestDrawer : public Code3CDrawer
 {
     char buf[256];
 public:
-    TestDrawer(): Code3CDrawer(700, 700, matb(20))
+    TestDrawer(): Code3CDrawer(700, 700, code3c::mat8_t(20))
     {
     }
     
@@ -132,21 +132,24 @@ int test_3c_drawer(int argc [[maybe_unused]], char** argv [[maybe_unused]])
 
 int test_create_data()
 {
-    Code3C code3C("https://gitlab.isima.fr/rinbaudelet/uca-l3_graphicalprot",
-                  CODE3C_MODEL_WB2C);
-    drawer = code3C.draw();
-    drawer->run();
-    delete drawer;
+    Code3C code3C("https://gitlab.isima.fr/rinbaudelet/uca-l3_graphicalprot");
+    code3C.setModel(CODE3C_MODEL_WB2C);
+    code3C.setErrorModel(CODE3C_ERRLVL_A);
+    code3C.generate();
+    code3C.display();
+
     return 0;
 }
 
 int test_create_data_with_huffman()
 {
-    Code3C code3C("https://gitlab.isima.fr/rinbaudelet/uca-l3_graphicalprot",
-                  CODE3C_MODEL_WB2C, CODE3C_ERRLVL_A, CODE3C_HUFFMAN_ASCII);
-    drawer = code3C.draw();
-    drawer->run();
-    delete drawer;
+    Code3C code3C("https://gitlab.isima.fr/rinbaudelet/uca-l3_graphicalprot");
+    code3C.setModel(CODE3C_MODEL_WB2C);
+    code3C.setErrorModel(CODE3C_ERRLVL_A);
+    code3C.setHuffmanTable(CODE3C_HUFFMAN_ASCII);
+    code3C.generate();
+    code3C.display();
+
     return 0;
 }
 
@@ -162,7 +165,7 @@ int test_draw_pixel()
     class PixelTestDrawer : public Code3CDrawer
     {
     public:
-        PixelTestDrawer() : Code3CDrawer(400, 400, matb(20))
+        PixelTestDrawer() : Code3CDrawer(400, 400, code3c::mat8_t(20))
         {
         }
         
@@ -235,7 +238,7 @@ int test_key_binding()
             fflush(stdout);
         }
     public:
-        KeyBindingDrawer(): Code3CDrawer(400, 400, matb(10))
+        KeyBindingDrawer(): Code3CDrawer(400, 400, code3c::mat8_t(10))
         {
             bindKey((DRAWER_KEY_CTRL | 'a'),
                     reinterpret_cast<delegate>(&KeyBindingDrawer::onCtrlAPressed)

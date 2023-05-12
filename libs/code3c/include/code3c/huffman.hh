@@ -488,7 +488,7 @@ namespace code3c
         return buf;
     }
 
-    static HuffmanTable* CODE3C_DEFAULT_HTF[5] {
+    static HuffmanTable* code3c_default_htf[5] {
         nullptr,
         HTFile::fromFile(C3CRC("en_EN.htf")),
         HTFile::fromFile(C3CRC("fr_FR.htf")),
