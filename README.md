@@ -51,7 +51,7 @@ Set up the Huffman compressing method. Per default, no compression method is set
 Specify an input file to generate 3C-Code
 ### `-m, --model=<{WB, WB2C, WB6C}>`
 Specify the 3C-Code model. Per default, WB2C is set
-### `-e={Hamming743, Hamming313}`
+### `-e, --err={Hamming743, Hamming313}`
 Specify the error model. Per default, Hamming743 is set (14% error coverage)
 ### `-t, --text "input text"`
 Specify an input text to generate 3C-Code

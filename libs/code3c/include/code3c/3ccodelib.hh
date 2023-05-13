@@ -41,7 +41,7 @@
 #endif
 
 #define CODE3C_LIB  202305100L //>! 2023/05 1.0.0-rc
-#define CODE3C_LIB_VERSION "2023/05 v1.0.0-rc (3c-code lib)"
+#define CODE3C_LIB_VERSION "2023/05 v1.0.0-rc"
 #define CODE3C_LIB_RELEASE 1
 #define CODE3C_LIB_MAJOR   0
 #define CODE3C_LIB_MINOR   0
