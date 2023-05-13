@@ -125,7 +125,7 @@ namespace code3c
 
     char8_t Code3C::data::getByte(size_t index) const
     {
-        return 0; // TODO getByte()
+        return m_parent->m_rawdata[index];
     }
 
     size_t Code3C::data::size() const
@@ -164,6 +164,19 @@ namespace code3c
         return bit & 1;
     }
 
+    void Code3C::header::from_buffer(char8_t *buf, size_t len)
+    {
+        size_t i(0);
+        for (size_t k(0); k < 2; k++, i++, desc <<= 1)
+            desc |= buf[i] & 1;
+        err |= buf[i++] & 1;
+        for (size_t k(0); k < 3; k++, i++, huff <<= 1)
+            huff |= buf[i] & 1;
+
+        for (; i < len; i++, dlen <<= 1)
+            dlen |= buf[i] & 1;
+    }
+
     Code3C::Code3C(const char *utf8buf):
             Code3C(utf8buf, strlen(utf8buf))
     {
@@ -172,22 +185,85 @@ namespace code3c
     Code3C::Code3C(const char *utf8buf, size_t buflen):
             m_rawdata((char8_t *) strcpy(new char[buflen+1], utf8buf)),
             m_datalen(buflen),
+            m_logo(nullptr),
             m_header({0,0,0,0,0})
     {
     }
 
     Code3C::Code3C(const mat8_t &in_data):
             m_header({0,0,0,0,0}),
-            m_data(new data(this, in_data))
+            m_data(new data(this, in_data)),
+            m_logo(nullptr)
     {
-        // TODO read
+        size_t i, j, r, t, bit(0);
+        size_t range[2] = {0, 0};
+        auto set_range = [&range](size_t lindex, size_t hindex) -> void {
+            range[0] = lindex; range[1] = hindex;
+        };
+
+        // Compute specials sections positions
+        int qcal1 = 1*dimension().axis_t/4, // q1: rad and angle calibration begin
+            qcal2 = 1*dimension().axis_t/2, // q2: end angle calibration
+            qcal3 = 3*dimension().axis_t/4; // q3: rad calibration
+        int tcal1 = 3*dimension().axis_t/8; // header position
+
+        // Read header
+        char8_t *headbuf = new char8_t[2*in_data.m()];
+        for (i = 0, t = 0; t < 2; t++)
+            for (r = 0; r < in_data.m(); r++, i++)
+                headbuf[i] = in_data[t, r];
+        m_header.from_buffer(headbuf, 2*in_data.m());
+
+        // Set-up descriptor values
+        m_desc = m_header.desc - 1;
+        m_huffmodel = m_header.huff;
+        m_errmodel = m_header.err;
+
+        // Set-up dimension
+        for (auto dim : model().dimensions)
+            if (dim.axis_t != in_data.n() || dim.axis_r != in_data.m())
+                m_dim++;
+        if (m_dim > sizeof(model().dimensions) /
+            sizeof(CODE3C_MODEL_DESC::CODE3C_MODEL_DIMENSION))
+        {
+            throw std::runtime_error("Invalid matrix (unable to find dimension)");
+        }
+
+        for (i = 0; i < dimension().axis_t; i++)
+        {
+            if (i == 0 || i == qcal3)
+            {
+                // Setup Calibration (radius)
+                set_range(0, 0);
+            }
+            else if (i <= qcal1 ||  (i >= qcal2 && i <= qcal3))
+            {
+                // Setup Calibration (angle)
+                set_range(1, dimension().axis_r);
+            }
+            else if (i == tcal1 || i == tcal1 + 1)
+            {
+                set_range(0, 0);
+            }
+            else set_range(0, dimension().axis_r);
+
+            // Write data
+            for (j = range[0]; j < range[1]; j++, bit++)
+            {
+                // TODO
+            }
+        }
+
+        // Free memory
+        delete[] headbuf;
     }
 
     Code3C::Code3C(const Code3C &code3C):
             m_rawdata((char8_t *) strcpy(new char[code3C.m_datalen+1], (char*)
                                          code3C.m_rawdata)),
             m_datalen(code3C.m_datalen),
-            m_header(code3C.m_header)
+            m_header(code3C.m_header),
+            m_logo(code3C.m_logo)
     {
     }
 
@@ -226,7 +302,7 @@ namespace code3c
         m_logo = fname;
     }
 
-    void Code3C::generate()
+    bool Code3C::generate()
     {
         // Check dimensions
         const HuffmanTable* huffman = code3c_default_htf[m_huffmodel];
@@ -242,6 +318,9 @@ namespace code3c
             if (total > model().bitl * dim.capacity)
                 m_dim++;
         }
+        if (m_dim > sizeof(model().dimensions) /
+            sizeof(CODE3C_MODEL_DESC::CODE3C_MODEL_DIMENSION))
+            return false;
 
         // Set-up header
         m_header = {
@@ -257,15 +336,12 @@ namespace code3c
 
         // Generate code3c data
         delete m_data;
+        delete m_drawer;
+
         m_data = new data(this);
-    }
 
-    // #### Display / Save #### //
-
-    void Code3C::display() const
-    {
-
-        class Code3CDrawerSample : public Code3CDrawer
+        // Generate drawer
+        class [[maybe_unused]] Code3CDrawerSample : public Code3CDrawer
         {
             const Code3C* parent;
             const CODE3C_MODEL_DESC::CODE3C_MODEL_DIMENSION &modelDimension;
@@ -440,28 +516,29 @@ namespace code3c
                     }
                 }
             }
-        } *cDrawerSample = new Code3CDrawerSample(this, *m_data);
-        cDrawerSample->run();
-        delete cDrawerSample;
+        };
+        m_drawer = new Code3CDrawerSample(this, *m_data);
 
-        // if (drawer)
-        // {
-        //     UIDrawer* ui = drawer->ui();
-        //     ui->run();
-        //     delete ui;
-        // }
+        return m_data != nullptr;
     }
 
-    // UIDrawer* Code3C::ui() const
-    // {
-    //     return drawer ? drawer->ui() : nullptr;
-    // }
+    // #### Display / Save #### //
+
+    void Code3C::display() const
+    {
+        m_drawer->run();
+    }
+
+    Drawer* Code3C::drawer() const
+    {
+        return m_drawer;
+    }
 
     bool Code3C::save(const char *dest) const
     {
-        if (m_data)
+        if (m_data && m_drawer)
         {
-
+            drawer()->savePNG(dest);
         }
 
         return false;

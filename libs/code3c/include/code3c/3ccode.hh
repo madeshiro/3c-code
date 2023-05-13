@@ -36,11 +36,6 @@
 
 namespace code3c
 {
-    /**
-     * TODO docs
-     */
-    typedef mat<char8_t> mat8_t;
-
     static struct CODE3C_MODEL_DESC { /* NOLINT */
             int model_id;
             unsigned bitl, mask;
@@ -214,7 +209,7 @@ namespace code3c
         
         const char* m_logo;
 
-        // Drawer* drawer;
+        Drawer* m_drawer;
 
         struct header final
         {
@@ -225,6 +220,7 @@ namespace code3c
             uint32_t meta_head_bitl = 6; /*< header length (bit) */
             uint32_t meta_full_bitl = meta_head_bitl+meta_dlen_bitl;
             char8_t operator[](size_t i) const;
+            void from_buffer(char8_t * buf, size_t len);
         } m_header;
     public:
         /**
@@ -305,7 +301,7 @@ namespace code3c
         /**
          *
          */
-        void generate();
+        bool generate();
 
         // #### Display / Save #### //
 
@@ -316,10 +312,10 @@ namespace code3c
         void display() const;
 
         /**
-         *
-         * @return
+         * Gets the drawer of the 3C-Code
+         * @return the 3C-Code drawer
          */
-        //UIDrawer* ui() const;
+        Drawer* drawer() const;
 
         /**
          *

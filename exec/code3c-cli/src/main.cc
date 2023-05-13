@@ -20,6 +20,10 @@
 using std::cout, std::endl;
 using namespace code3c;
 
+char* infile, intext, outfile;
+char* model, errmodel, huffmodel;
+
+
 int main(int argc [[maybe_unused]], char** argv [[maybe_unused]])
 {
     return 0;

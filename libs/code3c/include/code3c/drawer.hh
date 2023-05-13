@@ -85,7 +85,7 @@ namespace code3c
     {
     protected:
         // Display variables
-        const mat<char8_t>& m_data;
+        const mat8_t& m_data;
         int m_width, m_height;
         
         // FPS management
@@ -112,14 +112,14 @@ namespace code3c
         int delta_r;
         int delta_t;
     public:
-        Drawer(int width, int height, const mat<char8_t>& data);
+        Drawer(int width, int height, const mat8_t& data);
         Drawer(const Drawer&);
         virtual ~Drawer() = default;
         
         virtual unsigned long fps() const final;
         virtual int height() const final;
         virtual int width() const final;
-        virtual const mat<char8_t>& getData() const final;
+        virtual const mat8_t& getData() const final;
         
         virtual void show(bool b) = 0;
         virtual void clear() = 0;
@@ -196,7 +196,7 @@ namespace code3c
         void key_binding(bool _register);
 
     public:
-        X11Drawer(int width, int height, const mat<char8_t>&data);
+        X11Drawer(int width, int height, const mat8_t&data);
         X11Drawer(const X11Drawer &x11Drawer);
         ~X11Drawer() noexcept override;
         
@@ -261,7 +261,7 @@ namespace code3c
 
         void key_binding(bool _register);
     public:
-        Win32Drawer(int width, int height, const mat<char8_t>& data);
+        Win32Drawer(int width, int height, const mat8_t& data);
         Win32Drawer(const Win32Drawer& w32Drawer);
         ~Win32Drawer() noexcept override;
 

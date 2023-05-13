@@ -26,6 +26,7 @@ set(HEADERS
 message("> add target {'name': '${TARGET}', 'type': 'executable'}")
 add_executable(${TARGET} ${SOURCES} ${HEADERS})
 target_link_libraries(${TARGET} ${3CCODE_TARGET})
+target_link_libraries(${TARGET} ${CODE3C_DEPENDENCIES})
 
 # Windows Resources
 if (WIN32)
