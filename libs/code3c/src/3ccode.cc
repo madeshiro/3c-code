@@ -186,7 +186,8 @@ namespace code3c
             m_rawdata((char8_t *) strcpy(new char[buflen+1], utf8buf)),
             m_datalen(buflen),
             m_logo(nullptr),
-            m_header({0,0,0,0,0})
+            m_header({0,0,0,0,0}),
+            m_drawer(nullptr)
     {
     }
 
@@ -247,7 +248,7 @@ namespace code3c
             }
             else set_range(0, dimension().axis_r);
 
-            // Write data
+            // Read data
             for (j = range[0]; j < range[1]; j++, bit++)
             {
                 // TODO
@@ -263,7 +264,8 @@ namespace code3c
                                          code3C.m_rawdata)),
             m_datalen(code3C.m_datalen),
             m_header(code3C.m_header),
-            m_logo(code3C.m_logo)
+            m_logo(code3C.m_logo),
+            m_drawer(nullptr)
     {
     }
 
@@ -330,194 +332,17 @@ namespace code3c
                 .dlen = buflen,
 
                 .meta_dlen_bitl = static_cast<uint32_t>(
-                        2*(dimension().effRad*dimension().axis_r)-6),
+                        2*(dimension().axis_r)-6),
                 .meta_head_bitl = 6
         };
+        m_header.meta_full_bitl = m_header.meta_head_bitl+m_header.meta_dlen_bitl;
 
         // Generate code3c data
         delete m_data;
         delete m_drawer;
 
         m_data = new data(this);
-
-        // Generate drawer
-        class [[maybe_unused]] Code3CDrawerSample : public Code3CDrawer
-        {
-            const Code3C* parent;
-            const CODE3C_MODEL_DESC::CODE3C_MODEL_DIMENSION &modelDimension;
-
-            PixelMap *logo, *marker;
-
-            void save_ui()
-            {
-                char fname[256];
-                sprintf(fname, "3ccode-generated-%llx.png", hash());
-                savePNG(fname);
-            }
-        public:
-            Code3CDrawerSample(const Code3C* parent, const data& cData):
-            parent(parent), logo(nullptr), marker(nullptr),
-            Code3CDrawer(
-                40+2 * parent->dimension().absRad * CODE3C_PIXEL_UNIT,
-                40+2 * parent->dimension().absRad * CODE3C_PIXEL_UNIT,
-                cData
-                ), modelDimension(parent->dimension())
-            {
-                bindKey((DRAWER_KEY_CTRL | 's'),
-                        reinterpret_cast<delegate>(&Code3CDrawerSample::save_ui));
-            }
-
-            ~Code3CDrawerSample()
-            {
-                delete logo;
-                delete marker;
-            }
-
-            unsigned long bit_to_color(char _byte)
-            {
-                switch (parent->model().model_id)
-                {
-                    case CODE3C_MODEL_WB:   // WB -- 1bit
-                    {
-                        return 0xffffff & ~((_byte & 0b1) * 0xffffff);
-                    }
-                    case CODE3C_MODEL_WB2C: // WB2C -- 2bits
-                    {
-                        int cyan = 0xffff * ((_byte >> 1) & 1);
-                        int red  = 0xff   * ((_byte >> 0) & 1);
-                        return ~rgb(red, cyan>>8, cyan);
-                    }
-                    case CODE3C_MODEL_WB6C: // WB6C -- 3bits
-                    {
-                        int red   = 0xff * ((_byte >> 2) & 1);
-                        int green = 0xff * ((_byte >> 1) & 1);
-                        int blue  = 0xff * ((_byte >> 0) & 1);
-                        return ~rgb(red, green, blue);
-                    }
-                    default:
-                        throw std::runtime_error("Unsupported model");
-                }
-            }
-
-            void draw_angle(int t)
-            {
-                for (int r(m_data.m()-1); r >= 0; r--)
-                {
-                    char _byte(m_data[t, r]);
-
-                    int offRad(modelDimension.absRad-modelDimension.effRad
-                        +modelDimension.deltaRad);
-                    int currentRad((offRad+(r*modelDimension.deltaRad))
-                        *CODE3C_PIXEL_UNIT);
-
-                    foreground(bit_to_color(_byte));
-                    draw_slice(width() / 2, height() / 2, currentRad,
-                               180/modelDimension.rev,
-                               t*180/(modelDimension.rev));
-                }
-            }
-
-            void setup() override
-            {
-                // Setup window
-                setTitle("Code3C Drawing Frame");
-
-                // Load marker
-                {
-                    PixelMap map = PixelMap::loadFromPNG(C3CRC("code3c-marker.png"));
-                    marker = new PixelMap(map.resize(width(), height()));
-                }
-
-                // Load logo
-                {
-                    int logoDiameter = (modelDimension.absRad - modelDimension.effRad) *
-                                   CODE3C_PIXEL_UNIT * 2;
-
-                    PixelMap map = PixelMap::loadFromPNG(parent->m_logo ?
-                            parent->m_logo : parent->model().default_logo);
-                    logo = new PixelMap(map.resize(logoDiameter, logoDiameter));
-                }
-            }
-
-            void draw() override
-            {
-                // white background
-                background(0xffffff);
-
-                // Draw marker
-                draw_pixelmap(*marker, 0, 0);
-
-                // Draw colour calibration
-                {
-                    int offRad(modelDimension.absRad-modelDimension.effRad
-                        +modelDimension.deltaRad);
-                    int currentRad((offRad+(m_data.m()*modelDimension.deltaRad))
-                        *CODE3C_PIXEL_UNIT);
-                    int tcal1 = 3*modelDimension.axis_t/8; // header position
-
-                    // Left part from the header
-                    for (int bit(0), t=tcal1+1;
-                        bit < (1<<parent->model().bitl)/2;
-                        bit++,t++)
-                    {
-                        foreground(bit_to_color(bit));
-                        draw_slice(width()/2, height()/2, currentRad+5,
-                                   180/modelDimension.rev,
-                                   t*180/(modelDimension.rev));
-                    }
-                    // Right part from the header
-                    for (int bit(0b111&parent->model().mask), i(0),t=tcal1;
-                            i < (1<<parent->model().bitl)/2;
-                            bit--,t--, i++)
-                    {
-                        foreground(bit_to_color(bit));
-                        draw_slice(width()/2, height()/2, currentRad+5,
-                                   180/modelDimension.rev,
-                                   t*180/(modelDimension.rev));
-                    }
-                }
-
-#ifdef CODE3C_DEBUG
-                // Draw 3ccode outline
-                foreground(0);
-                fill_circle(width()/2, height()/2, 2+(width()-40)/2);
-                draw_line(0, height()/2, width(), height()/2);
-                draw_line(width()/2, 0, width()/2, height());
-
-                // Debug : header landmark
-                foreground(0xff0000);
-                draw_line(0, 0, width()/2, height()/2);
-#endif // CODE3C_DEBUG
-
-                // Draw data
-                for (int t(0); t < modelDimension.axis_t; t++)
-                    draw_angle(t);
-
-                // Fill logo
-                foreground(0xbe55ab);
-                fill_circle(width()/2, height()/2, (modelDimension
-                    .absRad-modelDimension.effRad)*CODE3C_PIXEL_UNIT);
-
-                // Draw logo
-                int logoDiameter = (modelDimension.absRad - modelDimension.effRad) *
-                                   CODE3C_PIXEL_UNIT * 2;
-                int origX = (width() - logoDiameter) / 2;
-                int origY = (height() - logoDiameter) / 2;
-
-                int rlogo = logoDiameter / 2;
-                for (int x = 0, xx=origX; x < logoDiameter; x++, xx++)
-                {
-                    int rx = abs(rlogo-x);
-                    for (int y = 0, yy=origY; y < logoDiameter; y++, yy++)
-                    {
-                        int ry = abs(rlogo-y);
-                        if (((rx*rx)+(ry*ry)) < (rlogo*rlogo))
-                            draw_pixel((*logo)[x,y].color, xx, yy);
-                    }
-                }
-            }
-        };
-        m_drawer = new Code3CDrawerSample(this, *m_data);
+        m_drawer = new Code3CDrawer(this, *m_data);
 
         return m_data != nullptr;
     }
@@ -534,14 +359,9 @@ namespace code3c
         return m_drawer;
     }
 
-    bool Code3C::save(const char *dest) const
+    void Code3C::set_output(const char *dest)
     {
-        if (m_data && m_drawer)
-        {
-            drawer()->savePNG(dest);
-        }
-
-        return false;
+        m_outfile = dest;
     }
 
     // #### Util functions #### //
@@ -579,5 +399,184 @@ namespace code3c
     const CODE3C_MODEL_DESC& Code3C::model() const
     {
         return code3c_models[m_desc];
+    }
+
+    __dlgt Code3CDrawer::save_ui()
+    {
+        savePNG(parent->m_outfile ? parent->m_outfile : "code3c.png");
+    }
+
+    Code3CDrawer::Code3CDrawer(const code3c::Code3C *parent, const Code3C::data &cData) :
+            parent(parent), logo(nullptr), marker(nullptr),
+            SimpleDrawer(
+                    40 + 2 * parent->dimension().absRad * CODE3C_PIXEL_UNIT,
+                    40 + 2 * parent->dimension().absRad * CODE3C_PIXEL_UNIT,
+                    cData
+            ), modelDimension(parent->dimension())
+    {
+        bindKey((DRAWER_KEY_CTRL | 's'),
+                reinterpret_cast<delegate>(&Code3CDrawer::save_ui));
+    }
+
+    Code3CDrawer::~Code3CDrawer()
+    {
+        delete logo;
+        delete marker;
+    }
+
+    unsigned long Code3CDrawer::bit_to_color(char _byte)
+    {
+        switch (parent->model().model_id)
+        {
+            case CODE3C_MODEL_WB:   // WB -- 1bit
+            {
+                return 0xffffff & ~((_byte & 0b1) * 0xffffff);
+            }
+            case CODE3C_MODEL_WB2C: // WB2C -- 2bits
+            {
+                int cyan = 0xffff * ((_byte >> 1) & 1);
+                int red = 0xff * ((_byte >> 0) & 1);
+                return ~rgb(red, cyan >> 8, cyan);
+            }
+            case CODE3C_MODEL_WB6C: // WB6C -- 3bits
+            {
+                int red = 0xff * ((_byte >> 2) & 1);
+                int green = 0xff * ((_byte >> 1) & 1);
+                int blue = 0xff * ((_byte >> 0) & 1);
+                return ~rgb(red, green, blue);
+            }
+            default:
+                throw std::runtime_error("Unsupported model");
+        }
+    }
+
+    void Code3CDrawer::draw_angle(int t)
+    {
+        for (int r(m_data.m() - 1); r >= 0; r--)
+        {
+            char _byte(m_data[t, r]);
+
+            int offRad(modelDimension.absRad - modelDimension.effRad
+                       + modelDimension.deltaRad
+            );
+            int currentRad((offRad + (r * modelDimension.deltaRad))
+                           * CODE3C_PIXEL_UNIT
+            );
+
+            foreground(bit_to_color(_byte));
+            draw_slice(width() / 2, height() / 2, currentRad,
+                       180 / modelDimension.rev,
+                       t * 180 / (modelDimension.rev));
+        }
+    }
+
+    void Code3CDrawer::setup()
+    {
+        // Setup window
+        setTitle("Code3C Drawing Frame");
+
+        // Load marker
+        {
+            PixelMap map = PixelMap::loadFromPNG(C3CRC("code3c-marker.png"));
+            marker = new PixelMap(map.resize(width(), height()));
+        }
+
+        // Load logo
+        {
+            int logoDiameter = (modelDimension.absRad - modelDimension.effRad) *
+                               CODE3C_PIXEL_UNIT * 2;
+            PixelMap map = PixelMap::loadFromPNG(parent->m_logo
+                                                 ? parent->m_logo
+                                                 : parent->model().default_logo
+            );
+            logo = new PixelMap(map.resize(logoDiameter, logoDiameter));
+        }
+    }
+
+    void Code3CDrawer::draw()
+    {
+        {
+            // white background
+            background(0xffffff);
+
+            // Draw marker
+            draw_pixelmap(*marker, 0, 0);
+
+            // Draw colour calibration
+            {
+                int offRad(modelDimension.absRad - modelDimension.effRad
+                           + modelDimension.deltaRad
+                );
+                int currentRad((offRad + (m_data.m() * modelDimension.deltaRad))
+                               * CODE3C_PIXEL_UNIT
+                );
+                int tcal1 = 3 * modelDimension.axis_t / 8; // header position
+
+                // Left part from the header
+                for (int bit(0), t = tcal1 + 1;
+                     bit < (1 << parent->model().bitl) / 2;
+                     bit++, t++)
+                {
+                    foreground(bit_to_color(bit));
+                    draw_slice(width() / 2, height() / 2, currentRad + 5,
+                               180 / modelDimension.rev,
+                               t * 180 / (modelDimension.rev));
+                }
+                // Right part from the header
+                for (int bit(0b111 & parent->model().mask), i(0), t = tcal1;
+                     i < (1 << parent->model().bitl) / 2;
+                     bit--, t--, i++)
+                {
+                    foreground(bit_to_color(bit));
+                    draw_slice(width() / 2, height() / 2, currentRad + 5,
+                               180 / modelDimension.rev,
+                               t * 180 / (modelDimension.rev));
+                }
+            }
+
+#ifdef CODE3C_DEBUG
+            // Draw 3ccode outline
+            foreground(0);
+            fill_circle(width()/2, height()/2, 2+(width()-40)/2);
+            draw_line(0, height()/2, width(), height()/2);
+            draw_line(width()/2, 0, width()/2, height());
+
+            // Debug : header landmark
+            foreground(0xff0000);
+            draw_line(0, 0, width()/2, height()/2);
+#endif // CODE3C_DEBUG
+
+            // Draw data
+            for (int t(0); t < modelDimension.axis_t; t++)
+            {
+                draw_angle(t);
+            }
+
+            // Fill logo
+            foreground(0xbe55ab);
+            fill_circle(width() / 2, height() / 2, (modelDimension
+                                                            .absRad -
+                                                    modelDimension.effRad) *
+                                                   CODE3C_PIXEL_UNIT
+            );
+
+            // Draw logo
+            int logoDiameter = (modelDimension.absRad - modelDimension.effRad) *
+                               CODE3C_PIXEL_UNIT * 2;
+            int origX = (width() - logoDiameter) / 2;
+            int origY = (height() - logoDiameter) / 2;
+
+            int rlogo = logoDiameter / 2;
+            for (int x = 0, xx = origX; x < logoDiameter; x++, xx++)
+            {
+                int rx = abs(rlogo - x);
+                for (int y = 0, yy = origY; y < logoDiameter; y++, yy++)
+                {
+                    int ry = abs(rlogo - y);
+                    if (((rx * rx) + (ry * ry)) < (rlogo * rlogo))
+                        draw_pixel((*logo)[x, y].color, xx, yy);
+                }
+            }
+        }
     }
 }

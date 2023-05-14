@@ -5,14 +5,14 @@
 using code3c::matb;
 using code3c::Code3C;
 using code3c::Drawer;
-using code3c::Code3CDrawer;
+using code3c::SimpleDrawer;
 
 /* override classes */
-class TestDrawer : public Code3CDrawer
+class TestDrawer : public SimpleDrawer
 {
     char buf[256];
 public:
-    TestDrawer(): Code3CDrawer(700, 700, code3c::mat8_t(20))
+    TestDrawer(): SimpleDrawer(700, 700, code3c::mat8_t(20))
     {
     }
     
@@ -162,10 +162,10 @@ int test_create_window()
 
 int test_draw_pixel()
 {
-    class PixelTestDrawer : public Code3CDrawer
+    class PixelTestDrawer : public SimpleDrawer
     {
     public:
-        PixelTestDrawer() : Code3CDrawer(400, 400, code3c::mat8_t(20))
+        PixelTestDrawer() : SimpleDrawer(400, 400, code3c::mat8_t(20))
         {
         }
         
@@ -212,7 +212,7 @@ int test_draw_pixel()
 
 int test_key_binding()
 {
-    class KeyBindingDrawer : public Code3CDrawer
+    class KeyBindingDrawer : public SimpleDrawer
     {
         void onCtrlAPressed()
         {
@@ -238,7 +238,7 @@ int test_key_binding()
             fflush(stdout);
         }
     public:
-        KeyBindingDrawer(): Code3CDrawer(400, 400, code3c::mat8_t(10))
+        KeyBindingDrawer(): SimpleDrawer(400, 400, code3c::mat8_t(10))
         {
             bindKey((DRAWER_KEY_CTRL | 'a'),
                     reinterpret_cast<delegate>(&KeyBindingDrawer::onCtrlAPressed)

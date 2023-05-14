@@ -192,7 +192,7 @@ int test_huff_file()
         char8_t *hbuf;
         uint32_t hblen, slen;
 
-        /* encode and save table */
+        /* encode and set_output table */
         {
             uint32_t nlen;
 

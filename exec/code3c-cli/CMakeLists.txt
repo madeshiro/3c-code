@@ -23,6 +23,8 @@ set(SOURCES
 set(HEADERS
         )
 
+file(COPY ${RESOURCES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/resources)
+
 message("> add target {'name': '${TARGET}', 'type': 'executable'}")
 add_executable(${TARGET} ${SOURCES} ${HEADERS})
 target_link_libraries(${TARGET} ${3CCODE_TARGET})

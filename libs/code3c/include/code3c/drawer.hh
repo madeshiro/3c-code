@@ -58,6 +58,8 @@
 #define DRAWER_KEY_F11      0xB000
 #define DRAWER_KEY_F12      0xC000
 
+#define __dlgt void
+
 namespace code3c
 {
     /**
@@ -232,7 +234,7 @@ namespace code3c
         void draw_line(int x1, int y1, int x2, int y2) override;
     };
 
-    typedef X11Drawer Code3CDrawer;
+    typedef X11Drawer SimpleDrawer;
 #endif //CODE3C_UNIX
 #ifdef CODE3C_WIN32
     class Win32Drawer : public Drawer
@@ -292,7 +294,7 @@ namespace code3c
         void fill_circle(int x, int y, int radius) override;
         void draw_line(int x1, int y1, int x2, int y2) override;
     };
-    typedef Win32Drawer Code3CDrawer;
+    typedef Win32Drawer SimpleDrawer;
 #endif //CODE3C_WIN32
 }
 

@@ -55,6 +55,8 @@ Specify the 3C-Code model. Per default, WB2C is set
 Specify the error model. Per default, Hamming743 is set (14% error coverage)
 ### `-t, --text "input text"`
 Specify an input text to generate 3C-Code
+### `--logo <file>`
+Specify the logo to put in the 3C-Code
 
 # `htfgen` CLI
 ### `-t, --table <.htf file>`  
@@ -63,6 +65,8 @@ Read a .htf file and ouput the result in the console output stream
 Generate a Huffman Table from a text's file
 ### `-s, --text <"text">`
 Generate a Huffman Table from a specified text
+### `-o, --output <file>`
+Specify the output file (.htf extension file)
 
 ---
 <div align="center">

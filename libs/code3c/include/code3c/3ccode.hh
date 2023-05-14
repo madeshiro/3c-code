@@ -131,9 +131,12 @@ namespace code3c
             }
     };
 
+    class Code3CDrawer;
+
     class Code3C
     {
-    protected:
+        friend class Code3CDrawer;
+    public:
         class data : public mat8_t
         {
             friend class Code3C;
@@ -196,7 +199,9 @@ namespace code3c
              * @return the size of the error bytes segment
              */
             size_t errSegSize() const;
-        } *m_data = nullptr;
+        };
+    private:
+        data *m_data = nullptr;
 
         uint8_t m_errmodel  = CODE3C_ERRLVL_A;   // default value
         uint8_t m_huffmodel = CODE3C_HUFFMAN_NO; // default value
@@ -209,7 +214,9 @@ namespace code3c
         
         const char* m_logo;
 
-        Drawer* m_drawer;
+        // Drawer variables
+        const char* m_outfile;
+        Code3CDrawer * m_drawer;
 
         struct header final
         {
@@ -299,15 +306,25 @@ namespace code3c
         void setLogo(const char* fname);
         
         /**
+         * Generate the 3C-Code using every defined descriptor values setup before.
+         * @warning This method is mandatory in order to display the 3C-Code in an
+         * user interface or to get some informations about it (like errSegSize...)
          *
+         * @see Code3C::display()
+         * @see Code3C::size()
+         * @see Code3C::dateSegSize()
+         * @see Code3C::errSegSize()
          */
         bool generate();
 
         // #### Display / Save #### //
 
         /**
+         * Show the user interface.
          *
-         * @return
+         * @warning method available only if 3C-Code has been generated through
+         * <code>Code3C::generate()</code> or using <code>Code3C::Code3C(const mat8_t&)
+         * </code> constructor.
          */
         void display() const;
 
@@ -318,9 +335,9 @@ namespace code3c
         Drawer* drawer() const;
 
         /**
-         *
+         * Sets the output file's (png) name
          */
-        bool save(const char* dest) const;
+        void set_output(const char* dest);
 
         // #### Util functions #### //
 
@@ -398,6 +415,26 @@ namespace code3c
          * @return the 3C-Code model descriptor.
          */
         const CODE3C_MODEL_DESC& model() const;
+    };
+
+    // Generate drawer
+    class Code3CDrawer : public SimpleDrawer
+    {
+        const Code3C *parent;
+        const CODE3C_MODEL_DESC::CODE3C_MODEL_DIMENSION &modelDimension;
+
+        PixelMap *logo, *marker;
+
+        __dlgt save_ui();
+    public:
+        Code3CDrawer(const Code3C *parent, const Code3C::data &cData);
+        ~Code3CDrawer();
+
+        unsigned long bit_to_color(char _byte);
+        void draw_angle(int t);
+
+        void setup() override;
+        void draw() override;
     };
 }
 
