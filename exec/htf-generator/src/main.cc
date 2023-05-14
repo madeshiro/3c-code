@@ -26,7 +26,11 @@
 using std::cout, std::endl;
 using namespace code3c;
 
+char inhtf[256];
+
 // Input
+char* inputhtf = nullptr;
+
 char* inputbuf  = nullptr;
 size_t inputlen = 0;
 
@@ -103,8 +107,9 @@ struct support_argument {
             else printf("\n");
         }
     }
-} registeredArguments[1] = {
+} registeredArguments[2] = {
         {
+#define HTFGEN_CLI_ARG_HELP 0
                 {"-h", "--help"},
                 "",
                 "Display this information",
@@ -127,6 +132,26 @@ struct support_argument {
                     printf("htfgen CLI " HTFGEN_CLI_VERSION "\n");
                     printf("3C-Code Library " CODE3C_LIB_VERSION "\n");
                     exit(EXIT_SUCCESS);
+                }
+        },
+        {
+#define HTFGEN_CLI_ARG_INHTF
+                {"-t", "--table"},
+                " <file>",
+                "Read a .htf file and display the result",
+                inhtf,
+                parse_composed,
+                check_composed,
+                []() -> bool
+                {
+                    size_t inhtflen = strlen(inhtf);
+                    if (inhtflen > 0)
+                    {
+                        inputhtf = strcpy(new char[inhtflen+1], inhtf);
+                        return true;
+                    }
+
+                    return false;
                 }
         }
 };
@@ -169,23 +194,20 @@ int main(int argc, char** argv)
     // Print help if no argument given
     if (argc <= 1)
     {
-        long size;
-        if ((fseek(stdin, 0, SEEK_END), size=ftell(stdin)) > 0)
-        {
-            rewind(stdin);
-            inputlen = (size_t) size;
-            inputbuf = new char[inputlen];
-            fgets(inputbuf, inputlen, stdin);
-        }
-        printf("size %ld\n", size);
-        if (!inputbuf)
-            registeredArguments[0].exec();
+        registeredArguments[0].exec();
+        return EXIT_SUCCESS;
     }
     else if (!parse_args(argc, argv))
         return EXIT_FAILURE;
 
-    if (inputbuf)
-        printf("%s\n", inputbuf);
+    if (inputhtf)
+    {
+        HuffmanTable* table = HTFile::fromFile(inputhtf);
+        if (table)
+        {
+            std::cout << *table << std::endl;
+        } else printf("Unable to find %s\n", inputhtf);
+    }
 
     return EXIT_SUCCESS;
 }

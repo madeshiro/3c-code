@@ -213,6 +213,10 @@ namespace code3c
         init_rec(m_tree->m_root, "", 0);
     }
 
+    const std::map<char32_t, HuffmanTable::Cell>& HuffmanTable::table() const
+    {
+        return m_table;
+    }
 
     const HuffmanTable::Cell& HuffmanTable::operator[](huff_char_t c) const
     {
@@ -239,6 +243,9 @@ namespace code3c
 
     std::ostream& operator<<(std::ostream& os, const HuffmanTable& table)
     {
+        if (table.hasEntryBit())
+            os << "entry bit set to " << (int) table.entry_bit << "\n";
+
         for (auto& pair : table.m_table)
         {
             os << "'" << (char)pair.first << "' : (" << pair.second.bitl()
