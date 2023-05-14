@@ -83,7 +83,7 @@ namespace code3c
         return 0;
     }
     
-    Win32Drawer::Win32Drawer(int width, int height, const matb &data):
+    Win32Drawer::Win32Drawer(int width, int height, const mat<char8_t> &data):
             Drawer(width, height, data)
     {
         m_instance = GetModuleHandle(NULL);

@@ -58,6 +58,8 @@
 #define DRAWER_KEY_F11      0xB000
 #define DRAWER_KEY_F12      0xC000
 
+#define __dlgt void
+
 namespace code3c
 {
     /**
@@ -85,7 +87,7 @@ namespace code3c
     {
     protected:
         // Display variables
-        const matb& m_data;
+        const mat8_t& m_data;
         int m_width, m_height;
         
         // FPS management
@@ -112,14 +114,14 @@ namespace code3c
         int delta_r;
         int delta_t;
     public:
-        Drawer(int width, int height, const matb& data);
+        Drawer(int width, int height, const mat8_t& data);
         Drawer(const Drawer&);
         virtual ~Drawer() = default;
         
         virtual unsigned long fps() const final;
         virtual int height() const final;
         virtual int width() const final;
-        virtual const matb& getData() const final;
+        virtual const mat8_t& getData() const final;
         
         virtual void show(bool b) = 0;
         virtual void clear() = 0;
@@ -196,7 +198,7 @@ namespace code3c
         void key_binding(bool _register);
 
     public:
-        X11Drawer(int width, int height, const matb &data);
+        X11Drawer(int width, int height, const mat8_t&data);
         X11Drawer(const X11Drawer &x11Drawer);
         ~X11Drawer() noexcept override;
         
@@ -232,7 +234,7 @@ namespace code3c
         void draw_line(int x1, int y1, int x2, int y2) override;
     };
 
-    typedef X11Drawer Code3CDrawer;
+    typedef X11Drawer SimpleDrawer;
 #endif //CODE3C_UNIX
 #ifdef CODE3C_WIN32
     class Win32Drawer : public Drawer
@@ -261,7 +263,7 @@ namespace code3c
 
         void key_binding(bool _register);
     public:
-        Win32Drawer(int width, int height, const matb& data);
+        Win32Drawer(int width, int height, const mat8_t& data);
         Win32Drawer(const Win32Drawer& w32Drawer);
         ~Win32Drawer() noexcept override;
 
@@ -292,7 +294,7 @@ namespace code3c
         void fill_circle(int x, int y, int radius) override;
         void draw_line(int x1, int y1, int x2, int y2) override;
     };
-    typedef Win32Drawer Code3CDrawer;
+    typedef Win32Drawer SimpleDrawer;
 #endif //CODE3C_WIN32
 }
 

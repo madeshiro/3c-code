@@ -23,11 +23,19 @@ set(SOURCES
 set(HEADERS
         )
 
+file(COPY ${RESOURCES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/resources)
+
 message("> add target {'name': '${TARGET}', 'type': 'executable'}")
 add_executable(${TARGET} ${SOURCES} ${HEADERS})
 target_link_libraries(${TARGET} ${3CCODE_TARGET})
+target_link_libraries(${TARGET} ${CODE3C_DEPENDENCIES})
 
 # Windows Resources
 if (WIN32)
     target_sources(${TARGET} PRIVATE ${CMAKE_HOME_DIRECTORY}/resources/code3c.rc)
 endif ()
+
+# Install
+install(TARGETS ${TARGET} RUNTIME DESTINATION bin)
+install(FILES ${SOURCES} DESTINATION src/code3c/code3c-cli)
+

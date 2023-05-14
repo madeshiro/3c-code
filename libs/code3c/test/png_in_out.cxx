@@ -68,13 +68,13 @@ int test_png_in_out(int argc [[maybe_unused]], char** argv [[maybe_unused]])
 int test_png_read()
 {
     PixelMap map(PixelMap::loadFromPNG("resources/3ccode-wb2c.png"));
-    class PNGDrawer : public Code3CDrawer
+    class PNGDrawer : public SimpleDrawer
     {
         PixelMap &map;
     public:
         explicit PNGDrawer(PixelMap &map):
-            Code3CDrawer(map.width(), map.height(), matb(20)),
-            map(map)
+                SimpleDrawer(map.width(), map.height(), mat<char8_t>(20)),
+                map(map)
         {
         }
         
@@ -106,13 +106,13 @@ int test_png_resize()
 {
     PixelMap map(PixelMap::loadFromPNG("resources/3ccode-wb2c.png"));
     PixelMap scaled(map.resize(169*2,0));
-    class PNGDrawer : public Code3CDrawer
+    class PNGDrawer : public SimpleDrawer
     {
         PixelMap &map;
     public:
         explicit PNGDrawer(PixelMap &map):
-            Code3CDrawer(map.width(), map.height(), matb(20)),
-            map(map)
+                SimpleDrawer(map.width(), map.height(), mat<char8_t>(20)),
+                map(map)
         {
         }
         

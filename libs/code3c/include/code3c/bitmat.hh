@@ -139,29 +139,33 @@ namespace code3c
         virtual T operator[](int i) const;
     };
     
-    typedef mat<float>   matf;  /*< */
-    typedef mat<double>  matlf; /*< */
-    typedef mat<char>    matb;  /*< */
-    typedef mat<int>     matd;  /*< */
-    typedef mat<long>    matld; /*< */
+    typedef mat<float>   matf;   /*< */
+    typedef mat<double>  matlf;  /*< */
+    typedef mat<char>    matb;   /*< */
+    typedef mat<int>     matd;   /*< */
+    typedef mat<long>    matld;  /*< */
+    typedef mat<char8_t> mat8_t; /*< */
 
-    typedef vec<float>   vecf;  /*< */
-    typedef vec<double>  veclf; /*< */
-    typedef vec<char>    vecb;  /*< */
-    typedef vec<int>     vecd;  /*< */
-    typedef vec<long>    vecld; /*< */
+    typedef vec<float>   vecf;   /*< */
+    typedef vec<double>  veclf;  /*< */
+    typedef vec<char>    vecb;   /*< */
+    typedef vec<int>     vecd;   /*< */
+    typedef vec<long>    vecld;  /*< */
+    typedef vec<char8_t> vec8_t; /*< */
 
     extern template class mat<float>;
     extern template class mat<double>;
     extern template class mat<char>;
     extern template class mat<int>;
     extern template class mat<long>;
+    extern template class mat<char8_t>;
 
     extern template class vec<float>;
     extern template class vec<double>;
     extern template class vec<char>;
     extern template class vec<int>;
     extern template class vec<long>;
+    extern template class vec<char8_t>;
 }
 
 #endif //HH_LIB_BITMAT

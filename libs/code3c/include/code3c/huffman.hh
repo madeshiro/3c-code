@@ -114,7 +114,7 @@ namespace code3c
 
         // 8bit char print
         friend std::ostream& operator<<(std::ostream&, const HuffmanTable&);
-
+    public:
         class Cell final
         {
             uint32_t m_bitl;
@@ -137,7 +137,7 @@ namespace code3c
             inline const char* bits() const
             { return m_bits; }
         };
-
+    private:
         HuffmanTree* m_tree;
         // use per default max capacity char
         std::map<char32_t, Cell> m_table;
@@ -151,6 +151,8 @@ namespace code3c
         explicit HuffmanTable(const std::map<char32_t, Cell> &table);
     public:
         explicit HuffmanTable(const HuffmanTree& tree);
+
+        const std::map<char32_t, Cell>& table() const;
 
         const Cell& operator [](huff_char_t c) const;
         huff_char_t operator [](const char* bits, uint32_t len) const;
@@ -488,10 +490,10 @@ namespace code3c
         return buf;
     }
 
-    static HuffmanTable* CODE3C_DEFAULT_HTF[5] {
+    static HuffmanTable* code3c_default_htf[5] {
         nullptr,
-        HTFile::fromFile("resources/en_EN.htf"),
-        HTFile::fromFile("resources/fr_FR.htf"),
+        HTFile::fromFile(C3CRC("en_EN.htf")),
+        HTFile::fromFile(C3CRC("fr_FR.htf")),
         nullptr,
         nullptr
     };

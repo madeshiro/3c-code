@@ -19,7 +19,6 @@ set(SOURCES
         src/drawer.cc
         src/huffman.cc
         src/bitmat.cc
-        src/in3ccode.cc
         src/pixelmap.cc
         src/pixelmap.c
         src/hamming743.cc)
@@ -30,16 +29,13 @@ set(HEADERS
         include/code3c/huffman.hh
         include/code3c/3ccodelib.hh
         include/code3c/bitmat.hh
-        include/code3c/in3ccode.hh
         include/code3c/pixelmap.hh
         include/code3c/hamming743.hh)
 
 if(UNIX)
-    add_definitions(-DCODE3C_UNIX)
     set(SOURCES ${SOURCES}
             src/x11/X11Drawer.cc)
 elseif(WIN32)
-    add_definitions(-DCODE3C_WIN32)
     set(SOURCES ${SOURCES}
             src/win32/Win32Drawer.cc)
 endif()
@@ -92,3 +88,9 @@ foreach(test ${ctest_runtest})
     set_property(TEST ${TARGET}.${test_name} PROPERTY LABELS ${TARGET})
     message("> add test ${TARGET}.${test_name}")
 endforeach()
+
+# Install
+install(TARGETS ${TARGET} DESTINATION lib)
+install(TARGETS ${TARGET}.so DESTINATION lib)
+install(DIRECTORY include/code3c DESTINATION include)
+install(FILES ${SOURCES} DESTINATION src/code3c)

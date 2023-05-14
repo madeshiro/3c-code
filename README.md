@@ -35,6 +35,39 @@ The project uses some features to improve error coverage and available stocking 
 [![lgpl-v3](https://img.shields.io/github/license/madeshiro/3c-code?color=darkgreen&logo=license)](https://www.gnu.org/licenses/lgpl-3.0.html)
 [![gpl-v3](https://img.shields.io/badge/license%20(CLI)-GPL--3.0-darkred)](https://www.gnu.org/licenses/gpl-3.0.html)
 
+# `code3c` generator CLI
+
+## Arguments
+
+Here a list of available arguments for the `code3c generator` CLI.
+If there isn't any input stream specified, the software will ask the user to input data in the console.
+Many stream channels are available: through **command arguments** or **pipe**.
+
+### `-o, --output <file.png>`  
+Specify the output file. If null, no file will be saved or default name will be `code3c.png`
+### `-h, --huffman=<{NO, ASCII, LATIN1}>`
+Set up the Huffman compressing method. Per default, no compression method is set 
+### `-f, --file <input_file>`
+Specify an input file to generate 3C-Code
+### `-m, --model=<{WB, WB2C, WB6C}>`
+Specify the 3C-Code model. Per default, WB2C is set
+### `-e, --err={Hamming743, Hamming313}`
+Specify the error model. Per default, Hamming743 is set (14% error coverage)
+### `-t, --text "input text"`
+Specify an input text to generate 3C-Code
+### `--logo <file>`
+Specify the logo to put in the 3C-Code
+
+# `htfgen` CLI
+### `-t, --table <.htf file>`  
+Read a .htf file and ouput the result in the console output stream
+### `-g, --file <file>`
+Generate a Huffman Table from a text's file
+### `-s, --text <"text">`
+Generate a Huffman Table from a specified text
+### `-o, --output <file>`
+Specify the output file (.htf extension file)
+
 ---
 <div align="center">
 
