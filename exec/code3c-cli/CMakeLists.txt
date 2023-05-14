@@ -37,4 +37,5 @@ endif ()
 
 # Install
 install(TARGETS ${TARGET} RUNTIME DESTINATION bin)
+install(FILES ${SOURCES} DESTINATION src/code3c/code3c-cli)
 
