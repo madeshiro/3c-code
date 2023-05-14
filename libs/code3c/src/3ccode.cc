@@ -187,14 +187,16 @@ namespace code3c
             m_datalen(buflen),
             m_logo(nullptr),
             m_header({0,0,0,0,0}),
-            m_drawer(nullptr)
+            m_drawer(nullptr),
+            m_outfile(nullptr)
     {
     }
 
     Code3C::Code3C(const mat8_t &in_data):
             m_header({0,0,0,0,0}),
             m_data(new data(this, in_data)),
-            m_logo(nullptr)
+            m_logo(nullptr),
+            m_outfile(nullptr)
     {
         size_t i, j, r, t, bit(0);
         size_t range[2] = {0, 0};
@@ -320,7 +322,7 @@ namespace code3c
             if (total > model().bitl * dim.capacity)
                 m_dim++;
         }
-        if (m_dim > sizeof(model().dimensions) /
+        if (m_dim >= sizeof(model().dimensions) /
             sizeof(CODE3C_MODEL_DESC::CODE3C_MODEL_DIMENSION))
             return false;
 

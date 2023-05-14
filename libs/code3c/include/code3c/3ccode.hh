@@ -211,10 +211,9 @@ namespace code3c
 
         char8_t* m_rawdata;
         size_t m_datalen;
-        
-        const char* m_logo;
 
         // Drawer variables
+        const char* m_logo;
         const char* m_outfile;
         Code3CDrawer * m_drawer;
 

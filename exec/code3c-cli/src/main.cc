@@ -47,6 +47,7 @@ struct {
     uint8_t huffmodel = CODE3C_HUFFMAN_NO;
 
     char * logo = nullptr;
+    char* outfile = nullptr;
 } code3c_args = {};
 
 int parse_null(char**, int avail, char*)
@@ -149,7 +150,16 @@ struct support_argument {
                 " name will be \"code3c.png\"",
                 outfile,
                 parse_composed,
-                check_composed
+                check_composed,
+                []() -> bool
+                {
+                    if (strlen(outfile) > 1)
+                    {
+                        code3c_args.outfile = strcpy(new char[strlen(outfile+1)],
+                                                     outfile);
+                    }
+                    return true;
+                }
         },
         {
 #define CODE3C_CLI_ARG_HUFFMODEL 2
@@ -190,6 +200,17 @@ struct support_argument {
                     FILE* file = fopen(infile, "rb");
                     if (file)
                     {
+                        fseek(file, 0, SEEK_END);
+                        inlen = (size_t) ftell(file);
+                        fseek(file, 0, SEEK_SET);
+                        if (inlen < 0) {
+                            printf("File empty, cannot generate 3C-Code\n");
+                            return false;
+                        }
+
+                        inbuf = new char[inlen+1];
+                        inbuf[inlen] = '\0';
+                        fread(inbuf, sizeof(char), inlen, file);
 
                         return true;
                     }
@@ -372,6 +393,8 @@ int main(int argc, char** argv)
     code3C.setHuffmanTable(code3c_args.huffmodel);
     if (code3c_args.logo)
         code3C.setLogo(code3c_args.logo);
+    if (code3c_args.outfile)
+        code3C.set_output(code3c_args.outfile);
 
     if (!code3C.generate())
         return EXIT_FAILURE;

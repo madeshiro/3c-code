@@ -92,3 +92,5 @@ endforeach()
 # Install
 install(TARGETS ${TARGET} DESTINATION lib)
 install(TARGETS ${TARGET}.so DESTINATION lib)
+install(DIRECTORY include/code3c DESTINATION include)
+install(FILES ${SOURCES} DESTINATION src/code3c)

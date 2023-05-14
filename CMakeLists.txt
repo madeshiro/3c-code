@@ -97,11 +97,8 @@ if (WIN32)
 endif()
 
 # Set-up CPack
-set(CPACK_GENERATOR "DEB")
 set(CPACK_PACKAGE_NAME "code3c")
 set(CPACK_VENDOR_NAME "Rin Baudelet")
-set(CPACK_PACKAGE_INSTALL_DIRECTORY)
-set(CPACK_PACKAGE_FILE_NAME code3c-1.0.0rc-debian-amd64)
 set(CPACK_PACKAGE_CONTACT rin.baudelet@etu.uca.fr)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
@@ -110,15 +107,30 @@ set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 set(CPACK_PACKAGE_VERSION_MAJOR 1)
 set(CPACK_PACKAGE_VERSION_MINOR 0)
 set(CPACK_PACKAGE_VERSION_PATCH 0)
-set(CPACK_SYSTEM_NAME Debian-AMD64)
 
-# Setup CPack
-include(CPack)
+if(UNIX)
+    set(CPACK_GENERATOR "DEB")
+    set(CPACK_PACKAGE_FILE_NAME code3c-1.0.0rc-debian-amd64)
+    set(CPACK_SYSTEM_NAME Debian-AMD64)
 
-# Resources
-foreach (rfile ${RESOURCES})
-    install(FILES "${rfile}" DESTINATION share/${PROJECT_NAME})
-endforeach()
+    # Setup CPack
+    include(CPack)
+
+    # Resources
+    foreach (rfile ${RESOURCES})
+        install(FILES "${rfile}" DESTINATION share/${PROJECT_NAME})
+    endforeach()
+elseif (WIN32)
+    set(CPACK_GENERATOR "ZIP")
+    set(CPACK_PACKAGE_FILE_NAME code3c-1.0.0rc-win-amd64)
+    set(CPACK_SYSTEM_NAME Windows-AMD64)
+
+    # Setup CPack
+    include(CPack)
+
+    # Resources
+    install(DIRECTORY resources DESTINATION bin)
+endif ()
 
 # Add sub-projects
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs)
